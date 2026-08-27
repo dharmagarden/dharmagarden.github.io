@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- UPDATED: Allow pinch-zoom on mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
     <title>Dharmagarden - Abode</title>
     <style>
         /* ========== RESET & BASE ========== */
@@ -30,6 +31,11 @@
             padding: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             border: 2px solid #d4af37;
+            /* NEW: Fit content tightly */
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            min-height: 0;
         }
 
         /* ========== HEADER TITLE ========== */
@@ -38,6 +44,7 @@
             padding: 10px 0 15px 0;
             border-bottom: 2px solid #d4af37;
             margin-bottom: 15px;
+            flex-shrink: 0;
         }
 
         .main-title {
@@ -66,6 +73,8 @@
             overflow: hidden;
             border: 2px solid #b8860b;
             box-shadow: inset 0 0 30px rgba(0,0,0,0.3);
+            /* NEW: Let it size naturally */
+            flex-shrink: 0;
         }
 
         .image-container {
@@ -172,14 +181,16 @@
             padding: 5px;
             width: 100%;
             box-sizing: border-box;
+            /* NEW: Don't force extra height */
+            flex-shrink: 0;
         }
 
         .footer-inner {
             background: #fef8e7;
             border-radius: 12px;
             padding: 7px 10px;
-            min-height: 70px;
-            max-height: 120px;
+            min-height: 50px;
+            max-height: 100px;
             overflow-y: auto;
             font-family: 'Georgia', 'Times New Roman', serif;
             color: #3b2a1f;
@@ -199,14 +210,14 @@
 
         .footer-title {
             color: #b45f06;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .footer-text {
-            font-size: 15px;
-            line-height: 1.5;
+            font-size: 14px;
+            line-height: 1.4;
             color: #3b2a1f;
         }
 
@@ -339,7 +350,6 @@
             position: relative;
         }
 
-        /* Mascot image - transparent PNG */
         .mascot-image {
             flex: 0 0 auto;
             width: 100px;
@@ -352,7 +362,6 @@
             border-radius: 12px;
         }
 
-        /* Speech bubble - MORE COMPACT */
         .speech-bubble {
             flex: 1;
             background: #fff8e7;
@@ -366,7 +375,6 @@
             justify-content: center;
         }
 
-        /* Speech bubble tail */
         .speech-bubble::before {
             content: '';
             position: absolute;
@@ -387,7 +395,6 @@
             z-index: 1;
         }
 
-        /* HIDE the icon - it's redundant with the title */
         .speech-bubble .bubble-icon {
             display: none;
         }
@@ -646,16 +653,12 @@
     <!-- ========== MASCOT + SPEECH BUBBLE POPUP ========== -->
     <div class="mascot-overlay" id="mascotOverlay">
         <div class="mascot-container">
-            <!-- Mascot PNG with transparency -->
             <img class="mascot-image" 
                  src="" 
                  alt="Mascot" 
                  id="mascotImage">
-            
-            <!-- Speech Bubble -->
             <div class="speech-bubble" id="speechBubble">
                 <button class="close-btn" id="bubbleCloseBtn">✕</button>
-                <!-- The icon is hidden via CSS (display: none) -->
                 <div class="bubble-icon" id="bubbleIcon">🏯</div>
                 <div class="bubble-title" id="bubbleTitle">Location Name</div>
                 <div class="bubble-description" id="bubbleDescription">Description goes here...</div>
@@ -938,21 +941,17 @@
         function showMascotPopup(sprite) {
             currentSprite = sprite;
             
-            // Use sprite's own icon as mascot (or custom mascot if provided)
             const mascotImg = document.getElementById('mascotImage');
             if (sprite.mascot) {
                 mascotImg.src = sprite.mascot;
                 mascotImg.style.display = 'block';
             } else {
-                // If no mascot, hide it
                 mascotImg.style.display = 'none';
             }
             
-            // Update speech bubble content (icon is hidden via CSS)
             document.getElementById('bubbleTitle').textContent = sprite.name;
             document.getElementById('bubbleDescription').textContent = sprite.description;
             
-            // Update button text
             const enterBtn = document.getElementById('bubbleEnterBtn');
             if (sprite.actionType === 'VIDEO') {
                 enterBtn.textContent = '🎬 Watch';
