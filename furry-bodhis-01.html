@@ -1,0 +1,4312 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>The Furry Bodhis - Quest for the 3 Gems</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: linear-gradient(135deg, #1a4d2a, #2d6a3f);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        font-family: 'Segoe UI', 'Georgia', serif;
+    }
+
+    .title-container {
+        text-align: center;
+        margin-bottom: 10px;
+        width: 100%;
+        max-width: 1100px;
+    }
+     /* --- CUSTOM TEXT BOX (below watch button) --- */
+     .donor-caption-box {
+         margin-top: 16px;
+         padding: 14px 16px;
+         background: #eef3f7;
+         border-radius: 16px;
+         border-left: 6px solid #7a9bb5;
+         box-shadow: inset 0 1px 4px rgba(0,0,0,0.02);
+         font-size: 13px;
+         line-height: 1.5;
+         color: #1e2a36;
+         width: 100%;
+         max-width: 1100px;
+     }
+     .donor-caption-box strong {
+         color: #3d5a73;
+     }
+     
+    .game-container {
+        max-width: 1100px;
+        width: 100%;
+        background: #2c5a2e;
+        border-radius: 40px;
+        padding: 15px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        border: 2px solid #d4af37;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* ========== HULU BUTTON ========== */
+    .hulu-button {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        width: clamp(40px, 8vw, 60px);
+        height: clamp(40px, 8vw, 60px);
+        background: linear-gradient(145deg, #d4a017, #b8860b);
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        transition: all 0.2s ease;
+        z-index: 100;
+        border: 2px solid #ffd700;
+    }
+
+    .hulu-button.visible { display: flex; }
+    .hulu-button img { width: 70%; height: 70%; object-fit: contain; }
+    .hulu-button:hover { transform: scale(1.08); }
+
+    /* ========== HULU MODAL ========== */
+    .hulu-modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: transparent;
+        border: none;
+        width: 340px;
+        max-width: 90%;
+        z-index: 1001;
+    }
+
+    .hulu-backdrop { width: 100%; display: block; }
+    .hulu-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 70px 20px 25px 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+    .stats-area { width: 70%; margin: 0 auto 15px auto; }
+    .stat-section { margin-bottom: 12px; }
+    .stat-label { color: #fdf0d8; font-size: 12px; margin-bottom: 3px; font-weight: bold; text-shadow: 1px 1px 0 #2c2e1e; }
+    .health-bar-bg, .progress-bar-bg { background: #3a2a1f; border-radius: 20px; height: 14px; overflow: hidden; }
+    .health-bar-fill { background: linear-gradient(90deg, #2d8a4e, #4caf50); width: 100%; height: 100%; border-radius: 20px; transition: width 0.3s; }
+    .progress-bar-fill { background: linear-gradient(90deg, #d4af37, #ffd700); width: 0%; height: 100%; border-radius: 20px; transition: width 0.3s; }
+
+    .inventory-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        margin: 10px 0;
+        max-height: 100px;
+        overflow-y: auto;
+    }
+    .inventory-item {
+        background: rgba(0,0,0,0.5);
+        border-radius: 10px;
+        padding: 4px;
+        text-align: center;
+        color: #fdf0d8;
+        font-size: 20px;
+        backdrop-filter: blur(4px);
+    }
+    .inventory-item span { display: block; font-size: 9px; margin-top: 2px; }
+
+    .hulu-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 8px;
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+        justify-content: center;
+    }
+    .hulu-buttons button {
+        flex: 1 1 auto;
+        min-width: 45px;
+        background: #d4af37;
+        border: none;
+        padding: 6px 8px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 11px;
+    }
+    .close-hulu { position: absolute; top: 12px; right: 15px; background: #8b0000; color: white; border: none; font-size: 18px; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; }
+
+    /* ========== SCENE STYLES ========== */
+    .intro-scene, .story-viewer, .success-scene {
+        position: relative;
+        width: 100%;
+        background: #3d6b3a;
+        border-radius: 24px;
+        overflow: hidden;
+        display: none;
+    }
+	 .intro-scene { display: block; }
+    .background { width: 100%; display: block; border-radius: 20px; }
+    
+    .hotspot {
+        position: absolute;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.3));
+    }
+    .hotspot:hover { transform: scale(1.05); filter: drop-shadow(0 0 12px gold); }
+    
+		/* ========== ACT 1 HOTSPOTS ========== */
+		.hotspot-act1.Oldtv { width: 20%; left: 67%; top: 28%; }
+		.hotspot-act1.dakkii { width: 18%; left: 22%; top: 67%; }
+		.hotspot-act1.bunnii { width: 19%; left: 55%; top: 61%; }
+		.hotspot-act1.pinkfairies { width: 21%; left: 37%; top: 70%; }
+		
+		/* ========== ACT 2 HOTSPOTS ========== */
+		.hotspot-act2.Oldtv { width: 18%; left: 81%; top: 9%; }
+		.hotspot-act2.dakkii { width: 11%; left: 7%; top: 54%; }
+		.hotspot-act2.bunnii { width: 19%; left: 35%; top: 50%; }
+		.hotspot-act2.pinkfairies { width: 14%; left: 19%; top: 44%; }
+		
+		/* ========== ACT 3 HOTSPOTS ========== */
+		.hotspot-act3.Oldtv { width: 27.5%; left: 31%; top: 34%; }
+		.hotspot-act3.dakkii { width: 13%; left: 81%; top: 61%; }
+		.hotspot-act3.bunnii { width: 13.3%; left: 84%; top: 43%; }
+		.hotspot-act3.pinkfairies { width: 19%; left: 59%; top: 58%; }
+		
+		/* ========== ACT 4 HOTSPOTS ========== */
+		.hotspot-act4.Oldtv { width: 23.5%; left: 71%; top: 22%; }
+		.hotspot-act4.dakkii { width: 14.6%; left: 27%; top: 73%; }
+		.hotspot-act4.bunnii { width: 16.3%; left: 39%; top: 66%; }
+		.hotspot-act4.pinkfairies { width: 19.34%; left: 50%; top: 79%; }
+		
+		/* ========== ACT 5 HOTSPOTS ========== */
+		.hotspot-act5.Oldtv { width: 25%; left: 68%; top: 10%; }
+		.hotspot-act5.dakkii { width: 28%; left: 16%; top: 46%; }
+		.hotspot-act5.bunnii { width: 22%; left: 55%; top: 52%; }
+		.hotspot-act5.pinkfairies { width: 25%; left: 40%; top: 60%; }
+		
+    /* Story Viewer */
+    .story-viewer { display: none; }
+    .story-background {
+        width: 100%;
+        display: block;
+        border-radius: 20px;
+    }
+    .story-nav {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin: 15px 0 10px;
+    }
+    .story-nav-btn {
+        background: #d4af37;
+        color: #2c4a1e;
+        border: none;
+        padding: 8px 24px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 40px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .story-nav-btn:hover:not(:disabled) {
+        background: #ffd700;
+        transform: scale(1.02);
+    }
+    .story-nav-btn:disabled {
+        background: #888;
+        cursor: not-allowed;
+    }
+
+    /* Act 1 Challenge Scene (Four Virtues Lock) */
+    .challenge-scene-act1 {
+        display: none;
+        position: relative;
+        width: 100%;
+        background: #3d6b3a;
+        border-radius: 24px;
+        overflow: hidden;
+    }
+    .lock-title {
+        color: #ffd700;
+        font-size: 24px;
+        text-align: center;
+        margin: 20px 0;
+        text-shadow: 2px 2px 0 #2c2e1e;
+    }
+    .question-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin: 20px 0;
+        padding: 0 10px;
+    }
+    .question-card {
+        background: rgba(44, 46, 30, 0.95);
+        border: 2px solid #d4af37;
+        border-radius: 16px;
+        padding: 15px;
+    }
+    .q-text {
+        color: #ffd700;
+        font-size: 15px;
+        font-weight: bold;
+        margin-bottom: 12px;
+    }
+    .q-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .q-option {
+        background: #4a3a2a;
+        color: #fdf0d8;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.2s;
+    }
+    .q-option.selected {
+        background: #d4af37;
+        color: #2c4a1e;
+        font-weight: bold;
+        box-shadow: 0 0 6px gold;
+    }
+    .q-option:hover { background: #d4af37; color: #2c4a1e; }
+    .submit-btn {
+        background: #d4af37;
+        color: #2c4a1e;
+        border: none;
+        padding: 12px 30px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        display: block;
+        margin: 20px auto;
+    }
+
+    /* ========== ACT 2 CHALLENGE (Ogre Battle) ========== */
+    .challenge-scene-act2 {
+        display: none;
+        width: 100%;
+        border-radius: 24px;
+        overflow: hidden;
+    }
+
+    /* ========== ACT 3 CHALLENGE (Qilin Compassion) ========== */
+    .challenge-scene-act3 {
+        display: none;
+        width: 100%;
+        border-radius: 24px;
+        overflow: hidden;
+    }
+
+    /* ========== ACT 4 CHALLENGE (Jealousy Demon) ========== */
+    .challenge-scene-act4 {
+        display: none;
+        width: 100%;
+        border-radius: 24px;
+        overflow: hidden;
+    }
+
+    .challenge-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        max-height: 65vh;
+        background: #2c5a2e;
+        border-radius: 24px 24px 0 0;
+        overflow: hidden;
+    }
+
+    .challenge-backdrop {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* Ogre sprite - using scale for smooth resizing */
+    .ogre-sprite {
+        position: absolute;
+        bottom: 15%;
+        left: 50%;
+        transform: translateX(-50%) scale(1);
+        transform-origin: bottom center;
+        width: 35%;
+        max-width: 200px;
+        z-index: 4;
+        transition: transform 0.8s ease, opacity 0.8s ease;
+    }
+
+    /* Qilin sprite - using scale for smooth resizing */
+    .qilin-sprite {
+        position: absolute;
+        bottom: 15%;
+        left: 50%;
+        transform: translateX(-50%) scale(1);
+        transform-origin: bottom right;
+        width: 31.5%;
+        max-width: 200px;
+        z-index: 4;
+        transition: transform 0.8s ease, opacity 0.8s ease, filter 0.8s ease;
+    }
+
+    .qilin-sprite.glow-weak {
+        filter: brightness(0.4) saturate(0.3);
+    }
+    .qilin-sprite.glow-medium {
+        filter: brightness(0.7) saturate(0.7);
+    }
+    .qilin-sprite.glow-strong {
+        filter: brightness(1.2) saturate(1.3) drop-shadow(0 0 20px rgba(255,215,0,0.6));
+    }
+    .qilin-sprite.glow-rainbow {
+        filter: brightness(1.4) saturate(1.5) drop-shadow(0 0 30px rgba(255,215,0,0.8));
+        animation: qilinGlow 0.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes qilinGlow {
+        0% { filter: brightness(1.2) saturate(1.3) drop-shadow(0 0 20px rgba(255,215,0,0.4)); }
+        100% { filter: brightness(1.6) saturate(1.6) drop-shadow(0 0 40px rgba(255,215,0,0.8)); }
+    }
+
+    /* Jealousy Demon sprite */
+    .demon-sprite {
+        position: absolute;
+        bottom: 15%;
+        left: 50%;
+        transform: translateX(-50%) scale(1);
+        transform-origin: bottom center;
+        width: 35%;
+        max-width: 500px;
+        z-index: 4;
+        transition: transform 0.8s ease, opacity 0.8s ease, filter 0.8s ease;
+    }
+
+    .demon-sprite.envy-weak {
+        filter: brightness(0.3) saturate(0.2);
+        opacity: 0.5;
+    }
+    .demon-sprite.envy-medium {
+        filter: brightness(0.6) saturate(0.6);
+        opacity: 0.8;
+    }
+    .demon-sprite.envy-strong {
+        filter: brightness(1.0) saturate(1.0);
+        opacity: 1;
+    }
+    .demon-sprite.envy-rage {
+        filter: brightness(1.3) saturate(1.3);
+        opacity: 1;
+        animation: demonPulse 0.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes demonPulse {
+        0% { transform: translateX(-50%) scale(1); }
+        100% { transform: translateX(-50%) scale(1.15); }
+    }
+
+    .vs-banner {
+        position: absolute;
+        top: 25%;
+        left: 18%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.7);
+        color: #ffd700;
+        font-size: clamp(18px, 4vw, 28px);
+        font-weight: bold;
+        padding: clamp(6px, 1.5vw, 10px) clamp(12px, 3vw, 20px);
+        border-radius: 60px;
+        border: 2px solid #d4af37;
+        text-shadow: 2px 2px 0 #2c2e1e;
+        z-index: 5;
+        display: none;
+    }
+
+    .health-bars {
+        position: absolute;
+        top: clamp(10px, 2vw, 20px);
+        left: clamp(10px, 2vw, 20px);
+        right: clamp(10px, 2vw, 20px);
+        display: flex;
+        justify-content: space-between;
+        gap: clamp(8px, 2vw, 20px);
+        z-index: 5;
+    }
+
+    .health-card {
+        background: rgba(0,0,0,0.7);
+        border-radius: clamp(8px, 1.5vw, 20px);
+        padding: clamp(4px, 1vw, 8px) clamp(8px, 1.5vw, 12px);
+        width: 45%;
+        backdrop-filter: blur(4px);
+        border: 1px solid #d4af37;
+    }
+
+    .health-name {
+        color: #ffd700;
+        font-size: clamp(10px, 1.5vw, 14px);
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .health-bar-bg-challenge {
+        background: #3a2a1f;
+        border-radius: 20px;
+        height: clamp(6px, 1vw, 12px);
+        overflow: hidden;
+    }
+
+    .health-bar-fill-challenge {
+        background: linear-gradient(90deg, #2d8a4e, #4caf50);
+        width: 100%;
+        height: 100%;
+        border-radius: 20px;
+        transition: width 0.5s ease;
+    }
+
+    .compassion-bar-fill {
+        background: linear-gradient(90deg, #ffd700, #ff6b6b);
+        width: 100%;
+        height: 100%;
+        border-radius: 20px;
+        transition: width 0.5s ease;
+    }
+
+    .jealousy-bar-fill {
+        background: linear-gradient(90deg, #4CAF50, #00ff00);
+        width: 100%;
+        height: 100%;
+        border-radius: 20px;
+        transition: width 0.5s ease;
+    }
+
+    /* ========== QUESTION AREA ========== */
+    .question-area-act2, .question-area-act3, .question-area-act4 {
+        width: 100%;
+        background: rgba(44, 46, 30, 0.95);
+        border-radius: 0 0 24px 24px;
+        padding: 15px 20px;
+        border: 2px solid #d4af37;
+        border-top: none;
+        box-sizing: border-box;
+    }
+
+    .challenge-question {
+        color: #ffd700;
+        font-size: 16px;
+        margin-bottom: 12px;
+        text-align: center;
+        min-height: 40px;
+        line-height: 1.4;
+    }
+
+    .challenge-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .challenge-opt {
+        background: #4a3a2a;
+        color: #fdf0d8;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.2s;
+        flex: 1 1 auto;
+        min-width: 80px;
+        max-width: 100%;
+        text-align: center;
+    }
+
+    .challenge-opt:hover {
+        background: #d4af37;
+        color: #2c4a1e;
+    }
+
+    .challenge-opt:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .challenge-feedback {
+        margin-top: 8px;
+        text-align: center;
+        font-size: 12px;
+        color: #ffd700;
+        min-height: 20px;
+    }
+
+    .choice-counter {
+        text-align: center;
+        color: #fdf0d8;
+        font-size: 12px;
+        margin-top: 5px;
+        opacity: 0.7;
+    }
+
+    @media (max-width: 700px) {
+        .ogre-sprite.size-small { width: 25%; bottom: 22%; margin-left: -12.5%; }
+        .ogre-sprite.size-medium { width: 40%; bottom: 18%; margin-left: -20%; }
+        .ogre-sprite.size-large { width: 55%; bottom: 12%; margin-left: -27.5%; }
+        .ogre-sprite.size-huge { width: 70%; bottom: 8%; margin-left: -35%; }
+    }
+
+    @media (max-width: 400px) {
+        .ogre-sprite { max-width: 150px; }
+        .ogre-sprite.size-small { width: 20%; bottom: 25%; margin-left: -10%; }
+        .ogre-sprite.size-medium { width: 35%; bottom: 20%; margin-left: -17.5%; }
+        .ogre-sprite.size-large { width: 50%; bottom: 15%; margin-left: -25%; }
+        .ogre-sprite.size-huge { width: 65%; bottom: 10%; margin-left: -32.5%; }
+    }
+
+    .retry-btn {
+        background: #d4af37;
+        color: #2c4a1e;
+        border: none;
+        padding: 12px 28px;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        display: block;
+        margin: 15px auto;
+        transition: all 0.2s;
+    }
+    .retry-btn:hover {
+        background: #ffd700;
+        transform: scale(1.02);
+    }
+    
+    /* Success Scenes */
+    .success-scene {
+        display: none;
+        text-align: center;
+        padding: 30px 20px;
+    }
+    .success-scene img {
+        width: 100%;
+        border-radius: 20px;
+        margin-bottom: 20px;
+    }
+
+		/* ========== ACT 5 CHALLENGE (Boat & Wind Cloud) ========== */
+		.challenge-scene-act5 {
+		    display: none;
+		    width: 100%;
+		    border-radius: 24px;
+		    overflow: hidden;
+		}
+		
+			/* Boat sprite */
+			.boat-sprite {
+			    position: absolute;
+			    bottom: 25%;  /* ← Changed from 18% to 25% */
+			    left: 50%;
+			    transform: translateX(-50%) scale(1);
+			    transform-origin: bottom center;
+			    width: 12%;
+			    max-width: 80px;
+			    z-index: 4;
+			    transition: transform 0.8s ease, bottom 0.8s ease, opacity 0.8s ease;
+			}
+		
+		/* Cloud sprite */
+		.cloud-sprite {
+		    position: absolute;
+		    top: 18%;  /* ← Changed from 8% to 18% */
+		    left: 50%;
+		    transform: translateX(-50%) scale(1);
+		    transform-origin: center center;
+		    width: 25%;
+		    max-width: 150px;
+		    z-index: 3;
+		    transition: transform 0.8s ease, opacity 0.8s ease, filter 0.8s ease;
+		}
+		
+		.cloud-sprite.calm {
+		    transform: translateX(-50%) scale(0.2);
+		    opacity: 0.1;
+		}
+		
+		.cloud-sprite.small {
+		    transform: translateX(-50%) scale(0.5);
+		    opacity: 0.4;
+		}
+		
+		.cloud-sprite.medium {
+		    transform: translateX(-50%) scale(1.0);
+		    opacity: 0.8;
+		}
+		
+		.cloud-sprite.large {
+		    transform: translateX(-50%) scale(1.8);
+		    opacity: 1;
+		}
+		
+		.cloud-sprite.storm {
+		    transform: translateX(-50%) scale(2.8);
+		    opacity: 1;
+		    filter: drop-shadow(0 0 30px rgba(255, 100, 0, 0.6));
+		    animation: cloudPulse 0.6s ease-in-out infinite alternate;
+		}
+
+		@media (max-width: 700px) {
+		    /* ... existing styles ... */
+		    
+		    /* Act 5 mobile adjustments */
+		    .cloud-sprite {
+		        top: 15%;
+		        width: 20%;
+		        max-width: 100px;
+		    }
+		    
+		    .boat-sprite {
+		        bottom: 22%;
+		        width: 15%;
+		        max-width: 60px;
+		    }
+		}
+		
+		@media (max-width: 400px) {
+		    .cloud-sprite {
+		        top: 12%;
+		        width: 18%;
+		        max-width: 80px;
+		    }
+		    
+		    .boat-sprite {
+		        bottom: 20%;
+		        width: 18%;
+		        max-width: 50px;
+		    }
+		}
+		
+		@keyframes cloudPulse {
+		    0% { transform: translateX(-50%) scale(2.8); }
+		    100% { transform: translateX(-50%) scale(3.2); }
+		}
+		
+		/* Boat rocking animations */
+		.boat-sprite.rock-light {
+		    animation: rockLight 0.8s ease-in-out infinite alternate;
+		}
+		
+		.boat-sprite.rock-medium {
+		    animation: rockMedium 0.6s ease-in-out infinite alternate;
+		}
+		
+		.boat-sprite.rock-heavy {
+		    animation: rockHeavy 0.4s ease-in-out infinite alternate;
+		}
+		
+		.boat-sprite.glide {
+		    animation: glide 2s ease-in-out infinite alternate;
+		}
+		
+		@keyframes rockLight {
+		    0% { transform: translateX(-50%) rotate(-3deg); }
+		    100% { transform: translateX(-50%) rotate(3deg); }
+		}
+		
+		@keyframes rockMedium {
+		    0% { transform: translateX(-50%) rotate(-8deg); }
+		    100% { transform: translateX(-50%) rotate(8deg); }
+		}
+		
+		@keyframes rockHeavy {
+		    0% { transform: translateX(-50%) rotate(-15deg); }
+		    100% { transform: translateX(-50%) rotate(15deg); }
+		}
+		
+		@keyframes glide {
+		    0% { transform: translateX(-50%) translateY(0px); }
+		    100% { transform: translateX(-50%) translateY(-5px); }
+		}
+		
+		/* Scholar sprite overlay for story frames */
+		.story-sprite {
+		    position: absolute;
+		    z-index: 3;
+		    transition: all 0.5s ease;
+		    filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.3));
+		}
+		
+		.story-sprite:hover {
+		    filter: drop-shadow(0 0 12px gold);
+		}
+		
+		.monk-sprite {
+		    left: 15%;
+		    bottom: 15%;
+		    width: 20%;
+		    max-width: 120px;
+		}
+		
+		.scholar-sprite {
+		    right: 15%;
+		    bottom: 15%;
+		    width: 20%;
+		    max-width: 120px;
+		}
+		
+		.scholar-sprite.angry {
+		    animation: shakeAngry 0.5s ease-in-out 3;
+		}
+		
+		@keyframes shakeAngry {
+		    0%, 100% { transform: rotate(0deg); }
+		    25% { transform: rotate(-8deg); }
+		    75% { transform: rotate(8deg); }
+		}
+		
+		.scholar-sprite.ashamed {
+		    animation: bowShame 1s ease-in-out 1;
+		}
+		
+		@keyframes bowShame {
+		    0% { transform: rotate(0deg); }
+		    100% { transform: rotate(-15deg) scale(0.9); }
+		}
+
+    /* ========== SCROLL PANEL ========== */
+    .scroll-panel {
+        margin-top: 10px;
+        background: #fdf0d8;
+        border-radius: 16px;
+        border: 3px solid #b8860b;
+        padding: 5px;
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+    
+    .scroll {
+        background: #fef8e7;
+        border-radius: 12px;
+        padding: 15px 20px;
+        max-height: 120px;
+        overflow-y: auto;
+        font-size: 15px;
+        line-height: 1.5;
+        color: #3b2a1f;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .proceed-area {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .proceed-btn, .next-act-btn, .transition-btn {
+        background: #d4af37;
+        color: #2c4a1e;
+        border: none;
+        padding: 10px 28px;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        margin: 5px;
+    }
+    .proceed-btn:disabled { background: #888; cursor: not-allowed; }
+
+    /* ========== VIDEO OVERLAY ========== */
+    .video-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    .video-container {
+        background: #1a1a1a;
+        padding: 20px;
+        border-radius: 20px;
+        max-width: 800px;
+        width: 90%;
+        position: relative;
+    }
+    .video-container iframe { width: 100%; height: 400px; border-radius: 12px; }
+    .close-video {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        background: red;
+        color: white;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+    }
+</style>
+</head>
+
+<body>
+<div class="title-container">
+    <h1 style="color:Yellow;font-size:30px;margin:5px 0;">Furry Bodhis Adventure</h1>
+    <h2 style="color:Yellow;font-size:20px;margin:0;">Quest For The 3 Gems!</h2>
+</div>
+<div class="game-container">
+
+    <!-- Hulu Button -->
+    <div class="hulu-button" id="huluButton">
+        <img src="https://i.imgur.com/g6Yf1ej.png" alt="Hulu">
+    </div>
+
+    <!-- ========== INTRO SCENE ========== -->
+    <div class="intro-scene" id="introScene">
+        <img src="https://i.imgur.com/ZTa2qK9.jpeg" class="background">
+        <img src="https://i.imgur.com/AwUwCUL.png" class="hotspot hotspot-act1 Oldtv" id="Oldtv" title="Click to play our song!">
+        <img src="https://i.imgur.com/z3zF4rr.png" class="hotspot hotspot-act1 dakkii" id="dakkii" title="Dak-kii the Duck">
+        <img src="https://i.imgur.com/KHqFssV.png" class="hotspot hotspot-act1 bunnii" id="bunnii" title="Bun-nii the Rabbit">
+        <img src="https://i.imgur.com/xivEsM8.png" class="hotspot hotspot-act1 pinkfairies" id="pinkfairies" title="Pink Fairies">
+    </div>
+
+    <!-- ========== ACT 1: STORY VIEWER ========== -->
+    <div class="story-viewer" id="storyViewerAct1">
+        <img class="story-background" id="storyBgAct1" src="https://i.imgur.com/RYwb7cU.jpeg">
+        <div class="story-nav">
+            <button class="story-nav-btn" id="storyPrevBtnAct1" disabled>◀ Previous</button>
+            <button class="story-nav-btn" id="storyNextBtnAct1">Next ▶</button>
+        </div>
+    </div>
+
+    <!-- ACT 1: STORY FRAMES -->
+    <div id="storyFramesAct1" style="display: none;">
+        <div class="story-frame" data-bg="https://i.imgur.com/RYwb7cU.jpeg">
+            <div class="story-speaker">Pink Fairies</div>
+            <div class="story-text">✨ Namo Buddhaya. Greetings to you. We are happy that you have chosen to walk this very ancient path. You have earned this Hulu. Go ahead, tap the top-right corner to look inside.</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/ICZzJma.jpeg">
+            <div class="story-speaker">Pink Fairies</div>
+            <div class="story-text">Great sages of old began their journey of Truth here just like you. They told of magical tales about the great monastery that sits at the peak of the mountain. There lives an old abbot, grand master Pika. He is seldom seen and nobody knows how old he is. If you are lucky, he might grant you precious gems that are unrivalled in the entire universe.</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/fNV8Tee.jpeg">
+            <div class="story-speaker">Pink Fairies</div>
+            <div class="story-text">But.. there are somethings that you must know about this path. It begins with the trail of 'Heavenly virtues.' Only when you have these virtues will the greater ancient path, The path of Noble truths, appear.</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/VIANehh.jpeg">
+            <div class="story-speaker">Pink Fairies</div>
+            <div class="story-text">Along the way, should you feel lost, don't hesitate to talk to us or check with each other. There may be wondrous things around but be warned, some are good and some are not. There are beings who are wise, there are some who are otherwise.</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/HHa47HD.jpeg">
+            <div class="story-speaker">Pink Fairies</div>
+            <div class="story-text">Enough is said. We have reached the trail of heavenly virtues. Looks like the entrance is closed. Your first task is to unlock the gate.</div>
+        </div>
+    </div>
+
+    <!-- ========== ACT 1: CHALLENGE (Four Virtues Lock) ========== -->
+    <div class="challenge-scene-act1" id="challengeSceneAct1">
+        <img src="https://i.imgur.com/AkR7k09.jpeg" class="background">
+        <div class="lock-title">🔐 The Four Heavenly Virtues Lock 🔐</div>
+        <div id="questionsContainer" class="question-grid"></div>
+        <button class="submit-btn" id="submitBtn">🔓 Submit Answers</button>
+    </div>
+
+    <!-- ========== ACT 1: SUCCESS SCENE ========== -->
+    <div class="success-scene" id="successSceneAct1">
+        <img src="https://i.imgur.com/Q7a8Apl.jpeg" class="background">
+        <div style="font-size: 28px;">✨🏆✨</div>
+        <h2 style="color: #ffd700; margin: 10px 0;">The Lock Opens!</h2>
+        <p style="color: #fdf0d8; margin-bottom: 20px;">Good! You know what the virtues are. It's time to practise them in ...</p>
+        <button class="next-act-btn" id="continueToAct2Btn">🌟Continue to Stage 2:🌟<br>The Trail of Heavenly Virtues </button>
+    </div>
+
+    <!-- ========== ACT 2: METTA - THE OGRE OF MOUNT DHAMMIKA ========== -->
+
+    <!-- ========== ACT 2: INTERACTIVE INTRO ========== -->
+    <div class="intro-scene" id="introAct2" style="display: none;">
+        <img src="https://i.imgur.com/p7JksiQ.jpeg" class="background" id="introBgAct2">
+        <img src="https://i.imgur.com/7Iy4MqR.png" class="hotspot hotspot-act2 Oldtv" id="tvAct2" title="Click to play the Metta song!">
+        <img src="https://i.imgur.com/WfaTEnv.png" class="hotspot hotspot-act2 dakkii" id="dakkiiAct2" title="Dak-kii the Duck">
+        <img src="https://i.imgur.com/H9YWIjZ.png" class="hotspot hotspot-act2 bunnii" id="bunniiAct2" title="Bun-nii the Rabbit">
+        <img src="https://i.imgur.com/9PNuZ0p.png" class="hotspot hotspot-act2 pinkfairies" id="pinkfairiesAct2" title="Pink Fairies">
+    </div>
+
+    <!-- ========== ACT 3: KARUNA - THE QILIN'S COMPASSION ========== -->
+
+    <!-- ========== ACT 3: INTERACTIVE INTRO ========== -->
+    <div class="intro-scene" id="introAct3" style="display: none;">
+        <img src="https://i.imgur.com/PfMzSiI.jpeg" class="background" id="introBgAct3">
+        <img src="https://i.imgur.com/KRt67f4.png" class="hotspot hotspot-act3 Oldtv" id="tvAct3" title="Click to play the Karuna song!">
+        <img src="https://i.imgur.com/v4O5im2.png" class="hotspot hotspot-act3 dakkii" id="dakkiiAct3" title="Dak-kii and Bun-nii">
+        <img src="https://i.imgur.com/bnCB6qf.png" class="hotspot hotspot-act3 bunnii" id="bunniiAct3" title="Kit-tii n Cap-pii">
+        <img src="https://i.imgur.com/pMT0bCf.png" class="hotspot hotspot-act3 pinkfairies" id="pinkfairiesAct3" title="Pink Fairies">
+    </div>
+
+    <!-- ACT 3: STORY VIEWER -->
+    <div class="story-viewer" id="storyViewerAct3">
+        <img class="story-background" id="storyBgAct3" src="">
+        <div class="story-nav">
+            <button class="story-nav-btn" id="storyPrevBtnAct3" disabled>◀ Previous</button>
+            <button class="story-nav-btn" id="storyNextBtnAct3">Next ▶</button>
+        </div>
+    </div>
+
+    <!-- ACT 3: STORY FRAMES -->
+    <div id="storyFramesAct3" style="display: none;">
+        <div class="story-frame" data-bg="https://i.imgur.com/jvFbBOJ.jpeg">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">Wise sages have reported seeing a Qilin. It is a fantastic creature with the head of a dragon with flaming mane, a body of a slender deer covered in jeweled scales, legs of an ox and a tail of a lion. They say it is the spirit of Karuna in the forest. It has protected the forest and it's occupants for a 1000 years.</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/50gMZIu.jpeg">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">"Bun-nii asked an important question ... How is Karuna different from Metta?"</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/ELC2SkO.jpeg">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">"Dak-kii wonders about how people who lack compassion can be cruel."</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/pP3x9S3.jpeg">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">"They talk about cyber-bullying"</div>
+        </div>             
+        <div class="story-frame" data-bg="https://i.imgur.com/OgOROaa.jpeg">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">"The Pink Fairies realized something was amissed"</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/6djtRb9.jpeg">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">"The Qilin had been trapped for three days. It's golden glow is slowly diminishing. Even it's mane is turning grey."</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/vL1exwi.jpeg">
+            <div class="story-speaker">Darkness of Doubt</div>
+            <div class="story-text">"The Darkness of Cruelty taunts the Furry Bodhis"</div>
+        </div>        
+        <div class="story-frame" data-bg="https://i.imgur.com/ZDaBQmn.jpeg">
+            <div class="story-speaker">The Narrator</div>
+            <div class="story-text">"This is the time to act."</div>
+        </div>
+    </div>
+
+    <!-- ACT 3: CHALLENGE (Qilin Compassion Battle) -->
+    <div class="challenge-scene-act3" id="challengeSceneAct3">
+        <div class="challenge-container">
+            <img class="challenge-backdrop" id="challengeBgAct3" src="https://i.imgur.com/daAp0ev.jpeg">
+            <img class="qilin-sprite glow-medium" id="qilinSprite" src="https://i.imgur.com/vGTsfDU.png">
+            <div class="vs-banner" id="vsBannerAct3">🦌 ⚔️ 🌑</div>
+            <div class="health-bars">
+                <div class="health-card">
+                    <div class="health-name">Furry Bodhis</div>
+                    <div class="health-bar-bg-challenge"><div class="health-bar-fill-challenge" id="playerHealthFillAct3" style="width: 100%;"></div></div>
+                </div>
+                <div class="health-card">
+                    <div class="health-name" id="opponentNameAct3">Qilin's Light</div>
+                    <div class="health-bar-bg-challenge"><div class="health-bar-fill-challenge compassion-bar-fill" id="opponentHealthFillAct3" style="width: 100%;"></div></div>
+                </div>
+            </div>
+        </div>
+        <div class="question-area-act3">
+            <div class="challenge-question" id="challengeQuestionAct3">The Qilin cries out in pain. The Shadow of Cruelty laughs. What will you do?</div>
+            <div class="challenge-options" id="challengeOptionsAct3"></div>
+            <div class="challenge-feedback" id="challengeFeedbackAct3"></div>
+            <div class="choice-counter" id="choiceCounterAct3">Round 1 of 4</div>
+        </div>
+    </div>
+    
+    <!-- ACT 3: SUCCESS SCENE -->
+    <div class="success-scene" id="successSceneAct3">
+        <img src="https://i.imgur.com/XYcRW8X.jpeg" class="background">
+        <div style="font-size: 28px;">✨🌈✨</div>
+        <h2 style="color: #ffd700; margin: 10px 0;">The Qilin is Free! You have mastered Karuna!</h2>
+        <p style="color: #fdf0d8; margin-bottom: 20px;">Your compassion has healed the forest! The Qilin's light shines brighter than ever!</p>
+        <button class="next-act-btn" id="nextActBtn3">🌟 Stage 3 Complete! Continue to Stage 4<br>The Trail of Mudita 🌟</button>
+    </div>
+    
+    <!-- ACT 3: DEFEAT SCENE -->
+    <div class="success-scene" id="defeatSceneAct3">
+        <img src="https://i.imgur.com/uVtgwk0.jpeg" class="background">
+        <div style="font-size: 26px;">😧</div>
+        <h2 style="color: #ff6b35; margin: 10px 0;">The Qilin fades!<br>The Shadow of Cruelty grows stronger!</h2>
+        <p style="color: #fdf0d8; margin-bottom: 20px;">Without compassion, even the greatest light can fade. Try again with a caring heart!</p>
+    </div>
+
+    <!-- ========== ACT 4: MUDITA - THE FESTIVAL OF MANY SMILES ========== -->
+
+    <!-- ACT 4: INTERACTIVE INTRO -->
+    <div class="intro-scene" id="introAct4" style="display: none;">
+        <img src="https://i.imgur.com/83RuQZu.jpeg" class="background" id="introBgAct4">
+        <img src="https://i.imgur.com/AxXpKo4.png" class="hotspot hotspot-act4 Oldtv" id="tvAct4" title="Mudita - Altruistic joy song!">
+        <img src="https://i.imgur.com/VmAVeqG.png" class="hotspot hotspot-act4 dakkii" id="dakkiiAct4" title="Dak-kii and Kit-tii">
+        <img src="https://i.imgur.com/XcCTHc9.png" class="hotspot hotspot-act4 bunnii" id="bunniiAct4" title="Bun-nii, Cik-kii n Cap-pii">
+        <img src="https://i.imgur.com/UNOHEW4.png" class="hotspot hotspot-act4 pinkfairies" id="pinkfairiesAct4" title="Pink Fairies">
+    </div>
+
+    <!-- ACT 4: STORY VIEWER -->
+    <div class="story-viewer" id="storyViewerAct4">
+        <img class="story-background" id="storyBgAct4" src="">
+        <div class="story-nav">
+            <button class="story-nav-btn" id="storyPrevBtnAct4" disabled>◀ Previous</button>
+            <button class="story-nav-btn" id="storyNextBtnAct4">Next ▶</button>
+        </div>
+    </div>
+
+    <!-- ACT 4: STORY FRAMES -->
+    <div id="storyFramesAct4" style="display: none;">
+        <div class="story-frame" data-bg="https://i.imgur.com/XubRBYO.jpeg">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">The Furry Bodhis arrived at the Festival of Many Smiles! All the smileys of Smile-Ville had gathered. The air was filled with laughter, music, and the smell of sweet berry treats! The Golden Smile Trophy gleamed in the sunlight.</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/YYFZjUg.jpeg">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">Smileys of all kinds were showing their talents - dancing, singing, painting, and even juggling! Everyone was cheering for each other. This was the happiest day of the year!</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/YOoGzJB.jpeg">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">"And the winner of the Golden Smile Trophy is... ANANDA THE SMILEY! For his beautiful dance that made everyone smile!" The crowd erupted in cheers!</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/43ONPFC.jpeg">
+            <div class="story-speaker">Bao-Bao 😤</div>
+            <div class="story-text">"Hmph! I should have won! My fire-juggling was WAY better! He just got lucky! I could have won easily!"</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/gTrEGx1.jpeg">
+            <div class="story-speaker">Sad Smiley 😔</div>
+            <div class="story-text">"I'll never be that good... why even try? I'm not special like him... My parents will be so disappointed."</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/bZtsw1H.jpeg">
+            <div class="story-speaker">Green-Eyed Monster 💚</div>
+            <div class="story-text">"YES! Feed on your envy! He don't deserve that trophy! You should be jealous! He is just showing off! WHY HIM AND NOT YOU?!"</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/c4XH5y3.jpeg">
+            <div class="story-speaker">Pink Fairies</div>
+            <div class="story-text">"This is the Green-Eyed Monster! It feeds on comparison and envy. But we can stop it with Mudita - the joy in others' success! Look at Ananda - He is being so humble. That's true winning!"</div>
+        </div>
+    </div>
+
+    <!-- ACT 4: CHALLENGE (Green-eyed monster Battle) -->
+    <div class="challenge-scene-act4" id="challengeSceneAct4">
+        <div class="challenge-container">
+            <img class="challenge-backdrop" id="challengeBgAct4" src="https://i.imgur.com/1RgVlh8.jpeg">
+            <img class="demon-sprite envy-medium" id="demonSprite" src="https://i.imgur.com/umKKC5V.png">
+            <div class="vs-banner" id="vsBannerAct4">😊 ⚔️ 💚</div>
+            <div class="health-bars">
+                <div class="health-card">
+                    <div class="health-name">Furry Bodhis</div>
+                    <div class="health-bar-bg-challenge"><div class="health-bar-fill-challenge" id="playerHealthFillAct4" style="width: 100%;"></div></div>
+                </div>
+                <div class="health-card">
+                    <div class="health-name" id="opponentNameAct4">Jealousy</div>
+                    <div class="health-bar-bg-challenge"><div class="health-bar-fill-challenge jealousy-bar-fill" id="opponentHealthFillAct4" style="width: 100%;"></div></div>
+                </div>
+            </div>
+        </div>
+        <div class="question-area-act4">
+            <div class="challenge-question" id="challengeQuestionAct4">The Green-Eyed Monster whispers poison. What will you do?</div>
+            <div class="challenge-options" id="challengeOptionsAct4"></div>
+            <div class="challenge-feedback" id="challengeFeedbackAct4"></div>
+            <div class="choice-counter" id="choiceCounterAct4">Round 1 of 4</div>
+        </div>
+    </div>
+    
+    <!-- ACT 4: SUCCESS SCENE -->
+    <div class="success-scene" id="successSceneAct4">
+        <img src="https://i.imgur.com/oKiTKSZ.jpeg" class="background">
+        <div style="font-size: 56px;">✨🎉✨</div>
+        <h2 style="color: #ffd700; margin: 10px 0;">The Green-Eyed Monster is Defeated! You have mastered Mudita!</h2>
+        <p style="color: #fdf0d8; margin-bottom: 20px;">You've learned to find joy in others' success! No more envy, no need to compare - just let your own light shine!</p>
+        <button class="next-act-btn" id="nextActBtn4">🌟 continue to stage 5 <br> The Trail of Upekkha🌟</button>
+    </div>
+    
+    <!-- ACT 4: DEFEAT SCENE -->
+    <div class="success-scene" id="defeatSceneAct4">
+        <img src="https://i.imgur.com/1BbiUfr.jpeg" class="background">
+        <div style="font-size: 26px;">💚</div>
+        <h2 style="color: #ff6b35; margin: 10px 0;">The Green-Eyed Monster feeds on your jealousy!</h2>
+        <p style="color: #fdf0d8; margin-bottom: 20px;">Remember: Someone else's success doesn't take anything away from you. Try again with Mudita!</p>
+    </div>
+
+    <!-- ========== ACT 5: UPEKKHA - THE UNSHAKABLE MONK ========== -->
+
+    <!-- ACT 5: INTERACTIVE INTRO -->
+    <div class="intro-scene" id="introAct5" style="display: none;">
+        <img src="https://placehold.co/1024x768/2d4a2e/ffd700?text=Act+5+Intro" class="background" id="introBgAct5">
+        <img src="https://placehold.co/100x80/d4af37/fff?text=TV" class="hotspot hotspot-act5 Oldtv" id="tvAct5" title="Click to play the Upekkha song!">
+        <img src="https://placehold.co/100x100/f4a460/fff?text=Dak-kii" class="hotspot hotspot-act5 dakkii" id="dakkiiAct5" title="Dak-kii the Duck">
+        <img src="https://placehold.co/90x100/e8e8e8/333?text=Bun-nii" class="hotspot hotspot-act5 bunnii" id="bunniiAct5" title="Bun-nii the Rabbit">
+        <img src="https://placehold.co/100x100/ff69b4/fff?text=Pink" class="hotspot hotspot-act5 pinkfairies" id="pinkfairiesAct5" title="Pink Fairies">
+    </div>
+
+    <!-- ACT 5: STORY VIEWER -->
+    <div class="story-viewer" id="storyViewerAct5">
+        <img class="story-background" id="storyBgAct5" src="">
+        <div class="story-nav">
+            <button class="story-nav-btn" id="storyPrevBtnAct5" disabled>◀ Previous</button>
+            <button class="story-nav-btn" id="storyNextBtnAct5">Next ▶</button>
+        </div>
+    </div>
+
+    <!-- ACT 5: STORY FRAMES -->
+    <div id="storyFramesAct5" style="display: none;">
+        <!-- Frame 1: Arrival at the river -->
+        <div class="story-frame" data-bg="https://placehold.co/1024x768/2d4a2e/ffd700?text=River+of+Reflection">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">"The Furry Bodhis came to the River of Reflection. On one side sat Master Foyin, a humble monk. On the other side lived Su Dongpo, a proud scholar who loved to meditate."</div>
+            <!-- Sprites will be added by JavaScript -->
+        </div>
+        <!-- Frame 2: Scholar meditating -->
+        <div class="story-frame" data-bg="https://placehold.co/1024x768/2d4a2e/ffd700?text=Scholar+Meditating">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">"Su Dongpo had been meditating for many years and felt he had reached great wisdom. He wrote a poem declaring himself unshakable: 'The Eight Winds cannot move me, Sitting still upon the golden lotus.'"</div>
+        </div>
+        <!-- Frame 3: Servant delivers poem -->
+        <div class="story-frame" data-bg="https://placehold.co/1024x768/2d4a2e/ffd700?text=Poem+Delivered">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">"Proud of his poem, Su Dongpo sent his servant across the river to show Master Foyin. He expected high praise. Foyin read the poem and smiled."</div>
+        </div>
+        <!-- Frame 4: Monk writes "Fart!" -->
+        <div class="story-frame" data-bg="https://placehold.co/1024x768/2d4a2e/ffd700?text=The+Response">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">"But instead of praise, Foyin wrote just one word across the poem and sent it back — 'Fart!'"</div>
+        </div>
+        <!-- Frame 5: Scholar furious -->
+        <div class="story-frame" data-bg="https://placehold.co/1024x768/2d4a2e/ffd700?text=Scholar+Furious">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">"Su Dongpo was furious! 'How dare he mock me!' He jumped into a boat and paddled across the river, fuming with anger."</div>
+        </div>
+        <!-- Frame 6: Scholar arrives at door -->
+        <div class="story-frame" data-bg="https://placehold.co/1024x768/2d4a2e/ffd700?text=The+Locked+Door">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">"When he arrived, the monk's door was locked. A note was tacked to the door..."</div>
+        </div>
+        <!-- Frame 7: The note -->
+        <div class="story-frame" data-bg="https://placehold.co/1024x768/2d4a2e/ffd700?text=The+Note">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">"The note read: 'The Eight Winds cannot move me, Yet one fart blows me right across the river.' The scholar read it and realized his own hypocrisy."</div>
+        </div>
+        <!-- Frame 8: The lesson -->
+        <div class="story-frame" data-bg="https://placehold.co/1024x768/2d4a2e/ffd700?text=Lesson+Learned">
+            <div class="story-speaker">Pink Fairies</div>
+            <div class="story-text">"Su Dongpo bowed his head in shame. The monk smiled peacefully. 'True equanimity isn't about declaring your calm — it's about staying calm when tested.' This is Upekkha."</div>
+        </div>
+    </div>
+
+    <!-- ACT 5: BATTLE CHALLENGE (Boat & Wind Cloud) -->
+    <div class="challenge-scene-act5" id="challengeSceneAct5">
+        <div class="challenge-container">
+            <img class="challenge-backdrop" id="challengeBgAct5" src="https://placehold.co/1024x768/2d4a2e/ffd700?text=River+Battle">
+            
+            <!-- Cloud Sprite -->
+            <img class="cloud-sprite medium" id="cloudSprite" src="https://placehold.co/100x80/666/fff?text=Cloud">
+            
+            <!-- Boat Sprite -->
+            <img class="boat-sprite" id="boatSprite" src="https://placehold.co/80x40/d4af37/2c4a1e?text=🚤">
+            
+            <div class="vs-banner" id="vsBannerAct5">🌊 ⚔️ 🌬️</div>
+            
+            <div class="health-bars">
+                <div class="health-card">
+                    <div class="health-name">🛶 Your Balance</div>
+                    <div class="health-bar-bg-challenge"><div class="health-bar-fill-challenge" id="playerHealthFillAct5" style="width: 100%;"></div></div>
+                </div>
+                <div class="health-card">
+                    <div class="health-name" id="opponentNameAct5">🌪️ The Wind</div>
+                    <div class="health-bar-bg-challenge"><div class="health-bar-fill-challenge" id="opponentHealthFillAct5" style="width: 100%;"></div></div>
+                </div>
+            </div>
+        </div>
+        <div class="question-area-act5">
+            <div class="challenge-question" id="challengeQuestionAct5">The Eight Winds blow! How will you respond?</div>
+            <div class="challenge-options" id="challengeOptionsAct5"></div>
+            <div class="challenge-feedback" id="challengeFeedbackAct5"></div>
+            <div class="choice-counter" id="choiceCounterAct5">Round 1 of 4</div>
+        </div>
+    </div>
+
+    <!-- ACT 5: SUCCESS SCENE -->
+    <div class="success-scene" id="successSceneAct5">
+        <img src="https://placehold.co/1024x768/4CAF50/ffd700?text=Upekkha+Mastered!" class="background">
+        <div style="font-size: 56px;">🌊✨🏔️</div>
+        <h2 style="color: #ffd700; margin: 10px 0;">Upekkha Mastered!</h2>
+        <p style="color: #fdf0d8; margin-bottom: 20px;">You have found equanimity! The Eight Winds cannot move you!</p>
+        <button class="next-act-btn" id="nextActBtn5">🌟 Stage 5 Complete! 🌟</button>
+    </div>
+
+    <!-- ACT 5: DEFEAT SCENE -->
+    <div class="success-scene" id="defeatSceneAct5">
+        <img src="https://placehold.co/1024x768/ff6b35/ffd700?text=Defeat...The+Wind+Won" class="background">
+        <div style="font-size: 26px;">🌪️</div>
+        <h2 style="color: #ff6b35; margin: 10px 0;">The Wind Blows You Over!</h2>
+        <p style="color: #fdf0d8; margin-bottom: 20px;">Your boat capsized! Remember: True equanimity means staying calm when tested. Try again!</p>
+    </div> 
+    
+       
+    <!-- ACT 2: STORY VIEWER (Transition Frames) -->
+    <div class="story-viewer" id="storyViewerAct2">
+        <img class="story-background" id="storyBgAct2" src="">
+        <div class="story-nav">
+            <button class="story-nav-btn" id="storyPrevBtnAct2" disabled>◀ Previous</button>
+            <button class="story-nav-btn" id="storyNextBtnAct2">Next ▶</button>
+        </div>
+    </div>
+
+    <!-- ACT 2: STORY FRAMES -->
+    <div id="storyFramesAct2" style="display: none;">
+        <div class="story-frame" data-bg="https://i.imgur.com/njEp9I7.jpeg">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">And so, the Furry Bodhis guided by the Pink Fairies set out on the Metta trail.</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/Oz1fu7o.jpeg">
+            <div class="story-speaker">All</div>
+            <div class="story-text">Along the way, the group talked about Metta</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/vfCPRls.jpeg">
+            <div class="story-speaker">All</div>
+            <div class="story-text">They had a good discussion</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/YpNU9NA.jpeg">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">After some time, as they were approaching a bridge to Mount Dhammika, they heard a strange, unearthly and primal scream. They continued with extreme caution.</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/iiM7rJO.jpeg">
+            <div class="story-speaker">Narrator</div>
+            <div class="story-text">They came upon a huge, angry ogre blocking the path. It roared and shook the ground with its fury.</div>
+        </div>
+        <div class="story-frame" data-bg="https://i.imgur.com/dkYya78.jpeg">
+            <div class="story-speaker">Pink Fairies</div>
+            <div class="story-text">"This is your first test of Metta," whispered the Pink Fairies. "Remember: Kindness is not weakness. It is the strength to face anger without becoming angry yourself."</div>
+        </div>
+    </div>
+
+    <!-- ACT 2: BATTLE CHALLENGE -->
+    <div class="challenge-scene-act2" id="challengeSceneAct2">
+        <div class="challenge-container">
+            <img class="challenge-backdrop" id="challengeBgAct2" src="https://i.imgur.com/AykA0Ru.jpeg">
+            <img class="ogre-sprite size-base" id="ogreSprite" src="https://i.imgur.com/7EEhALS.png">
+            <div class="vs-banner" id="vsBanner">⚔️ VS ⚔️</div>
+            <div class="health-bars">
+                <div class="health-card">
+                    <div class="health-name">Furry Bodhis</div>
+                    <div class="health-bar-bg-challenge"><div class="health-bar-fill-challenge" id="playerHealthFillAct2" style="width: 100%;"></div></div>
+                </div>
+                <div class="health-card">
+                    <div class="health-name" id="opponentNameAct2">Ogre's Anger</div>
+                    <div class="health-bar-bg-challenge"><div class="health-bar-fill-challenge anger-bar-fill" id="opponentHealthFillAct2" style="width: 100%;"></div></div>
+                </div>
+            </div>
+        </div>
+        <div class="question-area-act2">
+            <div class="challenge-question" id="challengeQuestionAct2">The ogre roars! What will you do?</div>
+            <div class="challenge-options" id="challengeOptionsAct2"></div>
+            <div class="challenge-feedback" id="challengeFeedbackAct2"></div>
+            <div class="choice-counter" id="choiceCounterAct2">Round 1 of 4</div>
+        </div>
+    </div>
+    
+    <!-- ACT 2: SUCCESS SCENE -->
+    <div class="success-scene" id="successSceneAct2">
+        <img src="https://i.imgur.com/6yReLrP.jpeg" class="background">
+        <div style="font-size: 56px;">✨🏆✨</div>
+        <h2 style="color: #ffd700; margin: 10px 0;">Well-done! You have mastered Metta!</h2>
+        <p style="color: #fdf0d8; margin-bottom: 20px;">You saved the day with your kindness. You may all continue!</p>
+        <button class="next-act-btn" id="nextActBtn">🌟 Stage 2 Complete! Continue to Stage 3 <br> The Trail of Karuna 🌟</button>
+    </div>
+    
+    <!-- ACT 2: DEFEAT SCENE -->
+    <div class="success-scene" id="defeatSceneAct2">
+        <img src="https://i.imgur.com/kWHyQpW.jpeg" class="background">
+        <div style="font-size: 26px;">💔</div>
+        <h2 style="color: #ff6b35; margin: 10px 0;">It's no good! The Ogre seems to feed on anger!</h2>
+        <p style="color: #fdf0d8; margin-bottom: 20px;">The ogre is still angry. Remember: Kindness is strength. Try again!</p>
+    </div>
+
+    <!-- ========== SCROLL PANEL ========== -->
+    <div class="scroll-panel">
+        <div class="scroll" id="scrollMessage">
+            <strong>📜 The Ancient Scroll:</strong><br>
+            Welcome to Dharmagarden...
+        </div>
+<template>
+        <div style="font-size: 11px; color: #b8860b; text-align: center; padding: 6px 0; opacity: 0.7;">
+            💾 Remember to save your game!<br>
+            <span style="font-size: 10px;">(If you refresh the page, your save will be lost on mobile)</span>
+        </div>
+    </div>
+</template>
+    <!-- Proceed Area -->
+    <div class="proceed-area" id="proceedArea"></div>
+</div>
+  <div class="donor-caption-box">
+	   <strong>🙏 Grateful Thanks For Your Support 🙏</strong><br>
+	   Let's make this gift of Dhamma together.<br>
+	   🪷Gwee Kok Hwa & family🪷Judy Tan & family🪷IMO Lee Yee Thim & Chee Yee Law🪷IMO Tan Hing Goon & Lee Thow🪷Elizabeth Wong & family🪷Koh Lai Hin🪷Koh Lai Lin🪷IMO Koh Lai Keng🪷Ng Lai Yi🪷Ronald Ong & family🪷Chen Huen Phuei & family🪷Khoo Bun Yu & family🪷Saw Kok Wei🪷Ong Kar Hian🪷Ong Sze Min🪷Tan Chee Wee & family🪷Tong Eng Chung & family🪷
+  </div>
+  
+<!-- ========== HULU MODAL ========== -->
+<div class="hulu-modal" id="huluModal">
+    <img src="https://i.imgur.com/FvGo0jA.png" class="hulu-backdrop">
+    <div class="hulu-content">
+        <div class="stats-area">
+            <div class="stat-section">
+                <div class="stat-label">❤️ Health</div>
+                <div class="health-bar-bg"><div class="health-bar-fill" id="healthFill" style="width: 100%;"></div></div>
+            </div>
+            <div class="stat-section">
+                <div class="stat-label">📍 Stage Progress</div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width: 0%;"></div></div>
+                <div class="stat-label" style="margin-top: 4px; text-align: center; font-size: 11px;" id="stageText">Stage 1 / 5</div>
+            </div>
+            <div class="stat-section">
+                <div class="stat-label">🎒 Inventory</div>
+                <div class="inventory-grid" id="inventoryGrid">
+                    <div class="inventory-item">🍐<span>Magic Hulu</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="hulu-buttons">
+            <button id="saveGameBtn">💾 Save</button>
+            <button id="loadGameBtn">📀 Load</button>
+            <button id="debugMenuBtn" style="background:#d4af37; color:#2c4a1e;">📖 Chapters</button>
+        </div>
+        <button class="close-hulu" id="closeHuluBtn">✕</button>
+    </div>
+</div>
+
+<!-- ========== VIDEO OVERLAY ========== -->
+<div class="video-overlay" id="videoOverlay">
+    <div class="video-container">
+        <button class="close-video" id="closeVideoBtn">✕</button>
+        <div id="youtubeContainer"></div>
+    </div>
+</div>
+
+<script>
+// ========== COOKIE HELPERS ==========
+function setCookie(name, value, days) {
+    const expires = days ? `; max-age=${days * 24 * 60 * 60}` : '';
+    document.cookie = `${name}=${encodeURIComponent(value)}${expires}; path=/; SameSite=Strict`;
+}
+
+function getCookie(name) {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        const [key, value] = cookie.trim().split('=');
+        if (key === name) return decodeURIComponent(value);
+    }
+    return null;
+}
+
+// ========== GAME STATE ==========
+let gameState = {
+    currentStage: 1,
+    currentScreen: "intro",
+    health: 100,
+    stageProgress: 0,
+    inventory: ["magic_hulu"],
+    hasClickedOldtv: false,
+    hasClickedDakkii: false,
+    hasClickedBunnii: false,
+    hasEarnedHulu: false,
+    hasCompletedAct1: false,
+    hasCompletedAct2: false,
+    hasCompletedAct3: false,
+    hasCompletedAct4: false,
+    // Act 2 state
+    act2Intro: { tv: false, dakkii: false, bunnii: false },
+    act2CurrentFrame: 0,
+    battleState: null,
+    // Act 3 state
+    act3Intro: { tv: false, dakkii: false, bunnii: false },
+    act3CurrentFrame: 0,
+    battleStateAct3: null,
+    // Act 4 state
+    act4Intro: { tv: false, dakkii: false, bunnii: false },
+    act4CurrentFrame: 0,
+    battleStateAct4: null
+};
+		
+let SONG_VIDEO_ID = "UnQASwhsryM";
+const TOTAL_STAGES = 5;
+
+// ========== ACT 1: QUESTION BANK ==========
+const questionBank = [
+    { text: "What is the meaning of Metta?", correctLetter: "A", correctVirtue: "Metta",
+      options: [{ letter: "A", text: "Loving-kindness" }, { letter: "B", text: "Compassion" }, { letter: "C", text: "Altruistic joy" }, { letter: "D", text: "Equanimity" }] },
+    { text: "What does Karuna mean?", correctLetter: "B", correctVirtue: "Karuna",
+      options: [{ letter: "A", text: "Loving-kindness" }, { letter: "B", text: "Compassion" }, { letter: "C", text: "Altruistic joy" }, { letter: "D", text: "Equanimity" }] },
+    { text: "What is the meaning of Mudita?", correctLetter: "C", correctVirtue: "Mudita",
+      options: [{ letter: "A", text: "Equanimity" }, { letter: "B", text: "Loving-kindness" }, { letter: "C", text: "Altruistic joy" }, { letter: "D", text: "Compassion" }] },
+    { text: "What does Upekkha mean?", correctLetter: "D", correctVirtue: "Upekkha",
+      options: [{ letter: "A", text: "Compassion" }, { letter: "B", text: "Loving-kindness" }, { letter: "C", text: "Altruistic joy" }, { letter: "D", text: "Equanimity" }] },
+    { text: "What is the Pali word for Loving-kindness?", correctLetter: "A", correctVirtue: "Metta",
+      options: [{ letter: "A", text: "Metta" }, { letter: "B", text: "Karuna" }, { letter: "C", text: "Mudita" }, { letter: "D", text: "Upekkha" }] },
+    { text: "What is the Pali word for Compassion?", correctLetter: "B", correctVirtue: "Karuna",
+      options: [{ letter: "A", text: "Metta" }, { letter: "B", text: "Karuna" }, { letter: "C", text: "Mudita" }, { letter: "D", text: "Upekkha" }] },
+    { text: "What is the Pali word for Altruistic joy?", correctLetter: "C", correctVirtue: "Mudita",
+      options: [{ letter: "A", text: "Upekkha" }, { letter: "B", text: "Metta" }, { letter: "C", text: "Mudita" }, { letter: "D", text: "Karuna" }] },
+    { text: "What is the Pali word for Equanimity?", correctLetter: "D", correctVirtue: "Upekkha",
+      options: [{ letter: "A", text: "Karuna" }, { letter: "B", text: "Metta" }, { letter: "C", text: "Mudita" }, { letter: "D", text: "Upekkha" }] }
+];
+
+// ========== ACT 1: CHALLENGE STATE ==========
+let currentQuestions = [];
+let playerSelections = ["", "", "", ""];
+
+function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function generateRandomCode() {
+    const letters = ["A", "B", "C", "D"];
+    const code = [];
+    for (let i = 0; i < 4; i++) code.push(letters[Math.floor(Math.random() * 4)]);
+    return code;
+}
+
+function generateQuestionsMatchingCode(code) {
+    const questions = [];
+    const usedQuestionTexts = [];
+    for (let i = 0; i < 4; i++) {
+        const targetLetter = code[i];
+        let possibleQuestions = questionBank.filter(q => q.correctLetter === targetLetter && !usedQuestionTexts.includes(q.text));
+        if (possibleQuestions.length === 0) {
+            possibleQuestions = questionBank.filter(q => q.correctLetter === targetLetter);
+        }
+        const selectedQ = possibleQuestions[Math.floor(Math.random() * possibleQuestions.length)];
+        usedQuestionTexts.push(selectedQ.text);
+        questions.push({
+            position: i,
+            questionText: selectedQ.text,
+            correctLetter: selectedQ.correctLetter,
+            correctVirtue: selectedQ.correctVirtue,
+            options: selectedQ.options
+        });
+    }
+    return shuffleArray(questions);
+}
+
+function renderChallenge() {
+    const container = document.getElementById('questionsContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    currentQuestions.forEach((q, idx) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.innerHTML = `<div class="q-text">🔒 Question ${idx + 1}: ${q.questionText}</div><div class="q-options" id="options-${idx}"></div>`;
+        container.appendChild(card);
+        const optionsDiv = document.getElementById(`options-${idx}`);
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'q-option';
+            if (playerSelections[idx] === opt.letter) btn.classList.add('selected');
+            btn.textContent = `${opt.letter}) ${opt.text}`;
+            btn.onclick = () => selectAnswer(idx, opt.letter);
+            optionsDiv.appendChild(btn);
+        });
+    });
+}
+
+function selectAnswer(questionIndex, selectedLetter) {
+    playerSelections[questionIndex] = selectedLetter;
+    const optionsDiv = document.getElementById(`options-${questionIndex}`);
+    if (optionsDiv) {
+        const btns = optionsDiv.querySelectorAll('.q-option');
+        btns.forEach(btn => {
+            btn.classList.remove('selected');
+            if (btn.textContent.startsWith(selectedLetter)) btn.classList.add('selected');
+        });
+    }
+    updateScrollMessage("Pink Fairies", `Question ${questionIndex + 1}: You chose ${selectedLetter}`, "normal");
+}
+
+function submitChallenge() {
+    const allAnswered = playerSelections.every(sel => sel !== "");
+    if (!allAnswered) {
+        updateScrollMessage("Pink Fairies", "❌ You haven't answered all four questions yet!", "low");
+        return;
+    }
+    const submittedCode = playerSelections.join('');
+    const correctCode = currentQuestions.map(q => q.correctLetter).join('');
+    if (submittedCode === correctCode) {
+        playBlip("high");
+        updateScrollMessage("Pink Fairies", "✨🎉 CORRECT! You did it. The lock opens! 🎉✨", "high");
+        document.getElementById('challengeSceneAct1').style.display = 'none';
+        document.getElementById('successSceneAct1').style.display = 'block';
+        gameState.hasCompletedAct1 = true;
+        gameState.stageProgress = 20;
+        gameState.currentScreen = 'act1Success';
+        updateUI();
+        localStorage.setItem('furryBodhis_save', JSON.stringify(gameState));
+        setCookie('furryBodhis_save', JSON.stringify(gameState), 30);
+    } else {
+        playBlip("low");
+        updateScrollMessage("Pink Fairies", `❌ Ooh, incorrect! The lock resets with a NEW combination! Try again, you must.`, "low");
+        resetChallenge();
+    }
+}
+
+function resetChallenge() {
+    const newCode = generateRandomCode();
+    currentQuestions = generateQuestionsMatchingCode(newCode);
+    playerSelections = ["", "", "", ""];
+    renderChallenge();
+}
+
+// ========== ACT 2: OGRE BATTLE (BUTTON-BASED) ==========
+let act2ChallengeActive = true;
+let playerHealthAct2 = 100;
+let ogreAnger = 100;
+let currentRound = 0;
+const MAX_ROUNDS = 4;
+let choiceHistory = [];
+let battleInProgress = false;
+let waitingForContinueAct2 = false;
+
+const ogreMessages = [
+    {
+        message: "GRRRR! Who dares cross my bridge? I'm hungry and angry! Go away or I'll crush you!",
+        choices: [
+            { text: "⚔️ Attack", effect: "attack", feedback: "The Furry Bodhis charge forward — but the ogre roars and grows bigger!", angerChange: 15, healthChange: -10, isGood: false },
+            { text: "🍞 Offer Food", effect: "food", feedback: "Dak-kii offers a bowl of rice. The ogre sniffs it, suspicious.", angerChange: -10, healthChange: 5, isGood: true },
+            { text: "🕊️ Kind Words", effect: "kind", feedback: "Bun-nii speaks softly: 'We mean you no harm. You seem hurt.'", angerChange: -15, healthChange: 5, isGood: true }
+        ]
+    },
+    {
+        message: "The ogre snarls and takes a step toward you! What do you do?",
+        choices: [
+            { text: "⚔️ Attack", effect: "attack", feedback: "The ogre swats you away! It grows even larger!", angerChange: 20, healthChange: -15, isGood: false },
+            { text: "🍞 Offer Food", effect: "food", feedback: "The ogre eats the rice. It pauses, slightly calmer.", angerChange: -15, healthChange: 8, isGood: true },
+            { text: "🕊️ Kind Words", effect: "kind", feedback: "The ogre's eyes soften. 'No one has spoken to me kindly in years.'", angerChange: -20, healthChange: 8, isGood: true }
+        ]
+    },
+    {
+        message: "The ogre roars again, but its voice cracks. It seems... uncertain. What will you do?",
+        choices: [
+            { text: "⚔️ Attack", effect: "attack", feedback: "The ogre is furious! It picks up a boulder!", angerChange: 25, healthChange: -20, isGood: false },
+            { text: "🍞 Offer Food", effect: "food", feedback: "You offer more food. The ogre eats and its anger fades.", angerChange: -20, healthChange: 10, isGood: true },
+            { text: "🕊️ Kind Words", effect: "kind", feedback: "'We see you,' says Chikii. 'You are not our enemy.'", angerChange: -25, healthChange: 10, isGood: true }
+        ]
+    },
+    {
+        message: "The ogre is breathing heavily. It looks at you with confusion. What is your final act?",
+        choices: [
+            { text: "⚔️ Attack", effect: "attack", feedback: "The ogre roars — you realize fighting only makes it worse.", angerChange: 30, healthChange: -25, isGood: false },
+            { text: "🍞 Offer Food", effect: "food", feedback: "The ogre is full. It sits down, calm and grateful.", angerChange: -25, healthChange: 12, isGood: true },
+            { text: "🕊️ Kind Words", effect: "kind", feedback: "The ogre weeps. 'I thought you would hurt me too.'", angerChange: -30, healthChange: 12, isGood: true }
+        ]
+    }
+];
+
+function startAct2Battle() {
+    gameState.currentScreen = 'act2Battle';
+    const proceedArea = document.getElementById('proceedArea');
+    proceedArea.innerHTML = '';
+    
+    playerHealthAct2 = 100;
+    ogreAnger = 100;
+    currentRound = 0;
+    choiceHistory = [];
+    act2ChallengeActive = true;
+    battleInProgress = true;
+    waitingForContinueAct2 = false;
+    
+    document.getElementById('playerHealthFillAct2').style.width = '100%';
+    document.getElementById('opponentHealthFillAct2').style.width = '100%';
+    document.getElementById('challengeFeedbackAct2').innerHTML = '';
+    document.getElementById('vsBanner').style.display = 'block';
+    
+    const ogreSprite = document.getElementById('ogreSprite');
+    ogreSprite.style.transform = 'translateX(-50%) scale(1)';
+    ogreSprite.style.opacity = '1';
+    ogreSprite.style.bottom = '15%';
+    
+    loadOgreRound();
+    updateScrollMessage("😠 Ogre", "An ogre blocks your path! Use wisdom, not force!<br>💡 TIP: Choose kindness to calm the ogre's anger!", "normal");
+}
+
+function loadOgreRound() {
+    if (!act2ChallengeActive || currentRound >= MAX_ROUNDS) {
+        return;
+    }
+    
+    const roundData = ogreMessages[currentRound];
+    document.getElementById('challengeQuestionAct2').innerHTML = roundData.message;
+    document.getElementById('choiceCounterAct2').innerHTML = `Round ${currentRound + 1} of ${MAX_ROUNDS}`;
+    
+    const optionsDiv = document.getElementById('challengeOptionsAct2');
+    optionsDiv.innerHTML = '';
+    
+    roundData.choices.forEach(function(choice, idx) {
+        const btn = document.createElement('button');
+        btn.className = 'challenge-opt';
+        btn.textContent = choice.text;
+        btn.onclick = function() { handleOgreChoice(choice); };
+        optionsDiv.appendChild(btn);
+    });
+    
+    document.getElementById('challengeFeedbackAct2').innerHTML = '';
+    waitingForContinueAct2 = false;
+}
+
+function handleOgreChoice(choice) {
+    if (!battleInProgress || !act2ChallengeActive || waitingForContinueAct2) return;
+    
+    const btns = document.querySelectorAll('#challengeOptionsAct2 .challenge-opt');
+    btns.forEach(b => b.disabled = true);
+    
+    choiceHistory.push(choice.effect);
+    
+    playerHealthAct2 = Math.max(0, Math.min(100, playerHealthAct2 + (choice.healthChange || 0)));
+    ogreAnger = Math.max(0, Math.min(100, ogreAnger + (choice.angerChange || 0)));
+    
+    document.getElementById('playerHealthFillAct2').style.width = `${playerHealthAct2}%`;
+    document.getElementById('opponentHealthFillAct2').style.width = `${ogreAnger}%`;
+    
+    const isGood = choice.isGood !== undefined ? choice.isGood : (choice.angerChange < 0);
+    const feedbackDiv = document.getElementById('challengeFeedbackAct2');
+    
+    let feedbackHTML = `<div style="font-size: 18px; font-weight: bold; padding: 12px; margin: 10px 0; border-radius: 12px; background: ${isGood ? 'rgba(46, 125, 50, 0.3)' : 'rgba(244, 67, 54, 0.3)'}; border: 2px solid ${isGood ? '#4CAF50' : '#f44336'};">
+        <div style="font-size: 24px;">${isGood ? '✅ GOOD!' : '❌ BAD!'}</div>
+        <div style="margin-top: 8px;">${choice.feedback}</div>
+        <div style="margin-top: 10px; font-size: 14px; color: ${isGood ? '#81C784' : '#ef9a9a'};">
+            ${isGood ? '✨ The ogre\'s anger decreases!' : '💢 The ogre\'s anger increases...'}
+            (${isGood ? '-' : '+'}${Math.abs(choice.angerChange)}% anger)
+        </div>
+    </div>`;
+    
+    feedbackDiv.innerHTML = feedbackHTML;
+    
+    const ogreSprite = document.getElementById('ogreSprite');
+    
+    const attackCount = choiceHistory.filter(c => c === 'attack').length;
+    const kindnessCount = choiceHistory.filter(c => c === 'food' || c === 'kind').length;
+    
+    let progress = attackCount - kindnessCount;
+    progress = Math.max(-4, Math.min(6, progress));
+    
+    let scale = 0.5;
+    let bottomPos = '25%';
+    let opacity = 1;
+    
+    if (progress <= -4) {
+        scale = 0.2;
+        bottomPos = '30%';
+        opacity = 0.4;
+    } else if (progress === -3) {
+        scale = 0.35;
+        bottomPos = '28%';
+        opacity = 0.6;
+    } else if (progress === -2) {
+        scale = 0.5;
+        bottomPos = '25%';
+    } else if (progress === -1) {
+        scale = 0.7;
+        bottomPos = '20%';
+    } else if (progress === 0) {
+        scale = 1.0;
+        bottomPos = '15%';
+    } else if (progress === 1) {
+        scale = 1.2;
+        bottomPos = '13%';
+    } else if (progress === 2) {
+        scale = 1.5;
+        bottomPos = '10%';
+    } else if (progress === 3) {
+        scale = 1.8;
+        bottomPos = '8%';
+    } else if (progress >= 4) {
+        scale = 2.2;
+        bottomPos = '5%';
+    }
+    
+    ogreSprite.style.transform = `translateX(-50%) scale(${scale})`;
+    ogreSprite.style.bottom = bottomPos;
+    ogreSprite.style.opacity = opacity;
+    
+    // Increment round counter
+    currentRound++;
+    
+    // ===== CHECK IF ALL ROUNDS COMPLETED =====
+    if (currentRound >= MAX_ROUNDS) {
+        battleInProgress = false;
+        act2ChallengeActive = false;
+        
+        // FINAL DECISION after all 4 rounds
+        // Victory: ogreAnger <= 30 AND more kindness than attacks
+        if (ogreAnger <= 30 && progress <= -1) {
+            feedbackDiv.innerHTML += `<div style="font-size: 24px; color: #ffd700; margin-top: 10px;">✨ The ogre's anger fades! Your kindness has won!</div>`;
+            showContinueButtonAct2('victory');
+        } else {
+            feedbackDiv.innerHTML += `<div style="font-size: 22px; color: #ff6b35; margin-top: 10px;">💔 The ogre is still too angry. Not enough kindness...</div>`;
+            showContinueButtonAct2('defeat');
+        }
+        return;
+    }
+    
+    // ===== EARLY DEFEAT ONLY - NO EARLY VICTORY =====
+    // Defeat if: player health <= 0 OR ogreAnger >= 100 (ogre too angry)
+    const isDefeated = playerHealthAct2 <= 0 || ogreAnger >= 100;
+    
+    if (isDefeated) {
+        battleInProgress = false;
+        act2ChallengeActive = false;
+        feedbackDiv.innerHTML += `<div style="font-size: 22px; color: #ff6b35; margin-top: 10px;">💔 The ogre is too angry! It's not working...</div>`;
+        showContinueButtonAct2('defeat');
+        return;
+    }
+    
+    // ===== SHOW CONTINUE BUTTON FOR NEXT ROUND =====
+    showContinueButtonAct2('next');
+}
+
+function showContinueButtonAct2(type) {
+    waitingForContinueAct2 = true;
+    const optionsDiv = document.getElementById('challengeOptionsAct2');
+    
+    // Clear any existing buttons
+    optionsDiv.innerHTML = '';
+    
+    // Create continue button
+    const continueBtn = document.createElement('button');
+    continueBtn.className = 'challenge-opt';
+    continueBtn.style.cssText = `
+        background: #d4af37;
+        color: #2c4a1e;
+        font-weight: bold;
+        font-size: 16px;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    `;
+    
+    if (type === 'victory') {
+        continueBtn.textContent = '🎉 Celebrate Kindness! 🎉';
+        continueBtn.style.background = '#4CAF50';
+        continueBtn.style.color = 'white';
+        continueBtn.onclick = function() {
+            act2Victory();
+        };
+    } else if (type === 'defeat') {
+        continueBtn.textContent = '💔 Accept Defeat';
+        continueBtn.style.background = '#f44336';
+        continueBtn.style.color = 'white';
+        continueBtn.onclick = function() {
+            act2Defeat();
+        };
+    } else {
+        // Next round
+        continueBtn.textContent = `➡️ Continue to Round ${currentRound + 1}`;
+        continueBtn.onmouseover = function() {
+            this.style.background = '#ffd700';
+            this.style.transform = 'scale(1.02)';
+        };
+        continueBtn.onmouseout = function() {
+            this.style.background = '#d4af37';
+            this.style.transform = 'scale(1)';
+        };
+        continueBtn.onclick = function() {
+            // Remove the continue button and load next round
+            optionsDiv.innerHTML = '';
+            waitingForContinueAct2 = false;
+            loadOgreRound();
+        };
+    }
+    
+    optionsDiv.appendChild(continueBtn);
+}
+
+function showContinueButtonAct2(type) {
+    waitingForContinueAct2 = true;
+    var optionsDiv = document.getElementById('challengeOptionsAct2');
+    
+    // Clear any existing buttons
+    optionsDiv.innerHTML = '';
+    
+    // Create continue button
+    var continueBtn = document.createElement('button');
+    continueBtn.className = 'challenge-opt';
+    continueBtn.style.cssText = 'background: #d4af37; color: #2c4a1e; font-weight: bold; font-size: 16px; padding: 12px 30px; border: none; border-radius: 30px; cursor: pointer; transition: all 0.2s; width: 100%; max-width: 300px; margin: 0 auto;';
+    
+    if (type === 'victory') {
+        continueBtn.textContent = '🎉 Celebrate Kindness! 🎉';
+        continueBtn.style.background = '#4CAF50';
+        continueBtn.style.color = 'white';
+        continueBtn.onclick = function() {
+            act2Victory();
+        };
+    } else if (type === 'defeat') {
+        continueBtn.textContent = '💔 Accept Defeat';
+        continueBtn.style.background = '#f44336';
+        continueBtn.style.color = 'white';
+        continueBtn.onclick = function() {
+            act2Defeat();
+        };
+    } else {
+        // Next round
+        continueBtn.textContent = '➡️ Continue to Round ' + (currentRound + 1);
+        continueBtn.onmouseover = function() {
+            this.style.background = '#ffd700';
+            this.style.transform = 'scale(1.02)';
+        };
+        continueBtn.onmouseout = function() {
+            this.style.background = '#d4af37';
+            this.style.transform = 'scale(1)';
+        };
+        continueBtn.onclick = function() {
+            // Remove the continue button and load next round
+            optionsDiv.innerHTML = '';
+            waitingForContinueAct2 = false;
+            loadOgreRound();
+        };
+    }
+    
+    optionsDiv.appendChild(continueBtn);
+}
+
+function act2Victory() {
+    gameState.currentScreen = 'act2Success';
+    document.getElementById('challengeSceneAct2').style.display = 'none';
+    document.getElementById('successSceneAct2').style.display = 'block';
+    updateScrollMessage("🎉 Victory!", "You have proven your loving-kindness! The ogre bows to you and steps aside.", "high");
+    gameState.hasCompletedAct2 = true;
+    gameState.currentStage = 2;
+    gameState.stageProgress = 40;
+    gameState.currentScreen = 'act2Success';
+    updateUI();
+    localStorage.setItem('furryBodhis_save', JSON.stringify(gameState));
+    setCookie('furryBodhis_save', JSON.stringify(gameState), 30);
+}
+
+function act2Defeat() {
+    act2ChallengeActive = false;
+    document.getElementById('challengeSceneAct2').style.display = 'none';
+    gameState.currentScreen = 'act2Defeat';
+    const defeatScene = document.getElementById('defeatSceneAct2');
+    const proceedArea = document.getElementById('proceedArea');
+    
+    if (defeatScene) {
+        defeatScene.style.display = 'block';
+        document.getElementById('storyViewerAct2').style.display = 'none';
+        proceedArea.innerHTML = '';
+        
+        updateScrollMessage("💔 Defeat", "The ogre was too angry. Perhaps kindness is the path forward. Try again!", "low");
+        
+        const retryBtn = document.createElement('button');
+        retryBtn.className = 'retry-btn';
+        retryBtn.id = 'retryAct2Btn';
+        retryBtn.textContent = '🔄 Try Again with Kindness 🔄';
+        retryBtn.onclick = function() {
+            proceedArea.innerHTML = '';
+            if (defeatScene) defeatScene.style.display = 'none';
+            document.getElementById('challengeSceneAct2').style.display = 'block';
+            const ogreSprite = document.getElementById('ogreSprite');
+            ogreSprite.style.transform = 'translateX(-50%) scale(1)';
+            ogreSprite.style.bottom = '15%';
+            ogreSprite.style.opacity = '1';
+            startAct2Battle();
+        };
+        proceedArea.appendChild(retryBtn);
+        
+        playerHealthAct2 = 100;
+        ogreAnger = 100;
+        return;
+    }
+}
+
+// ========== ACT 3: QILIN COMPASSION BATTLE (BUTTON-BASED) ==========
+let act3ChallengeActive = true;
+let playerHealthAct3 = 100;
+let qilinLight = 100;
+let currentRoundAct3 = 0;
+const MAX_ROUNDS_ACT3 = 4;
+let choiceHistoryAct3 = [];
+let battleInProgressAct3 = false;
+let waitingForContinueAct3 = false;
+
+const qilinMessages = [
+    {
+        message: "🦌 The Qilin cries out in pain. The Darkness of Cruelty laughs. What will you do?",
+        choices: [
+            { 
+                text: "🤝 Help lift the tree", 
+                effect: "help", 
+                feedback: "✅ GOOD! You rush to help! The Qilin's eyes fill with hope. Your compassion is making a difference!", 
+                lightChange: 15, 
+                healthChange: 5,
+                isGood: true
+            },
+            { 
+                text: "👀 Observe the pain", 
+                effect: "observe", 
+                feedback: "✨ You take time to understand the Qilin's suffering. This is the first step of compassion - seeing the pain clearly.", 
+                lightChange: 10, 
+                healthChange: 5,
+                isGood: true
+            },
+            { 
+                text: "🚶 Walk away", 
+                effect: "ignore", 
+                feedback: "❌ BAD! The Darkness of Cruelty grows larger. 'See? They don't care!' The Qilin's light dims...", 
+                lightChange: -15, 
+                healthChange: -10,
+                isGood: false
+            }
+        ]
+    },
+    {
+        message: "💫 The Qilin's antlers are dimming. 'Please... my light is fading...' The Darkness cackles.",
+        choices: [
+            { 
+                text: "💚 Share your energy", 
+                effect: "energy", 
+                feedback: "✅ WONDERFUL! You place your hands on the Qilin and share your warmth. Its antlers glow brighter! True compassion is giving of yourself.", 
+                lightChange: 20, 
+                healthChange: 5,
+                isGood: true
+            },
+            { 
+                text: "💧 Give water", 
+                effect: "water", 
+                feedback: "✅ GOOD! You pour water on the roots around the Qilin. The forest stirs with new life! Small acts of kindness matter.", 
+                lightChange: 10, 
+                healthChange: 5,
+                isGood: true
+            },
+            { 
+                text: "😢 Feel pity but do nothing", 
+                effect: "pity", 
+                feedback: "❌ BAD! Feeling sorry isn't enough - compassion requires ACTION. The Darkness laughs harder as you just watch.", 
+                lightChange: -10, 
+                healthChange: -8,
+                isGood: false
+            }
+        ]
+    },
+    {
+        message: "🌑 The Darkness grows: 'You'll never move this tree! It's impossible!' The Qilin whimpers.",
+        choices: [
+            { 
+                text: "🌱 Inspire hope", 
+                effect: "hope", 
+                feedback: "✅ AMAZING! 'We believe in you, Qilin!' Your words are like sunshine piercing the darkness. Hope is a form of compassion!", 
+                lightChange: 15, 
+                healthChange: 8,
+                isGood: true
+            },
+            { 
+                text: "🛠️ Find tools", 
+                effect: "tools", 
+                feedback: "✅ CLEVER! Dak-kii finds strong vines to help pull the tree! Working together shows compassion in action!", 
+                lightChange: 10, 
+                healthChange: 5,
+                isGood: true
+            },
+            { 
+                text: "😞 Give up", 
+                effect: "giveup", 
+                feedback: "❌ BAD! The Darkness engulfs the Qilin. 'Pathetic!' Giving up is the opposite of compassion - it leaves suffering unanswered.", 
+                lightChange: -15, 
+                healthChange: -15,
+                isGood: false
+            }
+        ]
+    },
+    {
+        message: "✨ The Qilin's antlers flicker... one last chance. The Darkness is threatening!",
+        choices: [
+            { 
+                text: "🙏 Pray for the forest", 
+                effect: "pray", 
+                feedback: "✅ BEAUTIFUL! You pray with all your heart. A golden light descends from the sky! Your compassion connects with something greater!", 
+                lightChange: 20, 
+                healthChange: 10,
+                isGood: true
+            },
+            { 
+                text: "🌿 Heal with kindness", 
+                effect: "heal", 
+                feedback: "✅ MAGICAL! You gently stroke the Qilin's fur. Rainbow light explodes from its antlers! Your compassion has awakened the Qilin's true power!", 
+                lightChange: 20, 
+                healthChange: 10,
+                isGood: true
+            },
+            { 
+                text: "⏳ Wait for someone else", 
+                effect: "wait", 
+                feedback: "❌ TERRIBLE! The Darkness consumes the Qilin. 'Too late!' Waiting is not compassion - it's abandoning those who need help.", 
+                lightChange: -25, 
+                healthChange: -20,
+                isGood: false
+            }
+        ]
+    }
+];
+
+function startAct3Battle() {
+    gameState.currentScreen = 'act3Battle';
+    const proceedArea = document.getElementById('proceedArea');
+    proceedArea.innerHTML = '';
+    
+    playerHealthAct3 = 100;
+    qilinLight = 100;
+    currentRoundAct3 = 0;
+    choiceHistoryAct3 = [];
+    act3ChallengeActive = true;
+    battleInProgressAct3 = true;
+    waitingForContinueAct3 = false;
+    
+    document.getElementById('playerHealthFillAct3').style.width = '100%';
+    document.getElementById('opponentHealthFillAct3').style.width = '100%';
+    document.getElementById('challengeFeedbackAct3').innerHTML = '';
+    document.getElementById('vsBannerAct3').style.display = 'block';
+    
+    const qilinSprite = document.getElementById('qilinSprite');
+    qilinSprite.style.transform = 'translateX(-50%) scale(1)';
+    qilinSprite.style.opacity = '1';
+    qilinSprite.style.bottom = '15%';
+    qilinSprite.className = 'qilin-sprite glow-medium';
+    
+    loadQilinRound();
+    updateScrollMessage("🦌 Qilin", "The Qilin is trapped! Show compassion to free it from the Shadow of Cruelty!<br>💡 TIP: Read the feedback carefully to learn what actions help!", "normal");
+}
+
+function loadQilinRound() {
+    if (!act3ChallengeActive || currentRoundAct3 >= MAX_ROUNDS_ACT3) {
+        return;
+    }
+    
+    const roundData = qilinMessages[currentRoundAct3];
+    document.getElementById('challengeQuestionAct3').innerHTML = roundData.message;
+    document.getElementById('choiceCounterAct3').innerHTML = `Round ${currentRoundAct3 + 1} of ${MAX_ROUNDS_ACT3}`;
+    
+    const optionsDiv = document.getElementById('challengeOptionsAct3');
+    optionsDiv.innerHTML = '';
+    
+    roundData.choices.forEach((choice, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'challenge-opt';
+        btn.textContent = choice.text;
+        btn.onclick = () => handleQilinChoice(choice);
+        optionsDiv.appendChild(btn);
+    });
+    
+    document.getElementById('challengeFeedbackAct3').innerHTML = '';
+    waitingForContinueAct3 = false;
+}
+
+function handleQilinChoice(choice) {
+    if (!battleInProgressAct3 || !act3ChallengeActive || waitingForContinueAct3) return;
+    
+    const btns = document.querySelectorAll('#challengeOptionsAct3 .challenge-opt');
+    btns.forEach(b => b.disabled = true);
+    
+    choiceHistoryAct3.push(choice.effect);
+    
+    playerHealthAct3 = Math.max(0, Math.min(100, playerHealthAct3 + (choice.healthChange || 0)));
+    qilinLight = Math.max(0, Math.min(100, qilinLight + (choice.lightChange || 0)));
+    
+    document.getElementById('playerHealthFillAct3').style.width = `${playerHealthAct3}%`;
+    document.getElementById('opponentHealthFillAct3').style.width = `${qilinLight}%`;
+    
+    const isGood = choice.isGood !== undefined ? choice.isGood : (choice.lightChange > 0);
+    const feedbackDiv = document.getElementById('challengeFeedbackAct3');
+    
+    let feedbackHTML = `<div style="font-size: 18px; font-weight: bold; padding: 12px; margin: 10px 0; border-radius: 12px; background: ${isGood ? 'rgba(46, 125, 50, 0.3)' : 'rgba(244, 67, 54, 0.3)'}; border: 2px solid ${isGood ? '#4CAF50' : '#f44336'};">
+        <div style="font-size: 24px;">${isGood ? '✅ GOOD!' : '❌ BAD!'}</div>
+        <div style="margin-top: 8px;">${choice.feedback}</div>
+        <div style="margin-top: 10px; font-size: 14px; color: ${isGood ? '#81C784' : '#ef9a9a'};">
+            ${isGood ? '✨ The Qilin\'s light grows stronger!' : '💔 The Qilin loses energy...'}
+            (${choice.lightChange > 0 ? '+' : ''}${choice.lightChange}% light)
+        </div>
+    </div>`;
+    
+    feedbackDiv.innerHTML = feedbackHTML;
+    
+    const qilinSprite = document.getElementById('qilinSprite');
+    
+    const compassionChoices = choiceHistoryAct3.filter(c => 
+        c === 'help' || c === 'observe' || c === 'energy' || c === 'water' || 
+        c === 'hope' || c === 'tools' || c === 'pray' || c === 'heal'
+    ).length;
+    const negativeChoices = choiceHistoryAct3.filter(c => 
+        c === 'ignore' || c === 'pity' || c === 'giveup' || c === 'wait'
+    ).length;
+    
+    let progress = compassionChoices - negativeChoices;
+    progress = Math.max(-4, Math.min(6, progress));
+    
+    // Visual feedback based on progress
+    let scale = 0.7;
+    let bottomPos = '20%';
+    
+    if (progress <= -4) {
+        scale = 0.2;
+        bottomPos = '30%';
+        qilinSprite.className = 'qilin-sprite glow-weak';
+        qilinSprite.style.opacity = '0.3';
+    } else if (progress === -3) {
+        scale = 0.35;
+        bottomPos = '27%';
+        qilinSprite.className = 'qilin-sprite glow-weak';
+        qilinSprite.style.opacity = '0.5';
+    } else if (progress === -2) {
+        scale = 0.5;
+        bottomPos = '25%';
+        qilinSprite.className = 'qilin-sprite glow-weak';
+        qilinSprite.style.opacity = '0.7';
+    } else if (progress === -1) {
+        scale = 0.7;
+        bottomPos = '20%';
+        qilinSprite.className = 'qilin-sprite glow-medium';
+        qilinSprite.style.opacity = '0.9';
+    } else if (progress === 0) {
+        scale = 1.0;
+        bottomPos = '15%';
+        qilinSprite.className = 'qilin-sprite glow-medium';
+        qilinSprite.style.opacity = '1';
+    } else if (progress === 1) {
+        scale = 1.1;
+        bottomPos = '14%';
+        qilinSprite.className = 'qilin-sprite glow-strong';
+        qilinSprite.style.opacity = '1';
+    } else if (progress === 2) {
+        scale = 1.2;
+        bottomPos = '12%';
+        qilinSprite.className = 'qilin-sprite glow-strong';
+        qilinSprite.style.opacity = '1';
+    } else if (progress === 3) {
+        scale = 1.3;
+        bottomPos = '10%';
+        qilinSprite.className = 'qilin-sprite glow-strong';
+        qilinSprite.style.opacity = '1';
+    } else if (progress >= 4) {
+        scale = 1.4;
+        bottomPos = '8%';
+        qilinSprite.className = 'qilin-sprite glow-rainbow';
+        qilinSprite.style.opacity = '1';
+    }
+    
+    qilinSprite.style.transform = `translateX(-50%) scale(${scale})`;
+    qilinSprite.style.bottom = bottomPos;
+    
+    // Increment round counter
+    currentRoundAct3++;
+    
+    // ===== CHECK DEFEAT CONDITION (early) =====
+    const isDefeated = playerHealthAct3 <= 0 || qilinLight <= 0 || progress <= -3;
+    
+    if (isDefeated) {
+        battleInProgressAct3 = false;
+        act3ChallengeActive = false;
+        feedbackDiv.innerHTML += `<div style="font-size: 22px; color: #ff6b35; margin-top: 10px;">💔 The Shadow of Cruelty has won!</div>`;
+        showContinueButtonAct3('defeat');
+        return;
+    }
+    
+    // ===== CHECK IF ALL ROUNDS COMPLETED =====
+    if (currentRoundAct3 >= MAX_ROUNDS_ACT3) {
+        battleInProgressAct3 = false;
+        act3ChallengeActive = false;
+        
+        if (qilinLight >= 60 && progress >= 1) {
+            feedbackDiv.innerHTML += `<div style="font-size: 24px; color: #ffd700; margin-top: 10px;">🌈 The Qilin is FREE! Your compassion has won!</div>`;
+            showContinueButtonAct3('victory');
+        } else {
+            feedbackDiv.innerHTML += `<div style="font-size: 22px; color: #ff6b35; margin-top: 10px;">💔 Not enough compassion. The Darkness wins...</div>`;
+            showContinueButtonAct3('defeat');
+        }
+        return;
+    }
+    
+    // ===== SHOW CONTINUE BUTTON FOR NEXT ROUND =====
+    showContinueButtonAct3('next');
+}
+
+function showContinueButtonAct3(type) {
+    waitingForContinueAct3 = true;
+    const optionsDiv = document.getElementById('challengeOptionsAct3');
+    
+    // Clear any existing buttons
+    optionsDiv.innerHTML = '';
+    
+    // Create continue button
+    const continueBtn = document.createElement('button');
+    continueBtn.className = 'challenge-opt';
+    continueBtn.style.cssText = `
+        background: #d4af37;
+        color: #2c4a1e;
+        font-weight: bold;
+        font-size: 16px;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    `;
+    
+    if (type === 'victory') {
+        continueBtn.textContent = '🌈 Celebrate Compassion! 🌈';
+        continueBtn.style.background = '#4CAF50';
+        continueBtn.style.color = 'white';
+        continueBtn.onclick = function() {
+            act3Victory();
+        };
+    } else if (type === 'defeat') {
+        continueBtn.textContent = '💔 Accept Defeat';
+        continueBtn.style.background = '#f44336';
+        continueBtn.style.color = 'white';
+        continueBtn.onclick = function() {
+            act3Defeat();
+        };
+    } else {
+        // Next round
+        continueBtn.textContent = `➡️ Continue to Round ${currentRoundAct3 + 1}`;
+        continueBtn.onmouseover = function() {
+            this.style.background = '#ffd700';
+            this.style.transform = 'scale(1.02)';
+        };
+        continueBtn.onmouseout = function() {
+            this.style.background = '#d4af37';
+            this.style.transform = 'scale(1)';
+        };
+        continueBtn.onclick = function() {
+            // Remove the continue button and load next round
+            optionsDiv.innerHTML = '';
+            waitingForContinueAct3 = false;
+            loadQilinRound();
+        };
+    }
+    
+    optionsDiv.appendChild(continueBtn);
+}
+
+function act3Victory() {
+    gameState.currentScreen = 'act3Success';
+    document.getElementById('challengeSceneAct3').style.display = 'none';
+    document.getElementById('successSceneAct3').style.display = 'block';
+    updateScrollMessage("🎉 Victory!", "The Qilin is free! Your compassion has healed the forest! Karuna mastered!", "high");
+    gameState.hasCompletedAct3 = true;
+    gameState.currentStage = 3;
+    gameState.stageProgress = 60;
+    updateUI();
+    localStorage.setItem('furryBodhis_save', JSON.stringify(gameState));
+    setCookie('furryBodhis_save', JSON.stringify(gameState), 30);
+}
+
+function act3Defeat() {
+    act3ChallengeActive = false;
+    document.getElementById('challengeSceneAct3').style.display = 'none';
+    gameState.currentScreen = 'act3Defeat';
+    const defeatScene = document.getElementById('defeatSceneAct3');
+    const proceedArea = document.getElementById('proceedArea');
+    
+    if (defeatScene) {
+        defeatScene.style.display = 'block';
+        proceedArea.innerHTML = '';
+        
+        updateScrollMessage("💔 Defeat", "The Shadow of Cruelty has won. The Qilin fades. Try again with compassion!", "low");
+        
+        const retryBtn = document.createElement('button');
+        retryBtn.className = 'retry-btn';
+        retryBtn.id = 'retryAct3Btn';
+        retryBtn.textContent = '🔄 Try Again with Compassion 🔄';
+        retryBtn.onclick = function() {
+            proceedArea.innerHTML = '';
+            if (defeatScene) defeatScene.style.display = 'none';
+            document.getElementById('challengeSceneAct3').style.display = 'block';
+            const qilinSprite = document.getElementById('qilinSprite');
+            qilinSprite.style.transform = 'translateX(-50%) scale(1)';
+            qilinSprite.style.bottom = '15%';
+            qilinSprite.style.opacity = '1';
+            qilinSprite.className = 'qilin-sprite glow-medium';
+            startAct3Battle();
+        };
+        proceedArea.appendChild(retryBtn);
+        
+        playerHealthAct3 = 100;
+        qilinLight = 100;
+        return;
+    }
+}
+
+// ========== ACT 4: JEALOUSY DEMON BATTLE (BUTTON-BASED) ==========
+let act4ChallengeActive = true;
+let playerHealthAct4 = 100;
+let jealousyLevel = 100;
+let currentRoundAct4 = 0;
+const MAX_ROUNDS_ACT4 = 4;
+let choiceHistoryAct4 = [];
+let battleInProgressAct4 = false;
+let waitingForContinue = false;
+
+const demonMessages = [
+    {
+        message: "💚 The Green-Eyed Monster whispers: 'Ananda don't deserve that trophy! You could have won!' What will you do?",
+        choices: [
+            { text: "🎉 Celebrate Ananda's win", effect: "celebrate", feedback: "✅ WONDERFUL! You cheer loudest for Ananda! Your joy is contagious! The monster shrinks!", joyChange: 25, healthChange: 5, isGood: true },
+            { text: "🤔 Feel a little envious", effect: "envy", feedback: "⚠️ CAREFUL! A little envy creeps in... The monster notices! 'YES! That's it!'", joyChange: 15, healthChange: -5, isGood: false },
+            { text: "😤 'Ananda don't deserve it!'", effect: "bitter", feedback: "❌ BAD! You feed The monster's power! 'You should be the winner!' The monster grows!", joyChange: 25, healthChange: -10, isGood: false }
+        ]
+    },
+    {
+        message: "💚 A parent compares their child to Ananda. 'Why can't you be like him?' What do you say?",
+        choices: [
+            { text: "💚 'Every child shines differently!'", effect: "encourage", feedback: "✅ BEAUTIFUL! You remind everyone that each smiley is unique! The monster loses power!", joyChange: 25, healthChange: 8, isGood: true },
+            { text: "🌸 'Your child has their own gifts!'", effect: "support", feedback: "✅ GOOD! You lift up the child's spirits! The monster hisses in frustration!", joyChange: 20, healthChange: 5, isGood: true },
+            { text: "😔 'My child will never be that good...'", effect: "compare", feedback: "❌ BAD! You feed The monster with comparison! 'Yes! They'll never be good enough!'", joyChange: 20, healthChange: -8, isGood: false }
+        ]
+    },
+    {
+        message: "💚 Bao-Bao gloats: 'I could have won easily! Ananda was not that special!' What do you do?",
+        choices: [
+            { text: "🙏 'Ananda is so humble! Inspiring!'", effect: "praise", feedback: "✅ AMAZING! You focus on Ananda's humility! The monster can't stand it!", joyChange: 25, healthChange: 8, isGood: true },
+            { text: "🕊️ 'Winning isn't about showing off!'", effect: "wisdom", feedback: "✅ SMART! You teach Bao-Bao about humility! The monster shrinks further!", joyChange: 20, healthChange: 5, isGood: true },
+            { text: "😈 'Bao-Bao is right! Ananda was just lucky!'", effect: "gossip", feedback: "❌ BAD! You join the gossip! The monster laughs triumphantly!", joyChange: 20, healthChange: -12, isGood: false }
+        ]
+    },
+    {
+        message: "💚 Final round! The Green-Eyed Monster makes its last attack! 'YOU WILL NEVER BE HAPPY FOR OTHERS!'",
+        choices: [
+            { text: "🌈 'I celebrate ALL successes!'", effect: "mudita", feedback: "✅ PERFECT! You have mastered Mudita! The monster shrieks and dissolves!", joyChange: 30, healthChange: 10, isGood: true },
+            { text: "🤗 'When others shine, we all shine!'", effect: "together", feedback: "✅ BEAUTIFUL! Your words create a rainbow of joy! The monster is defeated!", joyChange: 30, healthChange: 10, isGood: true },
+            { text: "💔 'It's not fair. Why them and not me?'", effect: "jealousy", feedback: "❌ TERRIBLE! You give in to jealousy! The monster becomes huge and powerful!", joyChange: 30, healthChange: -20, isGood: false }
+        ]
+    }
+];
+
+function startAct4Battle() {
+    gameState.currentScreen = 'act4Battle';
+    const proceedArea = document.getElementById('proceedArea');
+    proceedArea.innerHTML = '';
+    
+    playerHealthAct4 = 100;
+    jealousyLevel = 100;
+    currentRoundAct4 = 0;
+    choiceHistoryAct4 = [];
+    act4ChallengeActive = true;
+    battleInProgressAct4 = true;
+    waitingForContinue = false;
+    
+    document.getElementById('playerHealthFillAct4').style.width = '100%';
+    document.getElementById('opponentHealthFillAct4').style.width = '100%';
+    document.getElementById('challengeFeedbackAct4').innerHTML = '';
+    document.getElementById('vsBannerAct4').style.display = 'block';
+    
+    const demonSprite = document.getElementById('demonSprite');
+    demonSprite.style.transform = 'translateX(-50%) scale(1)';
+    demonSprite.style.opacity = '1';
+    demonSprite.style.bottom = '15%';
+    demonSprite.className = 'demon-sprite envy-medium';
+    
+    loadDemonRound();
+    updateScrollMessage("💚 Green-Eyed Monster", "The Green-Eyed Monster feeds on envy! Show Mudita - joy in others' joy!<br>💡 TIP: Celebrate others and reject comparison!", "normal");
+}
+
+function loadDemonRound() {
+    if (!act4ChallengeActive || currentRoundAct4 >= MAX_ROUNDS_ACT4) {
+        return;
+    }
+    
+    const roundData = demonMessages[currentRoundAct4];
+    document.getElementById('challengeQuestionAct4').innerHTML = roundData.message;
+    document.getElementById('choiceCounterAct4').innerHTML = `Round ${currentRoundAct4 + 1} of ${MAX_ROUNDS_ACT4}`;
+    
+    const optionsDiv = document.getElementById('challengeOptionsAct4');
+    optionsDiv.innerHTML = '';
+    
+    roundData.choices.forEach((choice, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'challenge-opt';
+        btn.textContent = choice.text;
+        btn.onclick = () => handleDemonChoice(choice);
+        optionsDiv.appendChild(btn);
+    });
+    
+    document.getElementById('challengeFeedbackAct4').innerHTML = '';
+    waitingForContinue = false;
+}
+
+function handleDemonChoice(choice) {
+    if (!battleInProgressAct4 || !act4ChallengeActive || waitingForContinue) return;
+    
+    // Disable choice buttons
+    const btns = document.querySelectorAll('#challengeOptionsAct4 .challenge-opt');
+    btns.forEach(b => b.disabled = true);
+    
+    choiceHistoryAct4.push(choice.effect);
+    
+    playerHealthAct4 = Math.max(0, Math.min(100, playerHealthAct4 + (choice.healthChange || 0)));
+    jealousyLevel = Math.max(0, Math.min(100, jealousyLevel - (choice.joyChange || 0)));
+    
+    document.getElementById('playerHealthFillAct4').style.width = `${playerHealthAct4}%`;
+    document.getElementById('opponentHealthFillAct4').style.width = `${jealousyLevel}%`;
+    
+    const isGood = choice.isGood !== undefined ? choice.isGood : (choice.joyChange > 0);
+    const feedbackDiv = document.getElementById('challengeFeedbackAct4');
+    
+    let feedbackHTML = `<div style="font-size: 18px; font-weight: bold; padding: 12px; margin: 10px 0; border-radius: 12px; background: ${isGood ? 'rgba(46, 125, 50, 0.3)' : 'rgba(244, 67, 54, 0.3)'}; border: 2px solid ${isGood ? '#4CAF50' : '#f44336'};">
+        <div style="font-size: 24px;">${isGood ? '✅ GOOD!' : '❌ BAD!'}</div>
+        <div style="margin-top: 8px;">${choice.feedback}</div>
+        <div style="margin-top: 10px; font-size: 14px; color: ${isGood ? '#81C784' : '#ef9a9a'};">
+            ${isGood ? '✨ Jealousy decreases!' : '💚 Jealousy increases...'}
+            (${isGood ? '-' : '+'}${choice.joyChange}% jealousy)
+        </div>
+    </div>`;
+    
+    feedbackDiv.innerHTML = feedbackHTML;
+    
+    const demonSprite = document.getElementById('demonSprite');
+    
+    // Count good vs bad choices
+    const goodChoices = choiceHistoryAct4.filter(c => 
+        c === 'celebrate' || c === 'encourage' || c === 'support' || c === 'praise' || 
+        c === 'wisdom' || c === 'mudita' || c === 'together'
+    ).length;
+    const badChoices = choiceHistoryAct4.filter(c => 
+        c === 'envy' || c === 'bitter' || c === 'compare' || c === 'gossip' || c === 'jealousy'
+    ).length;
+    
+    let progress = goodChoices - badChoices;
+    progress = Math.max(-4, Math.min(6, progress));
+    
+    // ===== DEMON SCALING =====
+    let scale = 1.0 - (progress * 0.15);
+    scale = Math.max(0.2, Math.min(2.5, scale));
+    
+    let bottomPos = 15 + (1.0 - scale) * 15;
+    bottomPos = Math.max(5, Math.min(30, bottomPos));
+    
+    let opacity = 0.7 + (scale - 0.2) * 0.15;
+    opacity = Math.max(0.4, Math.min(1.0, opacity));
+    
+    let glowClass = 'envy-medium';
+    if (scale >= 2.0) glowClass = 'envy-rage';
+    else if (scale >= 1.5) glowClass = 'envy-strong';
+    else if (scale >= 0.7) glowClass = 'envy-medium';
+    else if (scale >= 0.4) glowClass = 'envy-weak';
+    else glowClass = 'envy-weak';
+    
+    demonSprite.className = `demon-sprite ${glowClass}`;
+    demonSprite.style.transform = `translateX(-50%) scale(${scale})`;
+    demonSprite.style.bottom = `${bottomPos}%`;
+    demonSprite.style.opacity = opacity;
+    
+    // Increment round counter
+    currentRoundAct4++;
+    
+    // ===== CHECK DEFEAT CONDITION (early) =====
+    const isDefeated = playerHealthAct4 <= 0 || jealousyLevel >= 100 || progress <= -3;
+    
+    if (isDefeated) {
+        battleInProgressAct4 = false;
+        act4ChallengeActive = false;
+        feedbackDiv.innerHTML += `<div style="font-size: 22px; color: #ff6b35; margin-top: 10px;">💚 The Green-Eyed Monster has won!</div>`;
+        // Show continue button for defeat
+        showContinueButton('defeat');
+        return;
+    }
+    
+    // ===== CHECK IF ALL ROUNDS COMPLETED =====
+    if (currentRoundAct4 >= MAX_ROUNDS_ACT4) {
+        battleInProgressAct4 = false;
+        act4ChallengeActive = false;
+        
+        if (jealousyLevel <= 50 && progress >= 0) {
+            feedbackDiv.innerHTML += `<div style="font-size: 24px; color: #ffd700; margin-top: 10px;">🌈 The Green-Eyed Monster dissolves! Mudita wins!</div>`;
+            showContinueButton('victory');
+        } else {
+            feedbackDiv.innerHTML += `<div style="font-size: 22px; color: #ff6b35; margin-top: 10px;">💚 Not enough Mudita. The monster wins...</div>`;
+            showContinueButton('defeat');
+        }
+        return;
+    }
+    
+    // ===== SHOW CONTINUE BUTTON FOR NEXT ROUND =====
+    showContinueButton('next');
+}
+
+function showContinueButton(type) {
+    waitingForContinue = true;
+    const optionsDiv = document.getElementById('challengeOptionsAct4');
+    
+    // Clear any existing buttons
+    optionsDiv.innerHTML = '';
+    
+    // Create continue button
+    const continueBtn = document.createElement('button');
+    continueBtn.className = 'challenge-opt';
+    continueBtn.style.cssText = `
+        background: #d4af37;
+        color: #2c4a1e;
+        font-weight: bold;
+        font-size: 16px;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    `;
+    
+    if (type === 'victory') {
+        continueBtn.textContent = '🎉 Celebrate Victory! 🎉';
+        continueBtn.style.background = '#4CAF50';
+        continueBtn.style.color = 'white';
+        continueBtn.onclick = function() {
+            act4Victory();
+        };
+    } else if (type === 'defeat') {
+        continueBtn.textContent = '💔 Accept Defeat';
+        continueBtn.style.background = '#f44336';
+        continueBtn.style.color = 'white';
+        continueBtn.onclick = function() {
+            act4Defeat();
+        };
+    } else {
+        // Next round
+        continueBtn.textContent = `➡️ Continue to Round ${currentRoundAct4 + 1}`;
+        continueBtn.onmouseover = function() {
+            this.style.background = '#ffd700';
+            this.style.transform = 'scale(1.02)';
+        };
+        continueBtn.onmouseout = function() {
+            this.style.background = '#d4af37';
+            this.style.transform = 'scale(1)';
+        };
+        continueBtn.onclick = function() {
+            // Remove the continue button and load next round
+            optionsDiv.innerHTML = '';
+            waitingForContinue = false;
+            loadDemonRound();
+        };
+    }
+    
+    optionsDiv.appendChild(continueBtn);
+}
+
+function act4Victory() {
+    gameState.currentScreen = 'act4Success';
+    document.getElementById('challengeSceneAct4').style.display = 'none';
+    document.getElementById('successSceneAct4').style.display = 'block';
+    updateScrollMessage("🎉 Victory!", "The Green-Eyed Monster is defeated! You have mastered Mudita - joy in others' joy!", "high");
+    gameState.hasCompletedAct4 = true;
+    gameState.currentStage = 4;
+    gameState.stageProgress = 80;
+    updateUI();
+    localStorage.setItem('furryBodhis_save', JSON.stringify(gameState));
+    setCookie('furryBodhis_save', JSON.stringify(gameState), 30);
+}
+
+function act4Defeat() {
+    act4ChallengeActive = false;
+    document.getElementById('challengeSceneAct4').style.display = 'none';
+    gameState.currentScreen = 'act4Defeat';
+    const defeatScene = document.getElementById('defeatSceneAct4');
+    const proceedArea = document.getElementById('proceedArea');
+    
+    if (defeatScene) {
+        defeatScene.style.display = 'block';
+        proceedArea.innerHTML = '';
+        
+        updateScrollMessage("💔 Defeat", "The Green-Eyed Monster won. Remember: someone else's success doesn't take anything away from you! Try again with Mudita!", "low");
+        
+        const retryBtn = document.createElement('button');
+        retryBtn.className = 'retry-btn';
+        retryBtn.id = 'retryAct4Btn';
+        retryBtn.textContent = '🔄 Try Again with Mudita 🔄';
+        retryBtn.onclick = function() {
+            proceedArea.innerHTML = '';
+            if (defeatScene) defeatScene.style.display = 'none';
+            document.getElementById('challengeSceneAct4').style.display = 'block';
+            const demonSprite = document.getElementById('demonSprite');
+            demonSprite.style.transform = 'translateX(-50%) scale(1)';
+            demonSprite.style.bottom = '15%';
+            demonSprite.style.opacity = '1';
+            demonSprite.className = 'demon-sprite envy-medium';
+            startAct4Battle();
+        };
+        proceedArea.appendChild(retryBtn);
+        
+        playerHealthAct4 = 100;
+        jealousyLevel = 100;
+        return;
+    }
+}
+
+// ========== ACT 2: STORY FRAME SYSTEM ==========
+let act2Frames = [];
+let currentAct2FrameIndex = 0;
+
+function loadAct2StoryFrames() {
+    gameState.currentScreen = 'act2Story';
+    const frameElements = document.querySelectorAll('#storyFramesAct2 .story-frame');
+    act2Frames = [];
+    frameElements.forEach((el) => {
+        const bg = el.getAttribute('data-bg');
+        const speaker = el.querySelector('.story-speaker')?.innerText || "Narrator";
+        const text = el.querySelector('.story-text')?.innerHTML || "";
+        act2Frames.push({ bg, speaker, text });
+    });
+}
+
+function showAct2Frame(index) {
+    if (index >= act2Frames.length) {
+        document.getElementById('storyViewerAct2').style.display = 'none';
+        document.getElementById('challengeSceneAct2').style.display = 'block';
+        startAct2Battle();
+        return;
+    }
+    
+    const frame = act2Frames[index];
+    document.getElementById('storyBgAct2').src = frame.bg;
+    updateScrollMessage(frame.speaker, frame.text, "normal");
+    
+    const prevBtn = document.getElementById('storyPrevBtnAct2');
+    const nextBtn = document.getElementById('storyNextBtnAct2');
+    prevBtn.disabled = (index === 0);
+    nextBtn.textContent = (index === act2Frames.length - 1) ? "✨ Begin Battle ✨" : "Next ▶";
+    currentAct2FrameIndex = index;
+}
+
+function nextAct2Frame() {
+    if (currentAct2FrameIndex + 1 < act2Frames.length) {
+        showAct2Frame(currentAct2FrameIndex + 1);
+    } else if (currentAct2FrameIndex + 1 === act2Frames.length) {
+        showAct2Frame(currentAct2FrameIndex + 1);
+    }
+}
+
+function prevAct2Frame() {
+    if (currentAct2FrameIndex > 0) {
+        showAct2Frame(currentAct2FrameIndex - 1);
+    }
+}
+
+function startAct2() {
+    gameState.currentScreen = 'act2Intro';
+    const proceedArea = document.getElementById('proceedArea');
+    proceedArea.innerHTML = '';
+    
+    document.getElementById('successSceneAct1').style.display = 'none';
+    document.getElementById('storyViewerAct1').style.display = 'none';
+    document.getElementById('challengeSceneAct1').style.display = 'none';
+    document.getElementById('introAct2').style.display = 'none';
+    document.getElementById('storyViewerAct2').style.display = 'none';
+    document.getElementById('challengeSceneAct2').style.display = 'none';
+    document.getElementById('successSceneAct2').style.display = 'none';
+    document.getElementById('defeatSceneAct2').style.display = 'none';
+    
+    const existingRetryBtn = document.getElementById('retryAct2Btn');
+    if (existingRetryBtn) existingRetryBtn.remove();
+    
+    act2Intro = { tv: false, dakkii: false, bunnii: false };
+    
+    document.getElementById('introAct2').style.display = 'block';
+    updateScrollMessage("Pink Fairies", "OK, let's hear it from everyone about the virtue of Metta, loving kindness.<br>Do you practise Metta?<br>Click on all the characters.", "high");
+}
+
+// ========== ACT 2: INTERACTIVE INTRO ==========
+let act2Intro = {
+    tv: false,
+    dakkii: false,
+    bunnii: false
+};
+
+function checkAct2IntroComplete() {
+    if (act2Intro.tv && act2Intro.dakkii && act2Intro.bunnii) {
+        const proceedArea = document.getElementById('proceedArea');
+        proceedArea.innerHTML = '';
+        const btn = document.createElement('button');
+        btn.className = 'proceed-btn';
+        btn.id = 'proceedAct2Btn';
+        btn.innerHTML = '🌟 Let\'s go! 🌟';
+        btn.onclick = startAct2Story;
+        proceedArea.appendChild(btn);
+        updateScrollMessage("Pink Fairies", "Ok, we are good to go. Click 'Let's go!'", "high");
+    }
+}
+
+function startAct2Story() {
+    gameState.currentScreen = 'act2Story';
+    document.getElementById('proceedArea').innerHTML = '';
+    document.getElementById('introAct2').style.display = 'none';
+    loadAct2StoryFrames();
+    showAct2Frame(0);
+    document.getElementById('storyViewerAct2').style.display = 'block';
+    updateScrollMessage("Pink Fairies", "Stage 2: And so... our furry friends and the Pink Fairies set out on The Trail of Heavenly Virtues! What adventure awaits?", "high");
+}
+
+// ========== ACT 3: STORY FRAME SYSTEM ==========
+let act3Frames = [];
+let currentAct3FrameIndex = 0;
+
+function loadAct3StoryFrames() {
+    gameState.currentScreen = 'act3Story';
+    const frameElements = document.querySelectorAll('#storyFramesAct3 .story-frame');
+    act3Frames = [];
+    frameElements.forEach((el) => {
+        const bg = el.getAttribute('data-bg');
+        const speaker = el.querySelector('.story-speaker')?.innerText || "Narrator";
+        const text = el.querySelector('.story-text')?.innerHTML || "";
+        act3Frames.push({ bg, speaker, text });
+    });
+}
+
+function showAct3Frame(index) {
+    if (index >= act3Frames.length) {
+        document.getElementById('storyViewerAct3').style.display = 'none';
+        document.getElementById('challengeSceneAct3').style.display = 'block';
+        startAct3Battle();
+        return;
+    }
+    
+    const frame = act3Frames[index];
+    document.getElementById('storyBgAct3').src = frame.bg;
+    updateScrollMessage(frame.speaker, frame.text, "normal");
+    
+    const prevBtn = document.getElementById('storyPrevBtnAct3');
+    const nextBtn = document.getElementById('storyNextBtnAct3');
+    prevBtn.disabled = (index === 0);
+    nextBtn.textContent = (index === act3Frames.length - 1) ? "✨ Begin Challenge ✨" : "Next ▶";
+    currentAct3FrameIndex = index;
+}
+
+function nextAct3Frame() {
+    if (currentAct3FrameIndex + 1 < act3Frames.length) {
+        showAct3Frame(currentAct3FrameIndex + 1);
+    } else if (currentAct3FrameIndex + 1 === act3Frames.length) {
+        showAct3Frame(currentAct3FrameIndex + 1);
+    }
+}
+
+function prevAct3Frame() {
+    if (currentAct3FrameIndex > 0) {
+        showAct3Frame(currentAct3FrameIndex - 1);
+    }
+}
+
+function startAct3() {
+    gameState.currentScreen = 'act3Intro';
+    const proceedArea = document.getElementById('proceedArea');
+    proceedArea.innerHTML = '';
+    
+    document.getElementById('successSceneAct2').style.display = 'none';
+    document.getElementById('storyViewerAct2').style.display = 'none';
+    document.getElementById('challengeSceneAct2').style.display = 'none';
+    document.getElementById('defeatSceneAct2').style.display = 'none';
+    
+    document.getElementById('introAct3').style.display = 'none';
+    document.getElementById('storyViewerAct3').style.display = 'none';
+    document.getElementById('challengeSceneAct3').style.display = 'none';
+    document.getElementById('successSceneAct3').style.display = 'none';
+    document.getElementById('defeatSceneAct3').style.display = 'none';
+    
+    const existingRetryBtn = document.getElementById('retryAct3Btn');
+    if (existingRetryBtn) existingRetryBtn.remove();
+    
+    act3Intro = { tv: false, dakkii: false, bunnii: false };
+    
+    document.getElementById('introAct3').style.display = 'block';
+    updateScrollMessage("Pink Fairies", "We have entered the Whispering woods which is the start of the Trail of Karuna, compassion.<br>Do you have Karuna in your heart? <br>Let's hear it from everyone before we continue.", "high");
+}
+
+// ========== ACT 3: INTERACTIVE INTRO ==========
+let act3Intro = {
+    tv: false,
+    dakkii: false,
+    bunnii: false
+};
+
+function checkAct3IntroComplete() {
+    if (act3Intro.tv && act3Intro.dakkii && act3Intro.bunnii) {
+        const proceedArea = document.getElementById('proceedArea');
+        proceedArea.innerHTML = '';
+        const btn = document.createElement('button');
+        btn.className = 'proceed-btn';
+        btn.id = 'proceedAct3Btn';
+        btn.innerHTML = '🌟 Trail of Karuna! 🌟';
+        btn.onclick = startAct3Story;
+        proceedArea.appendChild(btn);
+        updateScrollMessage("Pink Fairies", "We are ready! Click 'Trail of Karuna' to begin.", "high");
+    }
+}
+
+function startAct3Story() {
+    gameState.currentScreen = 'act3Story';
+    document.getElementById('proceedArea').innerHTML = '';
+    document.getElementById('introAct3').style.display = 'none';
+    loadAct3StoryFrames();
+    showAct3Frame(0);
+    document.getElementById('storyViewerAct3').style.display = 'block';
+    updateScrollMessage("Narrator", "Stage 3: They enter the Whispering woods. It is called the whispering woods because of the soft and serene sound from all the giant bamboo plants. It is said that on one occasion Bhante Pika was meditating here and the whole bamboo grove played a beautiful ensemble of sounds. That was when he saw the guardian of the whispering woods. It was the Qilin, a mysterious celestial creature of great kindness and compassion. Only very fortunate or wise people can see it.", "high");
+}
+
+// ========== ACT 4: STORY FRAME SYSTEM ==========
+let act4Frames = [];
+let currentAct4FrameIndex = 0;
+
+function loadAct4StoryFrames() {
+    gameState.currentScreen = 'act4Story';
+    const frameElements = document.querySelectorAll('#storyFramesAct4 .story-frame');
+    act4Frames = [];
+    frameElements.forEach((el) => {
+        const bg = el.getAttribute('data-bg');
+        const speaker = el.querySelector('.story-speaker')?.innerText || "Narrator";
+        const text = el.querySelector('.story-text')?.innerHTML || "";
+        act4Frames.push({ bg, speaker, text });
+    });
+}
+
+function showAct4Frame(index) {
+    if (index >= act4Frames.length) {
+        document.getElementById('storyViewerAct4').style.display = 'none';
+        document.getElementById('challengeSceneAct4').style.display = 'block';
+        startAct4Battle();
+        return;
+    }
+    
+    const frame = act4Frames[index];
+    document.getElementById('storyBgAct4').src = frame.bg;
+    updateScrollMessage(frame.speaker, frame.text, "normal");
+    
+    const prevBtn = document.getElementById('storyPrevBtnAct4');
+    const nextBtn = document.getElementById('storyNextBtnAct4');
+    prevBtn.disabled = (index === 0);
+    nextBtn.textContent = (index === act4Frames.length - 1) ? "✨ Begin Challenge ✨" : "Next ▶";
+    currentAct4FrameIndex = index;
+}
+
+function nextAct4Frame() {
+    if (currentAct4FrameIndex + 1 < act4Frames.length) {
+        showAct4Frame(currentAct4FrameIndex + 1);
+    } else if (currentAct4FrameIndex + 1 === act4Frames.length) {
+        showAct4Frame(currentAct4FrameIndex + 1);
+    }
+}
+
+function prevAct4Frame() {
+    if (currentAct4FrameIndex > 0) {
+        showAct4Frame(currentAct4FrameIndex - 1);
+    }
+}
+
+function startAct4() {
+    gameState.currentScreen = 'act4Intro';
+    const proceedArea = document.getElementById('proceedArea');
+    proceedArea.innerHTML = '';
+    
+    document.getElementById('successSceneAct3').style.display = 'none';
+    document.getElementById('storyViewerAct3').style.display = 'none';
+    document.getElementById('challengeSceneAct3').style.display = 'none';
+    document.getElementById('defeatSceneAct3').style.display = 'none';
+    
+    document.getElementById('introAct4').style.display = 'none';
+    document.getElementById('storyViewerAct4').style.display = 'none';
+    document.getElementById('challengeSceneAct4').style.display = 'none';
+    document.getElementById('successSceneAct4').style.display = 'none';
+    document.getElementById('defeatSceneAct4').style.display = 'none';
+    
+    const existingRetryBtn = document.getElementById('retryAct4Btn');
+    if (existingRetryBtn) existingRetryBtn.remove();
+    
+    act4Intro = { tv: false, dakkii: false, bunnii: false };
+    
+    document.getElementById('introAct4').style.display = 'block';
+    updateScrollMessage("Pink Fairies", "The next morning, the group found themselves at the Mudita trail that leads into a strange village called Smile-Ville. A community of Smileys live there and they are going to celebrate their 'Festival of many Smiles.' This time it will include a talent competition. Make sure you tap every character to continue.", "high");
+}
+
+// ========== ACT 4: INTERACTIVE INTRO ==========
+let act4Intro = {
+    tv: false,
+    dakkii: false,
+    bunnii: false
+};
+
+function checkAct4IntroComplete() {
+    if (act4Intro.tv && act4Intro.dakkii && act4Intro.bunnii) {
+        const proceedArea = document.getElementById('proceedArea');
+        proceedArea.innerHTML = '';
+        const btn = document.createElement('button');
+        btn.className = 'proceed-btn';
+        btn.id = 'proceedAct4Btn';
+        btn.innerHTML = '🌟 Festival of Many Smiles! 🌟';
+        btn.onclick = startAct4Story;
+        proceedArea.appendChild(btn);
+        updateScrollMessage("Pink Fairies", "We are ready! Click 'Festival of Many Smiles' to begin.", "high");
+    }
+}
+
+function startAct4Story() {
+    gameState.currentScreen = 'act4Story';
+    document.getElementById('proceedArea').innerHTML = '';
+    document.getElementById('introAct4').style.display = 'none';
+    loadAct4StoryFrames();
+    showAct4Frame(0);
+    document.getElementById('storyViewerAct4').style.display = 'block';
+    updateScrollMessage("Narrator", "Stage 4: The Furry Bodhis arrive at the Festival of Many Smiles!<br>All the smileys of Smile-Ville have gathered to celebrate the Golden Smile Trophy competition.<br>Who will win? And will everyone be able to celebrate together?", "high");
+}
+
+// ========== ACT 1: STORY FRAME SYSTEM ==========
+let act1Frames = [];
+let currentAct1FrameIndex = 0;
+
+function loadAct1StoryFrames() {
+    const frameElements = document.querySelectorAll('#storyFramesAct1 .story-frame');
+    act1Frames = [];
+    frameElements.forEach((el) => {
+        const bg = el.getAttribute('data-bg');
+        const speaker = el.querySelector('.story-speaker')?.innerText || "Narrator";
+        const text = el.querySelector('.story-text')?.innerHTML || "";
+        act1Frames.push({ bg, speaker, text });
+    });
+}
+
+function showAct1Frame(index) {
+    if (index >= act1Frames.length) {
+        document.getElementById('storyViewerAct1').style.display = 'none';
+        document.getElementById('challengeSceneAct1').style.display = 'block';
+        resetChallenge();
+        updateScrollMessage("Pink Fairies", "Behold! The Four Heavenly Virtues Lock. Answer all four questions correctly to unlock it.", "normal");
+        return;
+    }
+    const frame = act1Frames[index];
+    document.getElementById('storyBgAct1').src = frame.bg;
+    updateScrollMessage(frame.speaker, frame.text, "normal");
+    const prevBtn = document.getElementById('storyPrevBtnAct1');
+    const nextBtn = document.getElementById('storyNextBtnAct1');
+    prevBtn.disabled = (index === 0);
+    nextBtn.textContent = (index === act1Frames.length - 1) ? "✨ Begin Challenge ✨" : "Next ▶";
+    currentAct1FrameIndex = index;
+}
+
+function nextAct1Frame() {
+    if (currentAct1FrameIndex + 1 < act1Frames.length) {
+        showAct1Frame(currentAct1FrameIndex + 1);
+    } else if (currentAct1FrameIndex + 1 === act1Frames.length) {
+        showAct1Frame(currentAct1FrameIndex + 1);
+        gameState.currentScreen = 'act1Challenge';
+    }
+}
+
+function prevAct1Frame() {
+    if (currentAct1FrameIndex > 0) {
+        showAct1Frame(currentAct1FrameIndex - 1);
+    }
+}
+
+// ========== ACT 5: BOAT & WIND CLOUD BATTLE ==========
+let act5ChallengeActive = true;
+let playerBalanceAct5 = 100;
+let windPowerAct5 = 100;
+let currentRoundAct5 = 0;
+const MAX_ROUNDS_ACT5 = 4;
+let choiceHistoryAct5 = [];
+let battleInProgressAct5 = false;
+let waitingForContinueAct5 = false;
+
+const windMessages = [
+    {
+        message: "🌬️ The Wind of Praise blows! Everyone is cheering for you! What will you do?",
+        choices: [
+            { text: "🙏 'I'm grateful, but I stay humble.'", effect: "humble", feedback: "✅ GOOD! The cloud shrinks! You don't let praise inflate your ego.", balanceChange: 20, windChange: -25, isGood: true },
+            { text: "😏 'Yes! I deserve this praise!'", effect: "proud", feedback: "⚠️ CAREFUL! The cloud grows! Praise is making you proud.", balanceChange: -15, windChange: 20, isGood: false },
+            { text: "🤷 'I don't care what they think.'", effect: "indifferent", feedback: "❌ BAD! Indifference is not equanimity — it's just avoiding the feeling.", balanceChange: -20, windChange: 25, isGood: false }
+        ]
+    },
+    {
+        message: "🌬️ The Wind of Blame blows! Someone blames you for a mistake. What will you do?",
+        choices: [
+            { text: "🧘 'I'll listen calmly and explain later.'", effect: "listen", feedback: "✅ GOOD! The cloud shrinks! You stay calm in the face of blame.", balanceChange: 20, windChange: -25, isGood: true },
+            { text: "😠 'How dare you blame me!'", effect: "defensive", feedback: "⚠️ CAREFUL! The cloud grows! You're reacting with anger.", balanceChange: -15, windChange: 20, isGood: false },
+            { text: "😢 'It's always my fault...'", effect: "victim", feedback: "❌ BAD! You're letting blame define you. True equanimity means not internalizing others' opinions.", balanceChange: -20, windChange: 25, isGood: false }
+        ]
+    },
+    {
+        message: "🌬️ The Wind of Gain blows! You win a prize, but your friend lost. What will you do?",
+        choices: [
+            { text: "🎉 'I'll share my joy and celebrate with my friend!'", effect: "share", feedback: "✅ GOOD! The cloud shrinks! You're not attached to winning.", balanceChange: 20, windChange: -25, isGood: true },
+            { text: "🏆 'I won! They should have tried harder.'", effect: "boast", feedback: "⚠️ CAREFUL! The cloud grows! You're letting success go to your head.", balanceChange: -15, windChange: 20, isGood: false },
+            { text: "😔 'I feel bad for winning...'", effect: "guilty", feedback: "❌ BAD! Guilt is just another attachment. Stay balanced in both joy and disappointment.", balanceChange: -20, windChange: 25, isGood: false }
+        ]
+    },
+    {
+        message: "🌬️ The Wind of Loss blows! You lost something important. What will you do?",
+        choices: [
+            { text: "🕊️ 'I accept this loss. Everything comes and goes.'", effect: "accept", feedback: "✅ GOOD! The cloud shrinks! You're not clinging to what you had.", balanceChange: 25, windChange: -30, isGood: true },
+            { text: "😤 'This is so unfair!'", effect: "angry", feedback: "⚠️ CAREFUL! The cloud grows! Anger is clouding your mind.", balanceChange: -15, windChange: 20, isGood: false },
+            { text: "😭 'I'll never get over this...'", effect: "despair", feedback: "❌ BAD! Despair is attachment to what you lost. Equanimity means letting go.", balanceChange: -25, windChange: 30, isGood: false }
+        ]
+    }
+];
+
+function startAct5Battle() {
+    gameState.currentScreen = 'act5Battle';
+    const proceedArea = document.getElementById('proceedArea');
+    proceedArea.innerHTML = '';
+    
+    playerBalanceAct5 = 100;
+    windPowerAct5 = 100;
+    currentRoundAct5 = 0;
+    choiceHistoryAct5 = [];
+    act5ChallengeActive = true;
+    battleInProgressAct5 = true;
+    waitingForContinueAct5 = false;
+    
+    document.getElementById('playerHealthFillAct5').style.width = '100%';
+    document.getElementById('opponentHealthFillAct5').style.width = '100%';
+    document.getElementById('challengeFeedbackAct5').innerHTML = '';
+    document.getElementById('vsBannerAct5').style.display = 'block';
+    
+    resetAct5Sprites();
+    loadWindRound();
+    updateScrollMessage("🌊 Upekkha", "The Eight Winds blow! Stay balanced like a mountain!<br>💡 TIP: Equanimity means staying calm through praise and blame, gain and loss.", "normal");
+}
+
+function resetAct5Sprites() {
+    const cloudSprite = document.getElementById('cloudSprite');
+    cloudSprite.className = 'cloud-sprite medium';
+    cloudSprite.style.transform = 'translateX(-50%) scale(0.9)';  // ← Changed from 0.8
+    cloudSprite.style.opacity = '0.7';
+    
+    const boatSprite = document.getElementById('boatSprite');
+    boatSprite.className = 'boat-sprite';
+    boatSprite.style.transform = 'translateX(-50%) scale(1)';
+    boatSprite.style.bottom = '25%';  // ← Matches CSS
+    boatSprite.style.opacity = '1';
+}
+
+function loadWindRound() {
+    if (!act5ChallengeActive || currentRoundAct5 >= MAX_ROUNDS_ACT5) {
+        return;
+    }
+    
+    const roundData = windMessages[currentRoundAct5];
+    document.getElementById('challengeQuestionAct5').innerHTML = roundData.message;
+    document.getElementById('choiceCounterAct5').innerHTML = `Round ${currentRoundAct5 + 1} of ${MAX_ROUNDS_ACT5}`;
+    
+    const optionsDiv = document.getElementById('challengeOptionsAct5');
+    optionsDiv.innerHTML = '';
+    
+    roundData.choices.forEach((choice, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'challenge-opt';
+        btn.textContent = choice.text;
+        btn.onclick = () => handleWindChoice(choice);
+        optionsDiv.appendChild(btn);
+    });
+    
+    document.getElementById('challengeFeedbackAct5').innerHTML = '';
+    waitingForContinueAct5 = false;
+}
+
+function handleWindChoice(choice) {
+    if (!battleInProgressAct5 || !act5ChallengeActive || waitingForContinueAct5) return;
+    
+    const btns = document.querySelectorAll('#challengeOptionsAct5 .challenge-opt');
+    btns.forEach(b => b.disabled = true);
+    
+    choiceHistoryAct5.push(choice.effect);
+    
+    // ===== PROGRESSIVE SIZING BASED ON CHOICE HISTORY =====
+    const goodCount = choiceHistoryAct5.filter(c => 
+        c === 'humble' || c === 'listen' || c === 'share' || c === 'accept'
+    ).length;
+    const badCount = choiceHistoryAct5.filter(c => 
+        c === 'proud' || c === 'indifferent' || c === 'defensive' || 
+        c === 'victim' || c === 'boast' || c === 'guilty' || c === 'angry' || c === 'despair'
+    ).length;
+    
+    // Net progress: bad choices make cloud grow, good choices make it shrink
+    let progress = badCount - goodCount;
+    progress = Math.max(-4, Math.min(4, progress));
+    
+    // ===== UPDATE HEALTH BARS =====
+    // Still show health bars for visual feedback
+    playerBalanceAct5 = Math.max(0, Math.min(100, playerBalanceAct5 + (choice.balanceChange || 0)));
+    windPowerAct5 = Math.max(0, Math.min(100, windPowerAct5 + (choice.windChange || 0)));
+    
+    document.getElementById('playerHealthFillAct5').style.width = `${playerBalanceAct5}%`;
+    document.getElementById('opponentHealthFillAct5').style.width = `${windPowerAct5}%`;
+    
+    // ===== UPDATE CLOUD SIZE BASED ON PROGRESS =====
+    updateAct5Visuals(progress);
+    
+    const isGood = choice.isGood !== undefined ? choice.isGood : (choice.windChange < 0);
+    const feedbackDiv = document.getElementById('challengeFeedbackAct5');
+    
+    let feedbackHTML = `<div style="font-size: 18px; font-weight: bold; padding: 12px; margin: 10px 0; border-radius: 12px; background: ${isGood ? 'rgba(46, 125, 50, 0.3)' : 'rgba(244, 67, 54, 0.3)'}; border: 2px solid ${isGood ? '#4CAF50' : '#f44336'};">
+        <div style="font-size: 24px;">${isGood ? '✅ GOOD!' : '❌ BAD!'}</div>
+        <div style="margin-top: 8px;">${choice.feedback}</div>
+        <div style="margin-top: 10px; font-size: 14px; color: ${isGood ? '#81C784' : '#ef9a9a'};">
+            ${isGood ? '🌊 The wind calms!' : '🌪️ The wind grows stronger!'}
+            (Wind: ${Math.round(windPowerAct5)}%)
+        </div>
+    </div>`;
+    
+    feedbackDiv.innerHTML = feedbackHTML;
+    
+    // Increment round counter
+    currentRoundAct5++;
+    
+    // ===== CHECK IF ALL ROUNDS COMPLETED =====
+    if (currentRoundAct5 >= MAX_ROUNDS_ACT5) {
+        battleInProgressAct5 = false;
+        act5ChallengeActive = false;
+        
+        // Victory: progress <= -2 (at least 2 more good than bad)
+        if (progress <= -2) {
+            feedbackDiv.innerHTML += `<div style="font-size: 24px; color: #ffd700; margin-top: 10px;">🏔️ The Wind is calm! You have mastered equanimity!</div>`;
+            showContinueButtonAct5('victory');
+        } else {
+            feedbackDiv.innerHTML += `<div style="font-size: 22px; color: #ff6b35; margin-top: 10px;">🌪️ The Wind is still strong...</div>`;
+            showContinueButtonAct5('defeat');
+        }
+        return;
+    }
+    
+    // ===== CHECK DEFEAT CONDITION =====
+    // Defeat only if player balance drops to 0 OR progress <= -4 (too many bad choices)
+    if (playerBalanceAct5 <= 0 || progress <= -4) {
+        battleInProgressAct5 = false;
+        act5ChallengeActive = false;
+        feedbackDiv.innerHTML += `<div style="font-size: 22px; color: #ff6b35; margin-top: 10px;">💔 Your balance has been lost! The wind has blown you over!</div>`;
+        showContinueButtonAct5('defeat');
+        return;
+    }
+    
+    // ===== SHOW CONTINUE BUTTON FOR NEXT ROUND =====
+    showContinueButtonAct5('next');
+}
+
+function updateAct5Visuals(progress) {
+    const cloudSprite = document.getElementById('cloudSprite');
+    const boatSprite = document.getElementById('boatSprite');
+    
+    // Map progress to cloud scale - MINIMUM scale is larger
+    let scale = 0.4;  // ← Changed from 0.3
+    let cloudClass = 'calm';
+    let opacity = 0.3;
+    let boatState = 'glide';
+    
+    if (progress <= -4) {
+        scale = 0.2;  // ← Changed from 0.1
+        cloudClass = 'calm';
+        opacity = 0.2;
+        boatState = 'glide';
+    } else if (progress <= -3) {
+        scale = 0.3;  // ← Changed from 0.2
+        cloudClass = 'small';
+        opacity = 0.3;
+        boatState = 'glide';
+    } else if (progress <= -2) {
+        scale = 0.5;  // ← Changed from 0.4
+        cloudClass = 'small';
+        opacity = 0.5;
+        boatState = 'glide';
+    } else if (progress <= -1) {
+        scale = 0.7;  // ← Changed from 0.6
+        cloudClass = 'medium';
+        opacity = 0.6;
+        boatState = '';
+    } else if (progress <= 0) {
+        scale = 0.9;  // ← Changed from 0.8
+        cloudClass = 'medium';
+        opacity = 0.7;
+        boatState = '';
+    } else if (progress <= 1) {
+        scale = 1.1;  // ← Changed from 1.0
+        cloudClass = 'medium';
+        opacity = 0.8;
+        boatState = 'rock-light';
+    } else if (progress <= 2) {
+        scale = 1.5;  // ← Changed from 1.4
+        cloudClass = 'large';
+        opacity = 0.9;
+        boatState = 'rock-light';
+    } else if (progress <= 3) {
+        scale = 2.0;  // ← Changed from 1.8
+        cloudClass = 'large';
+        opacity = 1.0;
+        boatState = 'rock-medium';
+    } else {
+        scale = 2.8;  // ← Changed from 2.5
+        cloudClass = 'storm';
+        opacity = 1.0;
+        boatState = 'rock-heavy';
+    }
+    
+    cloudSprite.className = `cloud-sprite ${cloudClass}`;
+    cloudSprite.style.transform = `translateX(-50%) scale(${scale})`;
+    cloudSprite.style.opacity = opacity;
+    
+    // Boat state
+    boatSprite.classList.remove('rock-light', 'rock-medium', 'rock-heavy', 'glide');
+    if (boatState) {
+        boatSprite.classList.add(boatState);
+    }
+}
+
+function showContinueButtonAct5(type) {
+    waitingForContinueAct5 = true;
+    const optionsDiv = document.getElementById('challengeOptionsAct5');
+    optionsDiv.innerHTML = '';
+    
+    const continueBtn = document.createElement('button');
+    continueBtn.className = 'challenge-opt';
+    continueBtn.style.cssText = `
+        background: #d4af37;
+        color: #2c4a1e;
+        font-weight: bold;
+        font-size: 16px;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    `;
+    
+    if (type === 'victory') {
+        continueBtn.textContent = '🏔️ Celebrate Upekkha! 🏔️';
+        continueBtn.style.background = '#4CAF50';
+        continueBtn.style.color = 'white';
+        continueBtn.onclick = function() { act5Victory(); };
+    } else if (type === 'defeat') {
+        continueBtn.textContent = '🌪️ Accept Defeat';
+        continueBtn.style.background = '#f44336';
+        continueBtn.style.color = 'white';
+        continueBtn.onclick = function() { act5Defeat(); };
+    } else {
+        continueBtn.textContent = `➡️ Continue to Round ${currentRoundAct5 + 1}`;
+        continueBtn.onmouseover = function() {
+            this.style.background = '#ffd700';
+            this.style.transform = 'scale(1.02)';
+        };
+        continueBtn.onmouseout = function() {
+            this.style.background = '#d4af37';
+            this.style.transform = 'scale(1)';
+        };
+        continueBtn.onclick = function() {
+            optionsDiv.innerHTML = '';
+            waitingForContinueAct5 = false;
+            loadWindRound();
+        };
+    }
+    
+    optionsDiv.appendChild(continueBtn);
+}
+
+function act5Victory() {
+    gameState.currentScreen = 'act5Success';
+    document.getElementById('challengeSceneAct5').style.display = 'none';
+    document.getElementById('successSceneAct5').style.display = 'block';
+    updateScrollMessage("🎉 Victory!", "You have mastered Upekkha! The Eight Winds cannot move you!", "high");
+    gameState.hasCompletedAct5 = true;
+    gameState.currentStage = 5;
+    gameState.stageProgress = 100;
+    updateUI();
+    localStorage.setItem('furryBodhis_save', JSON.stringify(gameState));
+    setCookie('furryBodhis_save', JSON.stringify(gameState), 30);
+}
+
+function act5Defeat() {
+    act5ChallengeActive = false;
+    document.getElementById('challengeSceneAct5').style.display = 'none';
+    gameState.currentScreen = 'act5Defeat';
+    const defeatScene = document.getElementById('defeatSceneAct5');
+    const proceedArea = document.getElementById('proceedArea');
+    
+    if (defeatScene) {
+        defeatScene.style.display = 'block';
+        proceedArea.innerHTML = '';
+        
+        updateScrollMessage("💔 Defeat", "The Wind blew you over! Remember: Equanimity means staying calm when tested. Try again!", "low");
+        
+        const retryBtn = document.createElement('button');
+        retryBtn.className = 'retry-btn';
+        retryBtn.id = 'retryAct5Btn';
+        retryBtn.textContent = '🔄 Try Again with Equanimity 🔄';
+        retryBtn.onclick = function() {
+            proceedArea.innerHTML = '';
+            if (defeatScene) defeatScene.style.display = 'none';
+            document.getElementById('challengeSceneAct5').style.display = 'block';
+            resetAct5Sprites();
+            startAct5Battle();
+        };
+        proceedArea.appendChild(retryBtn);
+        
+        playerBalanceAct5 = 100;
+        windPowerAct5 = 100;
+        return;
+    }
+}
+
+// ========== ACT 5: STORY FRAME SYSTEM ==========
+let act5Frames = [];
+let currentAct5FrameIndex = 0;
+
+function loadAct5StoryFrames() {
+    gameState.currentScreen = 'act5Story';
+    const frameElements = document.querySelectorAll('#storyFramesAct5 .story-frame');
+    act5Frames = [];
+    frameElements.forEach((el) => {
+        const bg = el.getAttribute('data-bg');
+        const speaker = el.querySelector('.story-speaker')?.innerText || "Narrator";
+        const text = el.querySelector('.story-text')?.innerHTML || "";
+        act5Frames.push({ bg, speaker, text });
+    });
+}
+
+function showAct5Frame(index) {
+    if (index >= act5Frames.length) {
+        document.getElementById('storyViewerAct5').style.display = 'none';
+        document.getElementById('challengeSceneAct5').style.display = 'block';
+        startAct5Battle();
+        return;
+    }
+    
+    const frame = act5Frames[index];
+    document.getElementById('storyBgAct5').src = frame.bg;
+    updateScrollMessage(frame.speaker, frame.text, "normal");
+    
+    const prevBtn = document.getElementById('storyPrevBtnAct5');
+    const nextBtn = document.getElementById('storyNextBtnAct5');
+    prevBtn.disabled = (index === 0);
+    nextBtn.textContent = (index === act5Frames.length - 1) ? "✨ Begin Challenge ✨" : "Next ▶";
+    currentAct5FrameIndex = index;
+}
+
+function nextAct5Frame() {
+    if (currentAct5FrameIndex + 1 < act5Frames.length) {
+        showAct5Frame(currentAct5FrameIndex + 1);
+    } else if (currentAct5FrameIndex + 1 === act5Frames.length) {
+        showAct5Frame(currentAct5FrameIndex + 1);
+    }
+}
+
+function prevAct5Frame() {
+    if (currentAct5FrameIndex > 0) {
+        showAct5Frame(currentAct5FrameIndex - 1);
+    }
+}
+
+function startAct5() {
+    gameState.currentScreen = 'act5Intro';
+    const proceedArea = document.getElementById('proceedArea');
+    proceedArea.innerHTML = '';
+    
+    // Hide ALL previous scenes
+    document.getElementById('successSceneAct4').style.display = 'none';
+    document.getElementById('storyViewerAct4').style.display = 'none';
+    document.getElementById('challengeSceneAct4').style.display = 'none';
+    document.getElementById('defeatSceneAct4').style.display = 'none';
+    
+    document.getElementById('introAct5').style.display = 'none';
+    document.getElementById('storyViewerAct5').style.display = 'none';
+    document.getElementById('challengeSceneAct5').style.display = 'none';
+    document.getElementById('successSceneAct5').style.display = 'none';
+    document.getElementById('defeatSceneAct5').style.display = 'none';
+    
+    const existingRetryBtn = document.getElementById('retryAct5Btn');
+    if (existingRetryBtn) existingRetryBtn.remove();
+    
+    act5Intro = { tv: false, dakkii: false, bunnii: false };
+    
+    document.getElementById('introAct5').style.display = 'block';
+    updateScrollMessage("Pink Fairies", "Welcome to the River of Reflection!<br>This is the Trail of Upekkha — Equanimity.<br>Let's hear from everyone before we continue.", "high");
+}
+
+// ========== ACT 5: INTERACTIVE INTRO ==========
+let act5Intro = {
+    tv: false,
+    dakkii: false,
+    bunnii: false
+};
+
+function checkAct5IntroComplete() {
+    if (act5Intro.tv && act5Intro.dakkii && act5Intro.bunnii) {
+        const proceedArea = document.getElementById('proceedArea');
+        proceedArea.innerHTML = '';
+        const btn = document.createElement('button');
+        btn.className = 'proceed-btn';
+        btn.id = 'proceedAct5Btn';
+        btn.innerHTML = '🌊 Trail of Equanimity 🌊';
+        btn.onclick = startAct5Story;
+        proceedArea.appendChild(btn);
+        updateScrollMessage("Pink Fairies", "We are ready! Click 'Trail of Equanimity' to begin.", "high");
+    }
+}
+
+function startAct5Story() {
+    gameState.currentScreen = 'act5Story';
+    document.getElementById('proceedArea').innerHTML = '';
+    document.getElementById('introAct5').style.display = 'none';
+    loadAct5StoryFrames();
+    showAct5Frame(0);
+    document.getElementById('storyViewerAct5').style.display = 'block';
+    updateScrollMessage("Narrator", "Stage 5: The River of Reflection!<br>The Furry Bodhis meet a wise monk and a proud scholar.<br>What lesson will they learn about equanimity?", "high");
+}
+
+// ========== ACT 5 HOTSPOTS ==========
+document.getElementById('tvAct5').addEventListener('click', function() {
+    if (!act5Intro.tv) {
+        act5Intro.tv = true;
+        updateScrollMessage("🎵 Old TV", "Playing 'Ride the Wave'! 🎶<br>'When the wind blows high and low, I know just where to go...'", "normal");
+    } else {
+        updateScrollMessage("🎵 Old TV", "Playing 'Ride the Wave' again! 🎶<br>'Like a mountain standing tall, I will calmly face it all.'", "normal");
+    }
+    SONG_VIDEO_ID = "YOUR_UPEKKHA_VIDEO_ID";
+    openVideo();
+    checkAct5IntroComplete();
+});
+
+document.getElementById('dakkiiAct5').addEventListener('click', function() {
+    if (!act5Intro.dakkii) {
+        act5Intro.dakkii = true;
+        updateScrollMessage("Dak-kii", "Upekkha means staying balanced like a mountain. When things go good or bad, we don't get blown around!", "normal");
+    } else {
+        updateScrollMessage("Dak-kii", "The song is about Upekkha — staying calm when life gets crazy. Don't forget to check the TV!", "normal");
+    }
+    checkAct5IntroComplete();
+});
+
+document.getElementById('bunniiAct5').addEventListener('click', function() {
+    if (!act5Intro.bunnii) {
+        act5Intro.bunnii = true;
+        updateScrollMessage("Bun-nii", "There's a story about a scholar who thought he was unshakable, but one word made him furious. Equanimity is tested when we face criticism!", "normal");
+    } else {
+        updateScrollMessage("Bun-nii", "True equanimity isn't about declaring your calm — it's about staying calm when tested. That's real strength!", "normal");
+    }
+    checkAct5IntroComplete();
+});
+
+document.getElementById('pinkfairiesAct5').addEventListener('click', function() {
+    if (act5Intro.tv && act5Intro.dakkii && act5Intro.bunnii) {
+        updateScrollMessage("Pink Fairies", "You're ready for Upekkha!<br>Click 'Trail of Equanimity' to begin the story of the Scholar and the Monk!", "high");
+    } else {
+        let missing = [];
+        if (!act5Intro.tv) missing.push("the Old TV");
+        if (!act5Intro.dakkii) missing.push("Dak-kii");
+        if (!act5Intro.bunnii) missing.push("Bun-nii");
+        updateScrollMessage("Pink Fairies", "Have you spoken with " + missing.join(" and ") + "? They have wisdom about Upekkha!", "low");
+    }
+});
+
+
+
+// ========== DOM Elements ==========
+const huluButton = document.getElementById('huluButton');
+const huluModal = document.getElementById('huluModal');
+const closeHuluBtn = document.getElementById('closeHuluBtn');
+const healthFill = document.getElementById('healthFill');
+const progressFill = document.getElementById('progressFill');
+const stageText = document.getElementById('stageText');
+const inventoryGrid = document.getElementById('inventoryGrid');
+const saveGameBtn = document.getElementById('saveGameBtn');
+const loadGameBtn = document.getElementById('loadGameBtn');
+const debugMenuBtn = document.getElementById('debugMenuBtn');
+const Oldtv = document.getElementById('Oldtv');
+const dakkii = document.getElementById('dakkii');
+const bunnii = document.getElementById('bunnii');
+const pinkfairies = document.getElementById('pinkfairies');
+const scrollDiv = document.getElementById('scrollMessage');
+const videoOverlay = document.getElementById('videoOverlay');
+const closeVideoBtn = document.getElementById('closeVideoBtn');
+const introScene = document.getElementById('introScene');
+const proceedArea = document.getElementById('proceedArea');
+const submitBtn = document.getElementById('submitBtn');
+const continueToAct2Btn = document.getElementById('continueToAct2Btn');
+const nextActBtn = document.getElementById('nextActBtn');
+const nextActBtn3 = document.getElementById('nextActBtn3');
+const nextActBtn4 = document.getElementById('nextActBtn4');
+const nextActBtn5 = document.getElementById('nextActBtn5');
+
+
+// Add story navigation
+document.getElementById('storyPrevBtnAct5').onclick = prevAct5Frame;
+document.getElementById('storyNextBtnAct5').onclick = nextAct5Frame;
+if (submitBtn) submitBtn.onclick = submitChallenge;
+if (continueToAct2Btn) continueToAct2Btn.onclick = startAct2;
+if (nextActBtn) nextActBtn.onclick = startAct3;
+if (nextActBtn3) nextActBtn3.onclick = startAct4;
+if (nextActBtn4) nextActBtn4.onclick = startAct5;
+if (nextActBtn5) nextActBtn5.onclick = () => {updateScrollMessage("Pink Fairies", "🎉 You have completed all five virtues!<br>You are ready to meet Bhante Pika and receive the 3 Gems!", "high");
+    // This will trigger the finale
+    gameState.stageProgress = 100;
+    updateUI();
+};
+
+// Story Navigation
+document.getElementById('storyPrevBtnAct1').onclick = prevAct1Frame;
+document.getElementById('storyNextBtnAct1').onclick = nextAct1Frame;
+document.getElementById('storyPrevBtnAct2').onclick = prevAct2Frame;
+document.getElementById('storyNextBtnAct2').onclick = nextAct2Frame;
+document.getElementById('storyPrevBtnAct3').onclick = prevAct3Frame;
+document.getElementById('storyNextBtnAct3').onclick = nextAct3Frame;
+document.getElementById('storyPrevBtnAct4').onclick = prevAct4Frame;
+document.getElementById('storyNextBtnAct4').onclick = nextAct4Frame;
+
+// ========== Audio ==========
+let audioContext = null;
+function playBlip(pitch = "normal") {
+    try {
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        let freq = (pitch === "high") ? 1000 : (pitch === "low") ? 500 : 800;
+        freq += Math.random() * 100;
+        oscillator.frequency.value = freq;
+        gainNode.gain.value = 0.08;
+        oscillator.start();
+        gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.2);
+        oscillator.stop(audioContext.currentTime + 0.2);
+        if (audioContext.state === 'suspended') audioContext.resume();
+    } catch(e) {}
+}
+
+// ========== UI Functions ==========
+function updateUI() {
+    healthFill.style.width = `${gameState.health}%`;
+    const stagePercent = ((gameState.currentStage - 1) / TOTAL_STAGES) * 100 + (gameState.stageProgress / TOTAL_STAGES);
+    progressFill.style.width = `${Math.min(100, stagePercent)}%`;
+    let displayStage = gameState.currentStage;
+    if (displayStage > TOTAL_STAGES) displayStage = TOTAL_STAGES;
+    stageText.innerText = `Stage ${displayStage} / ${TOTAL_STAGES}`;
+    inventoryGrid.innerHTML = '';
+    gameState.inventory.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'inventory-item';
+        div.innerHTML = `🍐<span>Magic Hulu</span>`;
+        inventoryGrid.appendChild(div);
+    });
+}
+
+function updateScrollMessage(speaker, message, sound = "normal") {
+    scrollDiv.innerHTML = `<strong>📜 ${speaker}:</strong><br>${message}`;
+    scrollDiv.scrollTop = 0;
+    playBlip(sound);
+}
+
+function checkIntroComplete() {
+    if (gameState.hasClickedOldtv && gameState.hasClickedDakkii && gameState.hasClickedBunnii && !gameState.hasEarnedHulu) {
+        proceedArea.innerHTML = '<button class="proceed-btn" id="proceedBtn">🌟 Let\'s go! 🌟</button>';
+        document.getElementById('proceedBtn').onclick = startAct1Transition;
+    }
+}
+
+function updateHuluVisibility() {
+    if (gameState.hasEarnedHulu) huluButton.classList.add('visible');
+    else huluButton.classList.remove('visible');
+}
+
+function startAct1Transition() {
+    document.getElementById('proceedArea').innerHTML = '';
+    gameState.hasEarnedHulu = true;
+    updateHuluVisibility();
+    gameState.currentScreen = 'act1Story';
+    updateUI();
+    introScene.style.display = 'none';
+    loadAct1StoryFrames();
+    showAct1Frame(0);
+    document.getElementById('storyViewerAct1').style.display = 'block';
+    // === updateScrollMessage("Pink Fairies", "Your journey begins! Read the story carefully — the challenge awaits at the end!", "high");
+}
+
+// ========== Hulu Modal ==========
+huluButton.addEventListener('click', () => {
+    huluModal.style.display = 'block';
+    updateUI();
+    playBlip("normal");
+});
+closeHuluBtn.addEventListener('click', () => huluModal.style.display = 'none');
+window.addEventListener('click', (e) => { if (e.target === huluModal) huluModal.style.display = 'none'; });
+
+// ========== DEBUG MENU ==========
+document.getElementById('debugMenuBtn').addEventListener('click', function() {
+    huluModal.style.display = 'none';
+    
+    const debugDiv = document.createElement('div');
+    debugDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #2c5a2e;
+        padding: 20px;
+        border-radius: 20px;
+        border: 2px solid #d4af37;
+        z-index: 2000;
+        min-width: 280px;
+        max-width: 90%;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    `;
+    
+    debugDiv.innerHTML = `
+        <h3 style="color: #ffd700; margin-bottom: 15px;">⚡️ Time Travel</h3>
+        <button onclick="jumpTo('intro')" style="display:block; width:100%; margin:8px 0; padding:10px; background:#8b0000; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">🏠 Trail Gate</button>
+        <button onclick="jumpTo('act1Challenge')" style="display:block; width:100%; margin:8px 0; padding:10px; background:#d4af37; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">🔒 Act 1: Trail of Heavenly Virtues Lock</button>
+        <button onclick="jumpTo('act2Battle')" style="display:block; width:100%; margin:8px 0; padding:10px; background:#d4af37; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">⚔️ Act 2: Ogre of Mt.Dhammika</button>
+        <button onclick="jumpTo('act3Intro')" style="display:block; width:100%; margin:8px 0; padding:10px; background:#d4af37; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">🦌 Act 3: Whispering Woods</button>
+        <button onclick="jumpTo('act3Battle')" style="display:block; width:100%; margin:8px 0; padding:10px; background:#d4af37; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">🌟 Act 3: Save Qilin</button>
+        <button onclick="jumpTo('act4Intro')" style="display:block; width:100%; margin:8px 0; padding:10px; background:#d4af37; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">😊 Act 4: Festival of Smiles</button>
+        <button onclick="jumpTo('act4Battle')" style="display:block; width:100%; margin:8px 0; padding:10px; background:#d4af37; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">💚 Act 4: Green-eyed Demon</button>
+			<button onclick="jumpTo('act5Intro')" style="display:block; width:100%; margin:8px 0; padding:10px; background:#d4af37; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">🏔️ Act 5: River of Reflection</button>
+			<button onclick="jumpTo('act5Battle')" style="display:block; width:100%; margin:8px 0; padding:10px; background:#d4af37; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">🌊 Act 5: Boat & Wind Cloud</button>
+        <button onclick="this.parentElement.remove()" style="display:block; width:100%; margin:8px 0; padding:10px; background:#555; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">❌ Close</button>
+    `;
+    
+    document.body.appendChild(debugDiv);
+});
+
+// Jump function for debug menu
+function jumpTo(destination) {
+    document.querySelector('[style*="position: fixed;"]')?.remove();
+    hideAllScenes();
+    document.getElementById('proceedArea').innerHTML = '';
+    
+    switch(destination) {
+        case 'intro':
+            document.getElementById('introScene').style.display = 'block';
+            gameState.currentScreen = 'intro';
+            updateScrollMessage("🏠 Main Menu", "Returned to the beginning!", "normal");
+            break;
+        case 'act1Challenge':
+            document.getElementById('challengeSceneAct1').style.display = 'block';
+            resetChallenge();
+            gameState.currentScreen = 'act1Challenge';
+            updateScrollMessage("🔒 Challenge", "Jumped to Act 1 Lock Challenge!", "normal");
+            break;
+        case 'act2Battle':
+            document.getElementById('challengeSceneAct2').style.display = 'block';
+            gameState.currentScreen = 'act2Battle';
+            startAct2Battle();
+            updateScrollMessage("⚔️ Battle", "Jumped to Act 2 Ogre Battle!", "normal");
+            break;
+        case 'act3Intro':
+            startAct3();
+            updateScrollMessage("🦌 Karuna", "Jumped to Act 3 Whispering woods!", "normal");
+            break;
+        case 'act3Battle':
+            document.getElementById('challengeSceneAct3').style.display = 'block';
+            gameState.currentScreen = 'act3Battle';
+            startAct3Battle();
+            updateScrollMessage("🌟 Battle", "Jumped to Act 3 Qilin Battle!", "normal");
+            break;
+        case 'act4Intro':
+            startAct4();
+            updateScrollMessage("😊 Mudita", "Jumped to Act 4 Intro!", "normal");
+            break;
+        case 'act4Battle':
+            document.getElementById('challengeSceneAct4').style.display = 'block';
+            gameState.currentScreen = 'act4Battle';
+            startAct4Battle();
+            updateScrollMessage("💚 Battle", "Jumped to Act 4 Green-Eyed Monster Battle!", "normal");
+            break;
+			case 'act5Intro':
+			    startAct5();
+			    updateScrollMessage("🏔️ Upekkha", "Jumped to Act 5 Intro!", "normal");
+			    break;
+			case 'act5Battle':
+			    document.getElementById('challengeSceneAct5').style.display = 'block';
+			    gameState.currentScreen = 'act5Battle';
+			    startAct5Battle();
+			    updateScrollMessage("🌊 Battle", "Jumped to Act 5 Boat Battle!", "normal");
+			    break;            
+    }
+}
+
+// ========== Save/Load ==========
+saveGameBtn.addEventListener('click', () => {
+    // gameState.currentScreen should already be correct
+    
+    if (gameState.currentScreen === 'act2Intro') {
+        gameState.act2Intro = { ...act2Intro };
+    } else if (gameState.currentScreen === 'act2Story') {
+        gameState.act2CurrentFrame = currentAct2FrameIndex;
+    } else if (gameState.currentScreen === 'act2Battle') {
+        gameState.battleState = {
+            playerHealth: playerHealthAct2,
+            ogreAnger: ogreAnger,
+            currentRound: currentRound,
+            choiceHistory: choiceHistory
+        };
+    } else if (gameState.currentScreen === 'act3Intro') {
+        gameState.act3Intro = { ...act3Intro };
+    } else if (gameState.currentScreen === 'act3Story') {
+        gameState.act3CurrentFrame = currentAct3FrameIndex;
+    } else if (gameState.currentScreen === 'act3Battle') {
+        gameState.battleStateAct3 = {
+            playerHealth: playerHealthAct3,
+            qilinLight: qilinLight,
+            currentRound: currentRoundAct3,
+            choiceHistory: choiceHistoryAct3
+        };
+    } else if (gameState.currentScreen === 'act4Intro') {
+        gameState.act4Intro = { ...act4Intro };
+    } else if (gameState.currentScreen === 'act4Story') {
+        gameState.act4CurrentFrame = currentAct4FrameIndex;
+    } else if (gameState.currentScreen === 'act4Battle') {
+        gameState.battleStateAct4 = {
+            playerHealth: playerHealthAct4,
+            jealousyLevel: jealousyLevel,
+            currentRound: currentRoundAct4,
+            choiceHistory: choiceHistoryAct4
+        };
+    }
+    
+    localStorage.setItem('furryBodhis_save', JSON.stringify(gameState));
+    setCookie('furryBodhis_save', JSON.stringify(gameState), 30);
+    updateScrollMessage("💾 Save", "Game saved! (stored in both storage and cookie)", "normal");
+    playBlip("high");
+});
+
+loadGameBtn.addEventListener('click', () => {
+    let saved = localStorage.getItem('furryBodhis_save');
+    if (!saved) {
+        saved = getCookie('furryBodhis_save');
+    }
+    
+    if (!saved) {
+        updateScrollMessage("⚠️ Load", "No saved game found. Start a new adventure!", "low");
+        return;
+    }
+    
+    try {
+        const loadedState = JSON.parse(saved);
+        Object.assign(gameState, loadedState);
+        
+        updateUI();
+        updateHuluVisibility();
+        hideAllScenes();
+        document.getElementById('proceedArea').innerHTML = '';
+        
+        console.log("Loading screen:", gameState.currentScreen);
+        
+        switch (gameState.currentScreen) {
+            case 'intro':
+                document.getElementById('introScene').style.display = 'block';
+                updateScrollMessage("Pink Fairies", "Welcome back! Click on the characters to begin!", "normal");
+                break;
+            case 'act1Story':
+                loadAct1StoryFrames();
+                showAct1Frame(0);
+                document.getElementById('storyViewerAct1').style.display = 'block';
+                updateScrollMessage("Pink Fairies", "Resuming Act 1 story!", "normal");
+                break;
+            case 'act1Challenge':
+                document.getElementById('challengeSceneAct1').style.display = 'block';
+                resetChallenge();
+                updateScrollMessage("Pink Fairies", "The lock awaits!", "normal");
+                break;
+            case 'act1Success':
+                document.getElementById('successSceneAct1').style.display = 'block';
+                const pa = document.getElementById('proceedArea');
+                pa.innerHTML = '';
+                const btn = document.createElement('button');
+                btn.className = 'next-act-btn';
+                btn.innerHTML = '🌟Continue to Stage 2:🌟<br>The Trail of Heavenly Virtues';
+                btn.onclick = startAct2;
+                pa.appendChild(btn);
+                updateScrollMessage("Pink Fairies", "You unlocked the gate! Ready for Act 2!", "normal");
+                break;
+            case 'act2Intro':
+                if (gameState.act2Intro) act2Intro = { ...gameState.act2Intro };
+                document.getElementById('introAct2').style.display = 'block';
+                if (act2Intro.tv && act2Intro.dakkii && act2Intro.bunnii) {
+                    const pa2 = document.getElementById('proceedArea');
+                    pa2.innerHTML = '';
+                    const btn2 = document.createElement('button');
+                    btn2.className = 'proceed-btn';
+                    btn2.id = 'proceedAct2Btn';
+                    btn2.innerHTML = '🌟 Let\'s go! 🌟';
+                    btn2.onclick = startAct2Story;
+                    pa2.appendChild(btn2);
+                }
+                updateScrollMessage("Pink Fairies", "Welcome back to Metta!", "normal");
+                break;
+            case 'act2Story':
+                loadAct2StoryFrames();
+                showAct2Frame(gameState.act2CurrentFrame || 0);
+                document.getElementById('storyViewerAct2').style.display = 'block';
+                updateScrollMessage("Pink Fairies", "Resuming the story of Metta!", "normal");
+                break;
+            case 'act2Battle':
+                document.getElementById('challengeSceneAct2').style.display = 'block';
+                if (gameState.battleState) {
+                    playerHealthAct2 = gameState.battleState.playerHealth || 100;
+                    ogreAnger = gameState.battleState.ogreAnger || 100;
+                    currentRound = gameState.battleState.currentRound || 0;
+                    choiceHistory = gameState.battleState.choiceHistory || [];
+                }
+                document.getElementById('playerHealthFillAct2').style.width = `${playerHealthAct2}%`;
+                document.getElementById('opponentHealthFillAct2').style.width = `${ogreAnger}%`;
+                document.getElementById('vsBanner').style.display = 'block';
+                act2ChallengeActive = true;
+                battleInProgress = true;
+                loadOgreRound();
+                updateScrollMessage("😠 Ogre", "The battle continues!", "normal");
+                break;
+            case 'act2Success':
+                document.getElementById('successSceneAct2').style.display = 'block';
+                const pa3 = document.getElementById('proceedArea');
+                pa3.innerHTML = '';
+                const btn3 = document.createElement('button');
+                btn3.className = 'next-act-btn';
+                btn3.id = 'nextActBtn';
+                btn3.innerHTML = '🌟 Stage 2 Complete! Continue to Act 3 🌟';
+                btn3.onclick = startAct3;
+                pa3.appendChild(btn3);
+                updateScrollMessage("🎉 Victory!", "You've mastered Metta! Ready for Act 3?", "high");
+                break;
+            case 'act2Defeat':
+                document.getElementById('defeatSceneAct2').style.display = 'block';
+                const pa4 = document.getElementById('proceedArea');
+                pa4.innerHTML = '';
+                const retryBtn2 = document.createElement('button');
+                retryBtn2.className = 'retry-btn';
+                retryBtn2.textContent = '🔄 Try Again with Kindness 🔄';
+                retryBtn2.onclick = function() {
+                    pa4.innerHTML = '';
+                    document.getElementById('defeatSceneAct2').style.display = 'none';
+                    document.getElementById('challengeSceneAct2').style.display = 'block';
+                    const ogreSprite = document.getElementById('ogreSprite');
+                    ogreSprite.style.transform = 'translateX(-50%) scale(1)';
+                    ogreSprite.style.bottom = '15%';
+                    ogreSprite.style.opacity = '1';
+                    startAct2Battle();
+                };
+                pa4.appendChild(retryBtn2);
+                updateScrollMessage("💔 Defeat", "The ogre was too strong. Try again!", "low");
+                break;
+            case 'act3Intro':
+                if (gameState.act3Intro) act3Intro = { ...gameState.act3Intro };
+                document.getElementById('introAct3').style.display = 'block';
+                if (act3Intro.tv && act3Intro.dakkii && act3Intro.bunnii) {
+                    const pa5 = document.getElementById('proceedArea');
+                    pa5.innerHTML = '';
+                    const btn5 = document.createElement('button');
+                    btn5.className = 'proceed-btn';
+                    btn5.id = 'proceedAct3Btn';
+                    btn5.innerHTML = '🌟 Trail of Karuna! 🌟';
+                    btn5.onclick = startAct3Story;
+                    pa5.appendChild(btn5);
+                }
+                updateScrollMessage("Pink Fairies", "Welcome back to Karuna!", "normal");
+                break;
+            case 'act3Story':
+                loadAct3StoryFrames();
+                showAct3Frame(gameState.act3CurrentFrame || 0);
+                document.getElementById('storyViewerAct3').style.display = 'block';
+                updateScrollMessage("Pink Fairies", "Resuming the story of Karuna!", "normal");
+                break;
+            case 'act3Battle':
+                document.getElementById('challengeSceneAct3').style.display = 'block';
+                if (gameState.battleStateAct3) {
+                    playerHealthAct3 = gameState.battleStateAct3.playerHealth || 100;
+                    qilinLight = gameState.battleStateAct3.qilinLight || 100;
+                    currentRoundAct3 = gameState.battleStateAct3.currentRound || 0;
+                    choiceHistoryAct3 = gameState.battleStateAct3.choiceHistory || [];
+                }
+                document.getElementById('playerHealthFillAct3').style.width = `${playerHealthAct3}%`;
+                document.getElementById('opponentHealthFillAct3').style.width = `${qilinLight}%`;
+                document.getElementById('vsBannerAct3').style.display = 'block';
+                act3ChallengeActive = true;
+                battleInProgressAct3 = true;
+                loadQilinRound();
+                updateScrollMessage("🦌 Qilin", "The battle continues! Show compassion!", "normal");
+                break;
+            case 'act3Success':
+                document.getElementById('successSceneAct3').style.display = 'block';
+                const pa6 = document.getElementById('proceedArea');
+                pa6.innerHTML = '';
+                const btn6 = document.createElement('button');
+                btn6.className = 'next-act-btn';
+                btn6.id = 'nextActBtn3';
+                btn6.innerHTML = '🌟 Stage 3 Complete! Continue to Act 4 🌟';
+                btn6.onclick = startAct4;
+                pa6.appendChild(btn6);
+                updateScrollMessage("🎉 Victory!", "You've mastered Karuna! The Qilin is free!", "high");
+                break;
+            case 'act3Defeat':
+                document.getElementById('defeatSceneAct3').style.display = 'block';
+                const pa7 = document.getElementById('proceedArea');
+                pa7.innerHTML = '';
+                const retryBtn3 = document.createElement('button');
+                retryBtn3.className = 'retry-btn';
+                retryBtn3.textContent = '🔄 Try Again with Compassion 🔄';
+                retryBtn3.onclick = function() {
+                    pa7.innerHTML = '';
+                    document.getElementById('defeatSceneAct3').style.display = 'none';
+                    document.getElementById('challengeSceneAct3').style.display = 'block';
+                    const qilinSprite = document.getElementById('qilinSprite');
+                    qilinSprite.style.transform = 'translateX(-50%) scale(1)';
+                    qilinSprite.style.bottom = '15%';
+                    qilinSprite.style.opacity = '1';
+                    qilinSprite.className = 'qilin-sprite glow-medium';
+                    startAct3Battle();
+                };
+                pa7.appendChild(retryBtn3);
+                updateScrollMessage("💔 Defeat", "The Shadow of Cruelty won. Try again!", "low");
+                break;
+            case 'act4Intro':
+                if (gameState.act4Intro) act4Intro = { ...gameState.act4Intro };
+                document.getElementById('introAct4').style.display = 'block';
+                if (act4Intro.tv && act4Intro.dakkii && act4Intro.bunnii) {
+                    const pa8 = document.getElementById('proceedArea');
+                    pa8.innerHTML = '';
+                    const btn8 = document.createElement('button');
+                    btn8.className = 'proceed-btn';
+                    btn8.id = 'proceedAct4Btn';
+                    btn8.innerHTML = '🌟 Festival of Many Smiles! 🌟';
+                    btn8.onclick = startAct4Story;
+                    pa8.appendChild(btn8);
+                }
+                updateScrollMessage("Pink Fairies", "Welcome back to Mudita!", "normal");
+                break;
+            case 'act4Story':
+                loadAct4StoryFrames();
+                showAct4Frame(gameState.act4CurrentFrame || 0);
+                document.getElementById('storyViewerAct4').style.display = 'block';
+                updateScrollMessage("Pink Fairies", "Resuming the story of Mudita!", "normal");
+                break;
+            case 'act4Battle':
+                document.getElementById('challengeSceneAct4').style.display = 'block';
+                if (gameState.battleStateAct4) {
+                    playerHealthAct4 = gameState.battleStateAct4.playerHealth || 100;
+                    jealousyLevel = gameState.battleStateAct4.jealousyLevel || 100;
+                    currentRoundAct4 = gameState.battleStateAct4.currentRound || 0;
+                    choiceHistoryAct4 = gameState.battleStateAct4.choiceHistory || [];
+                }
+                document.getElementById('playerHealthFillAct4').style.width = `${playerHealthAct4}%`;
+                document.getElementById('opponentHealthFillAct4').style.width = `${jealousyLevel}%`;
+                document.getElementById('vsBannerAct4').style.display = 'block';
+                act4ChallengeActive = true;
+                battleInProgressAct4 = true;
+                loadDemonRound();
+                updateScrollMessage("💚 Green-Eyed Monster", "The battle continues! Show Mudita!", "normal");
+                break;
+            case 'act4Success':
+                document.getElementById('successSceneAct4').style.display = 'block';
+                const pa9 = document.getElementById('proceedArea');
+                pa9.innerHTML = '';
+                const btn9 = document.createElement('button');
+                btn9.className = 'next-act-btn';
+                btn9.id = 'nextActBtn4';
+                btn9.innerHTML = '🌟 Stage 4 Complete! Act 5 coming soon 🌟';
+                btn9.onclick = () => updateScrollMessage("Pink Fairies", "Act 5 (Upekkha) is coming soon! Stay tuned!", "high");
+                pa9.appendChild(btn9);
+                updateScrollMessage("🎉 Victory!", "You've mastered Mudita! The Green-Eyed Monster is defeated!", "high");
+                break;
+            case 'act4Defeat':
+                document.getElementById('defeatSceneAct4').style.display = 'block';
+                const pa10 = document.getElementById('proceedArea');
+                pa10.innerHTML = '';
+                const retryBtn4 = document.createElement('button');
+                retryBtn4.className = 'retry-btn';
+                retryBtn4.textContent = '🔄 Try Again with Mudita 🔄';
+                retryBtn4.onclick = function() {
+                    pa10.innerHTML = '';
+                    document.getElementById('defeatSceneAct4').style.display = 'none';
+                    document.getElementById('challengeSceneAct4').style.display = 'block';
+                    const demonSprite = document.getElementById('demonSprite');
+                    demonSprite.style.transform = 'translateX(-50%) scale(1)';
+                    demonSprite.style.bottom = '15%';
+                    demonSprite.style.opacity = '1';
+                    demonSprite.className = 'demon-sprite envy-medium';
+                    startAct4Battle();
+                };
+                pa10.appendChild(retryBtn4);
+                updateScrollMessage("💔 Defeat", "The Green-Eyed Monster won. Try again!", "low");
+                break;
+            default:
+                document.getElementById('introScene').style.display = 'block';
+                updateScrollMessage("Pink Fairies", "Welcome back! Where would you like to go?", "normal");
+        }
+        
+        playBlip("high");
+        updateScrollMessage("📂 Load", "Game loaded successfully!", "normal");
+        
+    } catch (e) {
+        updateScrollMessage("⚠️ Load", "Error loading save file. Try again.", "low");
+        console.error("Load error:", e);
+    }
+});
+
+function hideAllScenes() {
+    document.getElementById('introScene').style.display = 'none';
+    document.getElementById('storyViewerAct1').style.display = 'none';
+    document.getElementById('challengeSceneAct1').style.display = 'none';
+    document.getElementById('successSceneAct1').style.display = 'none';
+    document.getElementById('introAct2').style.display = 'none';
+    document.getElementById('storyViewerAct2').style.display = 'none';
+    document.getElementById('challengeSceneAct2').style.display = 'none';
+    document.getElementById('successSceneAct2').style.display = 'none';
+    document.getElementById('defeatSceneAct2').style.display = 'none';
+    document.getElementById('introAct3').style.display = 'none';
+    document.getElementById('storyViewerAct3').style.display = 'none';
+    document.getElementById('challengeSceneAct3').style.display = 'none';
+    document.getElementById('successSceneAct3').style.display = 'none';
+    document.getElementById('defeatSceneAct3').style.display = 'none';
+    document.getElementById('introAct4').style.display = 'none';
+    document.getElementById('storyViewerAct4').style.display = 'none';
+    document.getElementById('challengeSceneAct4').style.display = 'none';
+    document.getElementById('successSceneAct4').style.display = 'none';
+    document.getElementById('defeatSceneAct4').style.display = 'none';
+    document.getElementById('proceedArea').innerHTML = '';
+    document.getElementById('introAct5').style.display = 'none';
+    document.getElementById('storyViewerAct5').style.display = 'none';
+    document.getElementById('challengeSceneAct5').style.display = 'none';
+    document.getElementById('successSceneAct5').style.display = 'none';
+    document.getElementById('defeatSceneAct5').style.display = 'none';
+    document.getElementById('proceedArea').innerHTML = '';    
+}
+
+// ========== Video Functions ==========
+const youtubeContainer = document.getElementById('youtubeContainer');
+function openVideo() {
+    const iframe = document.createElement('iframe');
+    iframe.width = '100%';
+    iframe.height = '400';
+    iframe.src = `https://www.youtube-nocookie.com/embed/${SONG_VIDEO_ID}?autoplay=1&rel=0`;
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    iframe.referrerpolicy = 'strict-origin-when-cross-origin';
+    iframe.allowFullscreen = true;
+    iframe.style.borderRadius = '12px';
+    youtubeContainer.innerHTML = '';
+    youtubeContainer.appendChild(iframe);
+    videoOverlay.style.display = 'flex';
+}
+function closeVideo() { youtubeContainer.innerHTML = ''; videoOverlay.style.display = 'none'; }
+closeVideoBtn.addEventListener('click', closeVideo);
+videoOverlay.addEventListener('click', (e) => { if (e.target === videoOverlay) closeVideo(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && videoOverlay.style.display === 'flex') closeVideo(); });
+
+// ========== Hotspots - Act 1 ==========
+Oldtv.addEventListener('click', () => {
+    if (!gameState.hasClickedOldtv) {
+        gameState.hasClickedOldtv = true;
+        updateScrollMessage("🎵 Old TV", "Playing: 'Walk the Path of Truth'!\n\nListen carefully — the song holds clues about the four virtues!", "normal");
+    } else {
+        updateScrollMessage("🎵 Old TV", "Playing our song again! Listen for Metta, Karuna, Mudita, and Upekkha!", "normal");
+    }
+    SONG_VIDEO_ID = "UnQASwhsryM";
+    openVideo();
+    checkIntroComplete();
+});
+dakkii.addEventListener('click', () => {
+    if (!gameState.hasClickedDakkii) {
+        gameState.hasClickedDakkii = true;
+        updateScrollMessage("Dak-kii", "Hey you! We are going to walk the path of Truth! Would love it if you come along!", "normal");
+    } else {
+        updateScrollMessage("Dak-kii", "Still here, friend? Ready to walk the path together?", "normal");
+    }
+    checkIntroComplete();
+});
+bunnii.addEventListener('click', () => {
+    if (!gameState.hasClickedBunnii) {
+        gameState.hasClickedBunnii = true;
+        updateScrollMessage("Bun-nii", "Do you want to walk the path with us? Our song is on the Old TV — check it out!", "normal");
+    } else {
+        updateScrollMessage("Bun-nii", "Don't forget to listen to the song on the Old TV!", "normal");
+    }
+    checkIntroComplete();
+});
+pinkfairies.addEventListener('click', () => {
+    if (gameState.hasClickedOldtv && gameState.hasClickedDakkii && gameState.hasClickedBunnii) {
+        updateScrollMessage("Pink Fairies", "You have met everyone and heard the song! Click 'Let's go!' to begin!", "normal");
+    } else {
+        let missing = [];
+        if (!gameState.hasClickedOldtv) missing.push("the Old TV");
+        if (!gameState.hasClickedDakkii) missing.push("Dak-kii");
+        if (!gameState.hasClickedBunnii) missing.push("Bun-nii");
+        updateScrollMessage("Pink Fairies", `Have you checked with ${missing.join(" and ")}?`, "low");
+    }
+});
+
+// ========== ACT 2 HOTSPOTS ==========
+document.getElementById('tvAct2').addEventListener('click', function() {
+    if (!act2Intro.tv) {
+        act2Intro.tv = true;
+        updateScrollMessage("🎵 Old TV", "Playing the Metta song! 🎶<br>Listen carefully — the song holds the spirit of loving-kindness!", "normal");
+    } else {
+        updateScrollMessage("🎵 Old TV", "Playing the Metta song again! 🎶<br>Let the music fill your heart with loving kindness!", "normal");
+    }
+    SONG_VIDEO_ID = "dwVuXc9gR04";
+    openVideo();
+    checkAct2IntroComplete();
+});
+
+document.getElementById('dakkiiAct2').addEventListener('click', function() {
+    if (!act2Intro.dakkii) {
+        act2Intro.dakkii = true;
+        updateScrollMessage("Dak-kii", "Metta means loving-kindness. We wish for everyone to be well, even the grumpy ones!", "normal");
+    } else {
+        updateScrollMessage("Dak-kii", "Hey! We've got a song about Metta especially for you on the TV! Tap on it.", "normal");          
+    }
+    checkAct2IntroComplete();
+});
+
+document.getElementById('bunniiAct2').addEventListener('click', function() {
+    if (!act2Intro.bunnii) {
+        act2Intro.bunnii = true;
+        updateScrollMessage("Bun-nii", "Metta... it means wishing happiness for all beings. Even the ones who aren't so nice to us. That's tough, but I think we can do it!", "normal");
+    } else {
+        updateScrollMessage("Bun-nii", "Even if others are angry at us, they will not have our hate. Love is our superpower.", "normal");
+    }
+    checkAct2IntroComplete();
+});
+
+document.getElementById('pinkfairiesAct2').addEventListener('click', function() {
+    if (act2Intro.tv && act2Intro.dakkii && act2Intro.bunnii) {
+        updateScrollMessage("Pink Fairies", "I'm proud of you all! That was a good song! <br> Now Click 'Let's go!' to continue!", "normal");
+    } else {
+        let missing = [];
+        if (!act2Intro.tv) missing.push("the Old TV");
+        if (!act2Intro.dakkii) missing.push("Dak-kii");
+        if (!act2Intro.bunnii) missing.push("Bun-nii");
+        updateScrollMessage("Pink Fairies", "Have you heard what " + missing.join(" and ") + " have to say? They have a song on the TV for you. Tap on it!", "low");
+    }
+});
+
+// ========== ACT 3 HOTSPOTS ==========
+document.getElementById('tvAct3').addEventListener('click', function() {
+    if (!act3Intro.tv) {
+        act3Intro.tv = true;
+        updateScrollMessage("🎵 Old TV", "Playing the Karuna song! 🎶<br>'Heart of Compassion' There's a heartwarming tale inside!", "normal");
+    } else {
+        updateScrollMessage("🎵 Old TV", "Playing the Karuna song! 🎶<br>'Compassion is the bridge that connects all hearts.' Let the music awaken your empathy!", "normal");
+    }
+    SONG_VIDEO_ID = "_FbVjKd9dwo";
+    openVideo();
+    checkAct3IntroComplete();
+});
+
+document.getElementById('dakkiiAct3').addEventListener('click', function() {
+    if (!act3Intro.dakkii) {
+        act3Intro.dakkii = true;
+        updateScrollMessage("Dak-kii", "Karuna means compassion. We must have empathy for others.", "normal");
+    } else {
+        updateScrollMessage("Bun-nii", "When others are in need, we should show true compassion by helping them!", "normal");          
+    }
+    checkAct3IntroComplete();
+});
+
+document.getElementById('bunniiAct3').addEventListener('click', function() {
+    if (!act3Intro.bunnii) {
+        act3Intro.bunnii = true;
+        updateScrollMessage("Kit-tii", "When others are in pain or distress. We should not wish them more hurt. <br>Compassion isn't just feeling sorry — it's taking action to ease suffering!", "normal");
+    } else {
+        updateScrollMessage("Cap-pii", "We must also have compassion for ourselves. That means not to be too hard on ourselves.", "normal");
+    }
+    checkAct3IntroComplete();
+});
+
+document.getElementById('pinkfairiesAct3').addEventListener('click', function() {
+    if (act3Intro.tv && act3Intro.dakkii && act3Intro.bunnii) {
+        updateScrollMessage("Pink Fairies", "We can proceed on the trail. Click Trail of Karuna to continue. If we are lucky, we just might catch a glimpse of a very beautiful creature which has protected this forest for 1000 years. A creature so gentle it never harms even the smallest blade of grass. Such is it's compassion.", "high");
+    } else {
+        let missing = [];
+        if (!act3Intro.tv) missing.push("the Old TV");
+        if (!act3Intro.dakkii) missing.push("Dak-kii");
+        if (!act3Intro.bunnii) missing.push("Kit-tii");
+        updateScrollMessage("Pink Fairies", "Have you spoken with " + missing.join(" and ") + "? They have wisdom to share about Karuna!", "low");
+    }
+});
+
+// ========== ACT 4 HOTSPOTS ==========
+document.getElementById('tvAct4').addEventListener('click', function() {
+    if (!act4Intro.tv) {
+        act4Intro.tv = true;
+        updateScrollMessage("🎵 Old TV", "Playing Mudita -Altruistic Joy! 🎶<br>'When others smile, the whole world lights up!' Let the music fill your heart with happiness for others!", "normal");
+    } else {
+        updateScrollMessage("🎵 Old TV", "Playing the Mudita song again! 🎶<br>Let's celebrate each other's joy!", "normal");
+    }
+    SONG_VIDEO_ID = "wNfqav5M3f0";
+    openVideo();
+    checkAct4IntroComplete();
+});
+
+document.getElementById('dakkiiAct4').addEventListener('click', function() {
+    if (!act4Intro.dakkii) {
+        act4Intro.dakkii = true;
+        updateScrollMessage("Kit-tii", "Wow! There will be a talent competition. May the best Smiley win! Hope the others will share the joy. That's the spirit of Mudita.", "normal");
+    } else {
+        updateScrollMessage("Dak-kii", "Remember: someone else's victory doesn't take anything away from you! There's enough happiness for everyone!", "normal");
+    }
+    checkAct4IntroComplete();
+});
+
+document.getElementById('bunniiAct4').addEventListener('click', function() {
+    if (!act4Intro.bunnii) {
+        act4Intro.bunnii = true;
+        updateScrollMessage("Bun-nii", "I used to feel jealous when others won. But then I realized - their success doesn't take anything away from me! When we celebrate others, we free ourselves from jealousy!", "normal");
+    } else {
+        updateScrollMessage("Cap-pii", "True Mudita also means winners celebrating with humility, not arrogance. Everyone loves a modest winner.", "normal");
+    }
+    checkAct4IntroComplete();
+});
+
+document.getElementById('pinkfairiesAct4').addEventListener('click', function() {
+    if (act4Intro.tv && act4Intro.dakkii && act4Intro.bunnii) {
+        updateScrollMessage("Pink Fairies", "Mudita is the third virtue. It protects us from envy and comparison. When we celebrate others, we free ourselves from the prison of jealousy. But true Mudita also means winners celebrating with humility, not arrogance. Click 'Festival of Many Smiles' to begin!", "high");
+    } else {
+        let missing = [];
+        if (!act4Intro.tv) missing.push("the Old TV");
+        if (!act4Intro.dakkii) missing.push("Dak-kii, Kit-tii");
+        if (!act4Intro.bunnii) missing.push("Bun-nii and they guys");
+        updateScrollMessage("Pink Fairies", "Have you tap " + missing.join(" and ") + "? They have something to share about Mudita!", "low");
+    }
+});
+
+// ========== Initialization ==========
+updateUI();
+updateHuluVisibility();
+updateScrollMessage("Welcome", "Dak-kii and gang are going to walk the talk or in their case, quack, purr or nibbles. They will 'Walk The path of Truth' in this game and you (or your 10 year old self) are invited to join them. Tap on all the characters to continue! They are at the gate at the beginning of a forest trail that leads to a beautiful monastery nestled among trees at the top of the mountain in Dharmagarden. Along the way they will meet many magical characters and encounter situational crisis that will test their resolve. Their goal is to reach the monastery to meet the elusive grandmaster Bhante Pika. It is said that Bhante can bestow gems of unrivalled brilliance to every one who enters the monastery. You are at the gate to The path of Truth! The Pink fairies guard this gate.", "normal");
+</script>
+</body>
+</html>
