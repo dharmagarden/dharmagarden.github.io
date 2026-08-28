@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Work in progress gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #a7a020;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        .deck-wrapper {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            background: brown;
+            border-radius: 24px;
+            padding: 10px 5px;
+            position: relative;
+        }
+
+        .deck-main-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 600;
+            color: #5a3e0e;
+            letter-spacing: 0px;
+            margin-bottom: 12px;
+            padding: 0 10px;
+        }
+        .deck-main-title span {
+            background: linear-gradient(145deg, #c9a03d, #8B6914);
+            padding: 5px 9px;
+            border-radius: 12px;
+            color: white;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(139, 105, 20, 0.2);
+        }
+        @media (max-width: 500px) {
+            .deck-main-title {
+                font-size: 16px;
+            }
+        }
+
+        .deck-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            background: white;
+            min-height: 550px;
+        }
+
+        .deck-slide {
+            display: none;
+            padding: 15px;
+            animation: fadeIn 0.4s ease;
+            background: white;
+        }
+
+        .deck-slide.active-slide {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .slide-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .slide-image {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .slide-image img {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: block;
+        }
+
+        .slide-image img:hover {
+            transform: scale(1.02);
+        }
+
+        .slide-text {
+            flex: 1.5;
+            min-width: 200px;
+            padding: 14px 16px;
+            background: #f8f4ea;
+            border-radius: 16px;
+            border-left: 6px solid #c9a03d;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.02);
+        }
+
+        .slide-text h3 {
+            color: #8B6914;
+            font-size: 22px;
+            margin-bottom: 12px;
+            border-left: 4px solid #D4AF37;
+            padding-left: 15px;
+        }
+
+        .slide-text .story-text {
+            font-size: 16px;
+            color: #2c2416;
+            line-height: 1.3;
+            margin-bottom: 16px;
+            padding: 10px 14px;
+            background: rgba(201, 160, 61, 0.08);
+            border-radius: 8px;
+            border-left: 3px solid #c9a03d;
+        }
+
+        /* ===== BUTTON STYLES ===== */
+        .slide-action-btn {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* Video button */
+        .slide-action-btn.video-btn {
+            background: #8B6914;
+            color: white;
+        }
+        .slide-action-btn.video-btn:hover {
+            background: #6B4F0E;
+        }
+
+        /* Page link button (internal) */
+        .slide-action-btn.page-btn {
+            background: #2c6b8f;
+            color: white;
+        }
+        .slide-action-btn.page-btn:hover {
+            background: #1a4a6b;
+        }
+
+        /* Info-only button (disabled look) */
+        .slide-action-btn.info-btn {
+            background: #8a8a8a;
+            color: #e0e0e0;
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        /* ===== CUSTOM TEXT BOX ===== */
+        .slide-caption-box {
+            margin-top: 16px;
+            padding: 14px 16px;
+            background: #eef3f7;
+            border-radius: 16px;
+            border-left: 6px solid #7a9bb5;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-left: 20px;
+            margin-right: 20px;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.02);
+            color: #1e2a36;
+        }
+        .slide-caption-box strong {
+            color: #3d5a73;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .nav-btn {
+            position: absolute;
+            top: 20%;
+            transform: translateY(-50%);
+            background: rgba(139, 105, 20, 0.8);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 20;
+        }
+
+        .nav-btn:hover {
+            background: rgba(107, 79, 14, 0.95);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .prev-deck {
+            left: 5px;
+        }
+
+        .next-deck {
+            right: 5px;
+        }
+
+        .deck-dots {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+        }
+
+        .deck-dot {
+            height: 10px;
+            width: 10px;
+            margin: 0 6px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .deck-dot.active-dot {
+            background-color: #8B6914;
+            width: 24px;
+            border-radius: 5px;
+        }
+
+        .page-counter {
+            text-align: center;
+            font-size: 13px;
+            color: #e0e0e0;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        /* ===== VIDEO MODAL ===== */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(3px);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 10px;
+        }
+        .video-modal.active-modal {
+            display: flex;
+        }
+        .video-modal-content {
+            background: #111;
+            border-radius: 24px;
+            max-width: 800px;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            overflow: hidden;
+        }
+        .video-modal-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        .video-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 28px;
+            font-weight: 300;
+            cursor: pointer;
+            border-radius: 40px;
+            width: 44px;
+            height: 44px;
+            backdrop-filter: blur(4px);
+            transition: 0.2s;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .video-modal-close:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        /* Video overlay for click-to-play */
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .video-overlay:hover {
+            background: rgba(0,0,0,0.1);
+        }
+        .video-overlay .play-btn {
+            font-size: 4rem;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .video-overlay .play-btn:hover {
+            transform: scale(1.1);
+            background: white;
+        }
+        .video-overlay .play-text {
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 16px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+            font-weight: 500;
+        }
+
+        /* ===== LINK CONTAINER (footer) ===== */
+        .link-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .link-container a {
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .link-container img {
+            width: 100px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .link-container p {
+            color: #e0e0e0;
+            font-size: 13px;
+            font-family: sans-serif;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 700px) {
+            .slide-content {
+                flex-direction: column;
+            }
+            .deck-slide {
+                padding: 20px;
+            }
+            .slide-text h3 {
+                font-size: 18px;
+            }
+            .nav-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .video-modal-content {
+                aspect-ratio: 16 / 9;
+                max-width: 100%;
+            }
+            .video-overlay .play-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 3rem;
+            }
+            .video-overlay .play-text {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="deck-wrapper">
+    <div class="deck-main-title"><span>Under Renovation<br>Please enjoy the gallery</span></div>
+
+    <button class="nav-btn prev-deck" id="prevDeckBtn">❮</button>
+    <button class="nav-btn next-deck" id="nextDeckBtn">❯</button>
+
+    <div class="deck-container" id="deckContainer">
+
+        <!-- ============================================= -->
+        <!-- SLIDE 1: PAGE LINK -->
+        <!-- ============================================= -->
+        <div class="deck-slide">
+            <div class="slide-content">
+                <div class="slide-image">
+                    <img src="abode/mainabode.jpg" alt="Dharmagarden Main">
+                </div>
+                <div class="slide-text">
+                    <h3>Dharmagarden bird's eye view</h3>
+                    <div class="story-text">Dharmagarden main landing page. You will soon 🥰 be able to visit the Buddha shrine, the Bodhi tree shrine, the school, the pagoda and more. Visit this gallery often to check on the progress of our 'renovation'.</div>
+                    <button class="slide-action-btn page-btn" data-page="https://sites.google.com/view/lidsine-dharmagarden/home">Click here for more</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================= -->
+        <!-- SLIDE 2: PAGE LINK -->
+        <!-- ============================================= -->
+        <div class="deck-slide">
+            <div class="slide-content">
+                <div class="slide-image">
+                    <img src="https://i.imgur.com/ZTa2qK9.jpeg" alt="Gate to path of Truth">
+                </div>
+                <div class="slide-text">
+                    <h3>Gate to the path of Truth</h3>
+                    <div class="story-text">This is the opening scene of the Furry Bodhi adventures. Join the Furry Bodhis on an interactive adventure to discover the path of Truth.</div>
+                    <button class="slide-action-btn page-btn" data-page="https://sites.google.com/view/lidsine-dharmagarden/the-furry-bodhis-adventure">Join the adventure!</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ============================================= -->
+        <!-- SLIDE 3: PAGE LINK -->
+        <!-- ============================================= -->
+        <div class="deck-slide">
+            <div class="slide-content">
+                <div class="slide-image">
+                    <img src="https://i.imgur.com/RYwb7cU.jpeg" alt="The pink fairies"> 
+                </div>
+                <div class="slide-text">
+                    <h3>The Pink Fairies</h3>
+                    <div class="story-text">The pink fairies are the trail guides who assist the Furry Bodhis on their path. Do you know that they are pink fairy armadillos? pink fairy armadillos are the smallest species of armadillos and can be found in the deserts of central Argentina.</div>
+                    <button class="slide-action-btn page-btn" data-page="https://sites.google.com/view/lidsine-dharmagarden/the-furry-bodhis-adventure">Join the adventure!</button>
+                </div>
+            </div>
+        </div>         
+        
+        <!-- ============================================= -->
+        <!-- SLIDE 4: PAGE LINK -->
+        <!-- ============================================= -->
+        <div class="deck-slide">
+            <div class="slide-content">
+                <div class="slide-image">
+                    <img src="https://i.imgur.com/ICZzJma.jpeg" alt="The mountain monastery">
+                </div>
+                <div class="slide-text">
+                    <h3>The Triple Gem Monastery</h3>
+                    <div class="story-text">The Furry Bodhis must go on the adventure to reach the Triple Gem Monastery at the top of the mountain. They will look for the elusive grandmaster Bhante Pika. It is said that Bhante can bestow gems of unrivalled brilliance to every one who enters the monastery.</div>
+                    <button class="slide-action-btn page-btn" data-page="https://sites.google.com/view/lidsine-dharmagarden/the-furry-bodhis-adventure">Join the adventure!</button>
+                </div>
+            </div>
+        </div>    
+        
+        <!-- ============================================= -->
+        <!-- SLIDE 5: PAGE LINK -->
+        <!-- ============================================= -->
+        <div class="deck-slide">
+            <div class="slide-content">
+                <div class="slide-image">
+                    <img src="https://i.imgur.com/HHa47HD.jpeg" alt="Locked gate">
+                </div>
+                <div class="slide-text">
+                    <h3>Oh, a locked gate!</h3>
+                    <div class="story-text">At times, they are faced with obstacles and will have to solve a puzzle to get pass.</div>
+                    <button class="slide-action-btn page-btn" data-page="https://sites.google.com/view/lidsine-dharmagarden/the-furry-bodhis-adventure">Join the adventure!</button>
+                </div>
+            </div>
+        </div>    
+        
+        <!-- ============================================= -->
+        <!-- SLIDE 6: PAGE LINK -->
+        <!-- ============================================= -->
+        <div class="deck-slide">
+            <div class="slide-content">
+                <div class="slide-image">
+                    <img src="https://i.imgur.com/njEp9I7.jpeg" alt="Beautiful forest garden">
+                </div>
+                <div class="slide-text">
+                    <h3>A nice place to picnic!</h3>
+                    <div class="story-text">The path goes through beautiful forest garden with babbling brook and colorful flowers.</div>
+                    <button class="slide-action-btn page-btn" data-page="https://sites.google.com/view/lidsine-dharmagarden/the-furry-bodhis-adventure">Join the adventure!</button>
+                </div>
+            </div>
+        </div>    
+
+        <!-- ============================================= -->
+        <!-- SLIDE 7: PAGE LINK -->
+        <!-- ============================================= -->
+        <div class="deck-slide">
+            <div class="slide-content">
+                <div class="slide-image">
+                    <img src="https://i.imgur.com/Oz1fu7o.jpeg" alt="Discussion">
+                </div>
+                <div class="slide-text">
+                    <h3>Dharma discussions</h3>
+                    <div class="story-text">They have insightful Dharma discussions.</div>
+                    <button class="slide-action-btn page-btn" data-page="https://sites.google.com/view/lidsine-dharmagarden/the-furry-bodhis-adventure">Join the adventure!</button>
+                </div>
+            </div>
+        </div>    
+
+        <!-- ============================================= -->
+        <!-- SLIDE 8: PAGE LINK -->
+        <!-- ============================================= -->
+        <div class="deck-slide">
+            <div class="slide-content">
+                <div class="slide-image">
+                    <img src="https://i.imgur.com/iiM7rJO.jpeg" alt="Ogre">
+                </div>
+                <div class="slide-text">
+                    <h3>Ogre of Mt. Dhammika</h3>
+                    <div class="story-text">As they were about to cross the bridge to Mt. Dhammika ...</div>
+                    <button class="slide-action-btn page-btn" data-page="https://sites.google.com/view/lidsine-dharmagarden/the-furry-bodhis-adventure">Join the adventure!</button>
+                </div>
+            </div>
+        </div>    
+
+        <!-- ============================================= -->
+        <!-- SLIDE 9: VIDEO LINK -->
+        <!-- ============================================= -->
+        <div class="deck-slide">
+            <div class="slide-content">
+                <div class="slide-image">
+                    <img src="https://i.imgur.com/sbtdtlR.jpeg" alt="Dharma songs" data-video="dwVuXc9gR04">
+                </div>
+                <div class="slide-text">
+                    <h3>Listen and learn with Dharma songs</h3>
+                    <div class="story-text">They share their Dharma songs along the way.</div>
+                    <button class="slide-action-btn video-btn" data-video="dwVuXc9gR04">🎬 watch the video</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================= -->
+        <!-- SLIDE 10: INFO ONLY -->
+        <!-- ============================================= -->
+        <div class="deck-slide">
+            <div class="slide-content">
+                <div class="slide-image">
+                    <img src="https://i.imgur.com/RXhfF7L.jpeg" alt="Coming soon">
+                </div>
+                <div class="slide-text">
+                    <h3>🦢 More coming soon!</h3>
+                    <div class="story-text">We are constantly adding new content to the gallery. Check back often for new updates and features.</div>
+                    <div style="margin-top: 8px; font-style: italic; color: #6a5a4a;">📖 More content coming soon</div>
+                </div>
+            </div>
+        </div>
+                        
+    </div>
+        
+    <div class="deck-dots" id="deckDots"></div>
+    <div class="page-counter" id="pageCounter">📖 Pg 1 / 10</div>
+
+    <div class="link-container">
+        <a href="support-dharmagarden.html">
+            <img src="dharmagardenlogo.png" alt="护持法园">
+            <p>Donate to Dharmagarden</p>
+        </a>
+    </div>
+
+    <!-- VIDEO MODAL -->
+    <div class="video-modal" id="videoModal">
+        <div class="video-modal-content">
+            <button class="video-modal-close" id="closeModalBtn">✕</button>
+            <div class="video-overlay" id="videoOverlay">
+                <button class="play-btn" id="playBtn">▶</button>
+                <span class="play-text">Click to play</span>
+            </div>
+            <iframe id="videoIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ============================================================
+            // SMART NAVIGATION - works in iframes and standalone
+            // ============================================================
+            
+            // Detect if page is embedded in an iframe
+            const isInIframe = window !== window.top;
+            console.log('📦 Is in iframe:', isInIframe);
+
+            function smartNavigate(url) {
+                console.log('🌐 Navigating to:', url);
+                console.log('📦 Is in iframe:', isInIframe);
+                
+                if (isInIframe) {
+                    // If embedded, try to break out of iframe
+                    try {
+                        console.log('🔄 Attempting to break out of iframe...');
+                        if (window.top && window.top !== window) {
+                            window.top.location.href = url;
+                        } else {
+                            window.open(url, '_blank');
+                        }
+                    } catch (e) {
+                        // Cross-origin iframe - open in new tab
+                        console.log('⚠️ Cross-origin iframe detected, opening in new tab');
+                        window.open(url, '_blank');
+                    }
+                } else {
+                    // Standalone page - navigate in same tab
+                    window.location.href = url;
+                }
+            }
+
+            // ============================================================
+            // CAROUSEL LOGIC
+            // ============================================================
+
+            let currentSlide = 0;
+            const slides = document.querySelectorAll('.deck-slide');
+            const dotsContainer = document.getElementById('deckDots');
+            const counter = document.getElementById('pageCounter');
+            const prevBtn = document.getElementById('prevDeckBtn');
+            const nextBtn = document.getElementById('nextDeckBtn');
+
+            function initDots() {
+                if (!dotsContainer) return;
+                dotsContainer.innerHTML = '';
+                for (let i = 0; i < slides.length; i++) {
+                    const dot = document.createElement('span');
+                    dot.classList.add('deck-dot');
+                    dot.setAttribute('data-index', i);
+                    dot.addEventListener('click', () => goToSlide(i));
+                    dotsContainer.appendChild(dot);
+                }
+                updateDotsAndCounter();
+            }
+
+            function updateDotsAndCounter() {
+                const dots = document.querySelectorAll('.deck-dot');
+                dots.forEach((dot, idx) => {
+                    if (idx === currentSlide) {
+                        dot.classList.add('active-dot');
+                    } else {
+                        dot.classList.remove('active-dot');
+                    }
+                });
+                if (counter) {
+                    counter.innerText = `📖 Pg ${currentSlide + 1} / ${slides.length}`;
+                }
+                slides.forEach((slide, idx) => {
+                    if (idx === currentSlide) {
+                        slide.classList.add('active-slide');
+                    } else {
+                        slide.classList.remove('active-slide');
+                    }
+                });
+            }
+
+            function goToSlide(index) {
+                if (index < 0) index = 0;
+                if (index >= slides.length) index = slides.length - 1;
+                currentSlide = index;
+                updateDotsAndCounter();
+            }
+
+            function nextSlide() {
+                let next = currentSlide + 1;
+                if (next >= slides.length) next = 0;
+                goToSlide(next);
+            }
+
+            function prevSlide() {
+                let prev = currentSlide - 1;
+                if (prev < 0) prev = slides.length - 1;
+                goToSlide(prev);
+            }
+
+            if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+            if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') prevSlide();
+                if (e.key === 'ArrowRight') nextSlide();
+            });
+
+            initDots();
+            goToSlide(0);
+
+            // ============================================================
+            // VIDEO MODAL - FIXED for YouTube 153 error
+            // ============================================================
+
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('videoIframe');
+            const closeBtn = document.getElementById('closeModalBtn');
+            const overlay = document.getElementById('videoOverlay');
+            const playBtn = document.getElementById('playBtn');
+
+            let videoIdToPlay = null;
+
+            function openVideo(videoId) {
+                if (!videoId) return;
+                videoIdToPlay = videoId;
+                
+                // Reset iframe and show overlay
+                iframe.src = '';
+                overlay.style.display = 'flex';
+                modal.classList.add('active-modal');
+                document.body.style.overflow = 'hidden';
+                
+                console.log('🎬 Video modal opened, ready to play:', videoId);
+            }
+
+            function playVideo() {
+                if (!videoIdToPlay) return;
+                
+                // Build the URL with proper parameters
+                const url = `https://www.youtube.com/embed/${videoIdToPlay}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
+                iframe.src = url;
+                overlay.style.display = 'none';
+                
+                console.log('▶️ Playing video:', videoIdToPlay);
+            }
+
+            function closeModal() {
+                modal.classList.remove('active-modal');
+                // Clear iframe after a delay to stop video
+                setTimeout(() => {
+                    iframe.src = '';
+                    overlay.style.display = 'flex';
+                }, 300);
+                document.body.style.overflow = '';
+                videoIdToPlay = null;
+                console.log('❌ Video modal closed');
+            }
+
+            // Click play button or overlay to play
+            playBtn.addEventListener('click', playVideo);
+            overlay.addEventListener('click', playVideo);
+
+            // Close button and outside click
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+
+            // ============================================================
+            // BUTTON CLICK HANDLERS
+            // ============================================================
+
+            // 1. Video buttons
+            document.querySelectorAll('.slide-action-btn.video-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const vid = this.getAttribute('data-video');
+                    if (vid) openVideo(vid);
+                });
+            });
+
+            // 2. Page link buttons - use smart navigation
+            document.querySelectorAll('.slide-action-btn.page-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const url = this.getAttribute('data-page');
+                    if (url) {
+                        smartNavigate(url);
+                    }
+                });
+            });
+
+            // 3. Click on images with data-video attribute
+            document.querySelectorAll('img[data-video]').forEach(img => {
+                img.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const vid = this.getAttribute('data-video');
+                    if (vid) openVideo(vid);
+                });
+            });
+
+            // ============================================================
+            // EXPOSE FUNCTIONS
+            // ============================================================
+
+            window.openVideo = openVideo;
+            window.closeModal = closeModal;
+            window.smartNavigate = smartNavigate;
+
+            console.log('🎬 Gallery carousel loaded!');
+            console.log('📦 Iframe detection:', isInIframe ? 'Embedded' : 'Standalone');
+            console.log('📌 Page links use smart navigation (breaks out of iframes)');
+            console.log('🎬 Videos use click-to-play (no autoplay errors)');
+        })();
+    </script>
+</body>
+</html>

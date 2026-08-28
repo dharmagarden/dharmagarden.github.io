@@ -719,7 +719,7 @@
                 widthPercent: 29.8,
                 spriteIcon: "abode/greatbuddhashrine.png",
                 actionType: "LINK",
-                targetURL: "greatbuddhashrine.html",
+                targetURL: "great-buddha-shrine.html",
                 isGate: false,
                 mascot: "abode/fruttiianjali1.png"
             },
