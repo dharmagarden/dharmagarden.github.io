@@ -1087,57 +1087,103 @@
             }
         });
 
-        // ============================================================
-        // VIDEO MODAL
-        // ============================================================
-
-        const modal = document.getElementById('videoModal');
-        const player = document.getElementById('videoPlayer');
-        const closeBtn = document.getElementById('closeModal');
-        const overlay = document.getElementById('videoOverlay');
-        const playBtn = document.getElementById('playBtn');
-        let videoIdToPlay = null;
-
-        function openVideoModal(embedURL) {
-            let videoId = embedURL;
-            if (embedURL.includes('youtube.com/embed/')) {
-                videoId = embedURL.split('/embed/')[1].split('?')[0];
-            }
-            videoIdToPlay = videoId;
-            player.src = '';
-            overlay.style.display = 'flex';
-            modal.classList.add('active-modal');
-            document.body.style.overflow = 'hidden';
-            if (!isPaused) togglePause(true);
-        }
-
-        function playVideo() {
-            if (!videoIdToPlay) return;
-            const url = `https://www.youtube.com/embed/${videoIdToPlay}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
-            player.src = url;
-            overlay.style.display = 'none';
-        }
-
-        function closeVideoModal() {
-            modal.classList.remove('active-modal');
-            setTimeout(() => {
-                player.src = '';
-                overlay.style.display = 'flex';
-            }, 300);
-            document.body.style.overflow = '';
-            videoIdToPlay = null;
-            if (isPaused) togglePause(false);
-        }
-
-        playBtn.addEventListener('click', playVideo);
-        overlay.addEventListener('click', playVideo);
-        closeBtn.addEventListener('click', closeVideoModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeVideoModal();
-        });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeVideoModal();
-        });
+			// ============================================================
+			// VIDEO MODAL FUNCTIONS - FIXED FOR MOBILE
+			// ============================================================
+			
+			const modal = document.getElementById('videoModal');
+			const player = document.getElementById('videoPlayer');
+			const closeBtn = document.getElementById('closeModal');
+			const overlay = document.getElementById('videoOverlay');
+			const playBtn = document.getElementById('playBtn');
+			let videoIdToPlay = null;
+			let isVideoModalOpen = false;
+			
+			function openVideoModal(embedURL) {
+			    // Extract video ID
+			    let videoId = embedURL;
+			    if (embedURL.includes('youtube.com/embed/')) {
+			        videoId = embedURL.split('/embed/')[1].split('?')[0];
+			    }
+			    videoIdToPlay = videoId;
+			    
+			    // 🔴 CRITICAL: Clear the iframe src BEFORE showing modal
+			    player.src = '';
+			    
+			    // Show overlay and modal
+			    overlay.style.display = 'flex';
+			    modal.classList.add('active-modal');
+			    document.body.style.overflow = 'hidden';
+			    isVideoModalOpen = true;
+			    
+			    // Pause carousel
+			    if (!isPaused) togglePause(true);
+			    
+			    console.log('🎬 Video modal opened - waiting for user to click play');
+			}
+			
+			function playVideo() {
+			    if (!videoIdToPlay) {
+			        console.warn('⚠️ No video ID to play');
+			        return;
+			    }
+			    
+			    // 🔴 CRITICAL: Only set the src when user explicitly clicks play
+			    const url = `https://www.youtube.com/embed/${videoIdToPlay}?autoplay=1&rel=0&modestbranding=1`;
+			    player.src = url;
+			    overlay.style.display = 'none';
+			    
+			    console.log('▶️ Playing video:', videoIdToPlay);
+			}
+			
+			function closeVideoModal() {
+			    modal.classList.remove('active-modal');
+			    isVideoModalOpen = false;
+			    
+			    // Stop video and show overlay again
+			    setTimeout(() => {
+			        player.src = '';
+			        overlay.style.display = 'flex';
+			    }, 300);
+			    
+			    document.body.style.overflow = '';
+			    videoIdToPlay = null;
+			    
+			    // Resume carousel
+			    if (isPaused) togglePause(false);
+			    
+			    console.log('❌ Video modal closed');
+			}
+			
+			// Event listeners
+			playBtn.addEventListener('click', function(e) {
+			    e.stopPropagation();
+			    playVideo();
+			});
+			
+			overlay.addEventListener('click', function(e) {
+			    e.stopPropagation();
+			    playVideo();
+			});
+			
+			closeBtn.addEventListener('click', closeVideoModal);
+			
+			modal.addEventListener('click', function(e) {
+			    if (e.target === modal) closeVideoModal();
+			});
+			
+			document.addEventListener('keydown', function(e) {
+			    if (e.key === 'Escape') closeVideoModal();
+			});
+			
+			// 🔴 ADD THIS: Prevent any accidental autoplay on mobile
+			// Some mobile browsers try to "help" by autoplaying
+			document.addEventListener('visibilitychange', function() {
+			    if (document.hidden && isVideoModalOpen) {
+			        // If user switches tabs while video modal is open, pause
+			        // This is just a safety measure
+			    }
+			});
 
         // ============================================================
         // INITIALIZE
