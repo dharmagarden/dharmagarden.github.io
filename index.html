@@ -217,7 +217,7 @@
             color: #3b2a1f;
         }
 
-        /* ========== VIDEO MODAL ========== */
+        /* ========== VIDEO MODAL - FIXED ========== */
         .video-modal {
             display: none;
             position: fixed;
@@ -231,6 +231,10 @@
             align-items: center;
             padding: 20px;
             box-sizing: border-box;
+        }
+
+        .video-modal.active-modal {
+            display: flex;
         }
 
         .video-container {
@@ -248,6 +252,7 @@
             width: 100%;
             height: 100%;
             border: none;
+            display: block;
         }
 
         .close-modal-btn {
@@ -268,6 +273,49 @@
 
         .close-modal-btn:hover {
             background: #ff0000;
+        }
+
+        /* Video overlay - click to play */
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .video-overlay:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .video-overlay .play-btn {
+            font-size: 4rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .video-overlay .play-btn:hover {
+            transform: scale(1.1);
+            background: white;
+        }
+        .video-overlay .play-text {
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 16px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            font-weight: 500;
         }
 
         /* ========== GUARDIAN OVERLAY ========== */
@@ -526,6 +574,14 @@
                 top: 3px;
                 right: 7px;
             }
+            .video-overlay .play-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 3rem;
+            }
+            .video-overlay .play-text {
+                font-size: 1rem;
+            }
         }
 
         @media (max-width: 400px) {
@@ -568,6 +624,11 @@
                 border-bottom-color: #d4af37;
                 border-right-color: transparent;
             }
+            .video-overlay .play-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 2.5rem;
+            }
         }
 
         @media (max-height: 500px) and (orientation: landscape) {
@@ -606,6 +667,11 @@
                 font-size: 0.75em;
                 padding: 4px 14px;
             }
+            .video-overlay .play-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 2.5rem;
+            }
         }
     </style>
 </head>
@@ -631,8 +697,8 @@
         <!-- ========== FOOTER / SCROLL BOX ========== -->
         <div class="footer-content-box">
             <div class="footer-inner">
-                <div class="footer-title" id="infoTitle">🏯 Welcome to Dharmagarden</div>
-                <div class="footer-text" id="infoText">Please tap the glowing gate to enter!</div>
+                <div class="footer-title" id="infoTitle">🏯 Dharmagarden</div>
+                <div class="footer-text" id="infoText">✨ Click the glowing gate to enter!</div>
             </div>
         </div>
 
@@ -690,8 +756,8 @@
         const menuSprites = [
             {
                 id: 1,
-                name: "🏯 Echoes of time Pagoda",
-                description: "A place for peaceful chanting and meditation.",
+                name: "🏯 Pagoda",
+                description: "Echoes of time Pagoda. Click 'Enter' to visit!",
                 topPercent: 19,
                 leftPercent: 49,
                 widthPercent: 13.7,
@@ -704,7 +770,7 @@
             {
                 id: 2,
                 name: "🌉 Moon Bridge",
-                description: "The bridge of wondrous sights. A serene place to catch the sunset.",
+                description: "The bridge of wondrous sights.",
                 topPercent: 23,
                 leftPercent: 24.8,
                 widthPercent: 11.7,
@@ -717,7 +783,7 @@
             {
                 id: 3,
                 name: "🪷 Great Buddha Shrine",
-                description: "The main shrine for 'Puja' or offerings and chanting.",
+                description: "The main shrine in Dharmagarden.",
                 topPercent: 35.8,
                 leftPercent: 64.1,
                 widthPercent: 29.8,
@@ -730,7 +796,7 @@
             {
                 id: 4,
                 name: "🍜 Happy Tummy Kitchen",
-                description: "Mmmm ... what happy meals could there be?",
+                description: "Mmmm ... Click 'Enter' to visit!",
                 topPercent: 46.5,
                 leftPercent: 82.4,
                 widthPercent: 16.8,
@@ -743,7 +809,7 @@
             {
                 id: 5,
                 name: "📚 Sunshine Lotus School",
-                description: "Find your courses, projects and talks.",
+                description: "Find your class. Click 'Enter' to visit!",
                 topPercent: 38,
                 leftPercent: 37.4,
                 widthPercent: 20.9,
@@ -756,7 +822,7 @@
             {
                 id: 6,
                 name: "ℹ️ Dharmagarden Infocenter",
-                description: "Meet Bodhi Fruttii there. He can tell you more about the temple.",
+                description: "Welcome to the reception. Click 'Enter' to visit!",
                 topPercent: 48.5,
                 leftPercent: 24.7,
                 widthPercent: 20.1,
@@ -782,7 +848,7 @@
             {
                 id: 8,
                 name: "Dharmagarden Temple Gate",
-                description: "Auspicious main gate into the temple.",
+                description: "✨ Click the gate to enter Dharmagarden!",
                 topPercent: 70.5,
                 leftPercent: 26.1,
                 widthPercent: 19.4,
@@ -795,7 +861,7 @@
             {
                id: 9,
                name: "🎨 Joyous Heart Gallery",
-               description: "An exhibition of selected works.",
+               description: "Gallery of our hearts. Click 'Enter' to visit!",
                topPercent: 58.7,
                leftPercent: 68.9,
                widthPercent: 21.9,
@@ -919,7 +985,7 @@
             });
             
             document.getElementById('infoTitle').innerText = '🪷 Welcome to Dharmagarden';
-            document.getElementById('infoText').innerText = '👆 Click a location to learn more!';
+            document.getElementById('infoText').innerText = '👆 Click a shrine to learn more!';
             
             console.log('🚪 Temple gates opened!');
         }
@@ -1120,12 +1186,12 @@
                 document.getElementById("infoText").innerText = "✨ Click the glowing gate to enter!";
             } else {
                 document.getElementById("infoTitle").innerText = "🪷 Welcome to Dharmagarden";
-                document.getElementById("infoText").innerText = "👆 Click a location to learn more!";
+                document.getElementById("infoText").innerText = "👆 Click a shrine to learn more!";
             }
         }
 
         // ============================================================
-        // VIDEO MODAL - FIXED FOR ALL DEVICES
+        // VIDEO MODAL - FIXED
         // ============================================================
 
         const modal = document.getElementById('videoModal');
@@ -1134,7 +1200,6 @@
         const overlay = document.getElementById('videoOverlay');
         const playBtn = document.getElementById('playBtn');
         let videoIdToPlay = null;
-        let isVideoModalOpen = false;
 
         function openVideoModal(embedURL) {
             console.log('🎬 Opening video modal for:', embedURL);
@@ -1146,14 +1211,13 @@
             }
             videoIdToPlay = videoId;
             
-            // 🔴 CRITICAL: Clear the iframe src BEFORE showing modal
+            // 🔴 Clear the iframe src BEFORE showing modal
             player.src = '';
             
             // Show overlay and modal
             overlay.style.display = 'flex';
             modal.classList.add('active-modal');
             document.body.style.overflow = 'hidden';
-            isVideoModalOpen = true;
             
             console.log('🎬 Video modal opened - waiting for user to click play');
         }
@@ -1166,7 +1230,7 @@
             
             console.log('▶️ Playing video:', videoIdToPlay);
             
-            // 🔴 CRITICAL: Only set the src when user explicitly clicks play
+            // 🔴 Only set the src when user explicitly clicks play
             const url = `https://www.youtube.com/embed/${videoIdToPlay}?autoplay=1&rel=0&modestbranding=1`;
             player.src = url;
             overlay.style.display = 'none';
@@ -1175,7 +1239,6 @@
         function closeVideoModal() {
             console.log('❌ Closing video modal');
             modal.classList.remove('active-modal');
-            isVideoModalOpen = false;
             
             // Stop video and show overlay again
             setTimeout(() => {
@@ -1246,7 +1309,7 @@
                 });
                 
                 document.getElementById('infoTitle').innerText = '🪷 Welcome to Dharmagarden';
-                document.getElementById('infoText').innerText = '👆 Click a location to learn more!';
+                document.getElementById('infoText').innerText = '👆 Click a shrine to learn more!';
                 console.log('🔄 Temple state restored');
             }
             
@@ -1256,6 +1319,7 @@
                 console.log('💡 Temple entered:', templeEntered);
                 console.log('💡 Click a shrine → Mascot with speech bubble appears');
                 console.log('💡 Click Enter to visit, ✕ or ESC to close');
+                console.log('🎬 Videos: Click play button to watch (no autoplay errors)');
             }, 100);
         }
 
