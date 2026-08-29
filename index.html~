@@ -666,11 +666,19 @@
         </div>
     </div>
 
-    <!-- ========== VIDEO MODAL ========== -->
+    <!-- ========== VIDEO MODAL - FIXED ========== -->
     <div id="videoModal" class="video-modal">
         <div class="video-container">
             <button class="close-modal-btn" id="closeModal">✕ CLOSE</button>
-            <iframe id="videoPlayer" src="" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            <div class="video-overlay" id="videoOverlay">
+                <button class="play-btn" id="playBtn">▶</button>
+                <span class="play-text">Click to play</span>
+            </div>
+            <iframe id="videoPlayer" 
+                    src="" 
+                    referrerpolicy="strict-origin-when-cross-origin" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen></iframe>
         </div>
     </div>
 
@@ -748,7 +756,7 @@
             {
                 id: 6,
                 name: "ℹ️ Dharmagarden Infocenter",
-                description: "Meet Bodhi Fruittee there. He can tell you more about the temple.",
+                description: "Meet Bodhi Fruttii there. He can tell you more about the temple.",
                 topPercent: 48.5,
                 leftPercent: 24.7,
                 widthPercent: 20.1,
@@ -1116,35 +1124,97 @@
             }
         }
 
-        // Video modal functions
-        const modal = document.getElementById("videoModal");
-        const player = document.getElementById("videoPlayer");
+        // ============================================================
+        // VIDEO MODAL - FIXED FOR ALL DEVICES
+        // ============================================================
+
+        const modal = document.getElementById('videoModal');
+        const player = document.getElementById('videoPlayer');
+        const closeBtn = document.getElementById('closeModal');
+        const overlay = document.getElementById('videoOverlay');
+        const playBtn = document.getElementById('playBtn');
+        let videoIdToPlay = null;
+        let isVideoModalOpen = false;
 
         function openVideoModal(embedURL) {
-            player.src = embedURL + "?autoplay=1&rel=0";
-            modal.style.display = "flex";
-            document.body.style.overflow = "hidden";
+            console.log('🎬 Opening video modal for:', embedURL);
+            
+            // Extract video ID
+            let videoId = embedURL;
+            if (embedURL.includes('youtube.com/embed/')) {
+                videoId = embedURL.split('/embed/')[1].split('?')[0];
+            }
+            videoIdToPlay = videoId;
+            
+            // 🔴 CRITICAL: Clear the iframe src BEFORE showing modal
+            player.src = '';
+            
+            // Show overlay and modal
+            overlay.style.display = 'flex';
+            modal.classList.add('active-modal');
+            document.body.style.overflow = 'hidden';
+            isVideoModalOpen = true;
+            
+            console.log('🎬 Video modal opened - waiting for user to click play');
+        }
+
+        function playVideo() {
+            if (!videoIdToPlay) {
+                console.warn('⚠️ No video ID to play');
+                return;
+            }
+            
+            console.log('▶️ Playing video:', videoIdToPlay);
+            
+            // 🔴 CRITICAL: Only set the src when user explicitly clicks play
+            const url = `https://www.youtube.com/embed/${videoIdToPlay}?autoplay=1&rel=0&modestbranding=1`;
+            player.src = url;
+            overlay.style.display = 'none';
         }
 
         function closeVideoModal() {
-            modal.style.display = "none";
-            player.src = "";
-            document.body.style.overflow = "";
+            console.log('❌ Closing video modal');
+            modal.classList.remove('active-modal');
+            isVideoModalOpen = false;
+            
+            // Stop video and show overlay again
+            setTimeout(() => {
+                player.src = '';
+                overlay.style.display = 'flex';
+            }, 300);
+            
+            document.body.style.overflow = '';
+            videoIdToPlay = null;
         }
 
-        document.getElementById("closeModal").addEventListener("click", closeVideoModal);
-        modal.addEventListener("click", (e) => {
+        // Event listeners
+        playBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            playVideo();
+        });
+
+        overlay.addEventListener('click', function(e) {
+            e.stopPropagation();
+            playVideo();
+        });
+
+        closeBtn.addEventListener('click', closeVideoModal);
+
+        modal.addEventListener('click', function(e) {
             if (e.target === modal) closeVideoModal();
         });
 
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") closeVideoModal();
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.menu-sprite') && !e.target.closest('.mascot-container')) {
-                if (templeEntered) {
-                    resetFooter();
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (document.getElementById('videoModal').classList.contains('active-modal')) {
+                    closeVideoModal();
+                }
+                if (document.getElementById('guardianOverlay').classList.contains('active')) {
+                    enterTemple();
+                }
+                if (document.getElementById('mascotOverlay').classList.contains('active')) {
+                    closeMascotPopup();
+                    currentSprite = null;
                 }
             }
         });
