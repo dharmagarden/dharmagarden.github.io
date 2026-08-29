@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+    <title>Dharmagarden - Info Center</title>
+    <style>
+        /* ========== RESET & BASE ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a1a, #2d1f0a);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            font-family: 'Segoe UI', 'Georgia', serif;
+        }
+
+        .page-wrapper {
+            max-width: 1100px;
+            width: 100%;
+            background: #3d2b1a;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 2px solid #d4af37;
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            min-height: 0;
+        }
+
+        /* ========== HEADER TITLE ========== */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0 15px 0;
+            border-bottom: 2px solid #d4af37;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            background: rgba(139, 105, 20, 0.3);
+            color: #ffd700;
+            border: 1px solid #d4af37;
+            padding: 6px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            background: rgba(139, 105, 20, 0.6);
+            transform: scale(1.05);
+        }
+
+        .main-title {
+            color: #ffd700;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-shadow: 2px 2px 0 #2c2e1e;
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        .main-subtitle {
+            color: #fdf0d8;
+            font-size: 0.85em;
+            margin: 0;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        /* ========== CAROUSEL CONTAINER ========== */
+        .carousel-wrapper {
+            position: relative;
+            width: 100%;
+            background: #2c1a0a;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 2px solid #b8860b;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+            touch-action: none; /* Prevents browser scroll interference */
+            flex-shrink: 0;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            background: #2c1a0a;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            height: 100%;
+            will-change: transform;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Background image for each slide */
+        .carousel-slide .slide-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            opacity: 0.3;
+        }
+
+        /* Overlay image (Fruttii mascot with transparent background) */
+        .carousel-slide .slide-overlay {
+            position: relative;
+            z-index: 2;
+            max-width: 80%;
+            max-height: 85%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 30px rgba(0,0,0,0.4));
+            user-select: none;
+            -webkit-user-drag: none;
+            pointer-events: none;
+        }
+
+        /* Support for animated GIFs */
+        .carousel-slide .slide-overlay.gif-overlay {
+            animation: none; /* GIF plays natively */
+        }
+
+        /* ========== NAVIGATION BUTTONS ========== */
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            background: rgba(139, 105, 20, 0.7);
+            color: white;
+            border: 2px solid #d4af37;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 22px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+            touch-action: manipulation;
+        }
+
+        .carousel-btn:hover {
+            background: rgba(139, 105, 20, 0.95);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-btn:active {
+            transform: translateY(-50%) scale(0.9);
+        }
+
+        .carousel-btn.prev {
+            left: 10px;
+        }
+
+        .carousel-btn.next {
+            right: 10px;
+        }
+
+        /* ========== DOTS INDICATOR ========== */
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 0;
+            background: rgba(44, 26, 10, 0.8);
+            flex-shrink: 0;
+        }
+
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+        }
+
+        .carousel-dot.active {
+            background: #d4af37;
+            width: 24px;
+            border-radius: 5px;
+            border-color: #d4af37;
+        }
+
+        .carousel-dot:hover {
+            background: rgba(255, 215, 0, 0.6);
+        }
+
+        /* ========== FOOTER / MESSAGE BOX ========== */
+        .footer-content-box {
+            margin-top: 15px;
+            background: #fdf0d8;
+            border-radius: 16px;
+            border: 3px solid #b8860b;
+            padding: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .footer-inner {
+            background: #fef8e7;
+            border-radius: 12px;
+            padding: 10px 15px;
+            min-height: 60px;
+            max-height: 120px;
+            overflow-y: auto;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            color: #3b2a1f;
+        }
+
+        .footer-inner::-webkit-scrollbar {
+            width: 6px;
+        }
+        .footer-inner::-webkit-scrollbar-track {
+            background: #e8dcc8;
+            border-radius: 4px;
+        }
+        .footer-inner::-webkit-scrollbar-thumb {
+            background: #b8860b;
+            border-radius: 4px;
+        }
+
+        .footer-title {
+            color: #b45f06;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            line-height: 1.4;
+            color: #3b2a1f;
+        }
+
+        .footer-text .footer-link {
+            display: inline-block;
+            margin-top: 6px;
+            background: #8B6914;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background 0.2s;
+            border: none;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+        }
+
+        .footer-text .footer-link:hover {
+            background: #6B4F0E;
+        }
+
+        .footer-text .footer-link:active {
+            transform: scale(0.95);
+        }
+
+        /* ========== VIDEO MODAL ========== */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .video-modal.active-modal {
+            display: flex;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .close-modal-btn {
+            position: absolute;
+            top: -44px;
+            right: 0;
+            background: #8b0000;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 30px;
+            font-size: 14px;
+            transition: background 0.2s;
+            z-index: 10;
+        }
+
+        .close-modal-btn:hover {
+            background: #ff0000;
+        }
+
+        /* Video overlay for click-to-play */
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .video-overlay:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .video-overlay .play-btn {
+            font-size: 4rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .video-overlay .play-btn:hover {
+            transform: scale(1.1);
+            background: white;
+        }
+        .video-overlay .play-text {
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 16px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            font-weight: 500;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 700px) {
+            .header-section {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .header-left {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .main-title {
+                font-size: 1.2em;
+            }
+            .main-subtitle {
+                font-size: 0.75em;
+            }
+            .carousel-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .carousel-btn.prev {
+                left: 5px;
+            }
+            .carousel-btn.next {
+                right: 5px;
+            }
+            .carousel-container {
+                aspect-ratio: 4 / 3;
+            }
+            .footer-inner {
+                padding: 8px 12px;
+                min-height: 50px;
+                max-height: 100px;
+            }
+            .footer-title {
+                font-size: 14px;
+            }
+            .footer-text {
+                font-size: 13px;
+            }
+            .carousel-slide .slide-overlay {
+                max-width: 90%;
+                max-height: 80%;
+            }
+            .video-overlay .play-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 3rem;
+            }
+            .video-overlay .play-text {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .carousel-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
+            .carousel-container {
+                aspect-ratio: 1 / 1;
+            }
+            .carousel-slide .slide-overlay {
+                max-width: 95%;
+                max-height: 85%;
+            }
+            .footer-inner {
+                padding: 6px 10px;
+                min-height: 40px;
+                max-height: 90px;
+            }
+            .footer-title {
+                font-size: 13px;
+            }
+            .footer-text {
+                font-size: 12px;
+            }
+            .carousel-dots {
+                padding: 8px 0;
+                gap: 6px;
+            }
+            .carousel-dot {
+                width: 8px;
+                height: 8px;
+            }
+            .carousel-dot.active {
+                width: 18px;
+            }
+        }
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            .carousel-container {
+                aspect-ratio: 16 / 9;
+                max-height: 60vh;
+            }
+            .carousel-slide .slide-overlay {
+                max-width: 60%;
+                max-height: 80%;
+            }
+            .header-section {
+                padding: 5px 0 10px 0;
+                margin-bottom: 10px;
+            }
+            .main-title {
+                font-size: 1.1em;
+            }
+            .footer-inner {
+                min-height: 40px;
+                max-height: 70px;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page-wrapper">
+
+        <!-- ========== HEADER TITLE ========== -->
+        <div class="header-section">
+            <div class="header-left">
+                <button class="back-btn" id="backBtn">◀ Back</button>
+                <div class="main-title">ℹ️ Info Center</div>
+            </div>
+            <div class="main-subtitle">Swipe or click to explore</div>
+        </div>
+
+        <!-- ========== CAROUSEL ========== -->
+        <div class="carousel-wrapper" id="carouselWrapper">
+            <div class="carousel-container" id="carouselContainer">
+                <div class="carousel-track" id="carouselTrack">
+                    <!-- Slides will be inserted by JavaScript -->
+                </div>
+
+                <!-- Navigation Buttons -->
+                <button class="carousel-btn prev" id="prevBtn" aria-label="Previous slide">❮</button>
+                <button class="carousel-btn next" id="nextBtn" aria-label="Next slide">❯</button>
+            </div>
+
+            <!-- Dots Indicator -->
+            <div class="carousel-dots" id="carouselDots"></div>
+        </div>
+
+        <!-- ========== FOOTER / MESSAGE BOX ========== -->
+        <div class="footer-content-box">
+            <div class="footer-inner">
+                <div class="footer-title" id="infoTitle">ℹ️ Info Center</div>
+                <div class="footer-text" id="infoText">Swipe or use the buttons to browse messages from Fruttii.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ========== VIDEO MODAL ========== -->
+    <div id="videoModal" class="video-modal">
+        <div class="video-container">
+            <button class="close-modal-btn" id="closeModal">✕ CLOSE</button>
+            <div class="video-overlay" id="videoOverlay">
+                <button class="play-btn" id="playBtn">▶</button>
+                <span class="play-text">Click to play</span>
+            </div>
+            <iframe id="videoPlayer" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // CONFIGURATION - Add your slides here
+        // ============================================================
+
+        const slides = [{
+            id: 1,
+            title: "🙏 Welcome to Dharmagarden",
+            message: "We are delighted to have you here. This is a place of peace, learning, and compassion. Explore the temple, visit the shrines, and discover the path of Truth.",
+            overlay: "abode/fruttii/fruttiianjali1.png",
+            // overlay can also be an animated GIF:
+            // overlay: "abode/fruttii/fruttiianimated.gif",
+            bgImage: "shrine/infocenter-bg.jpg",
+            actionType: "NONE",
+            actionURL: ""
+        }, {
+            id: 2,
+            title: "🌟 New: Great Buddha Shrine",
+            message: "The Great Buddha Shrine is now open! Visit the main shrine to learn about the offerings and participate in interactive rituals. Click here to visit.",
+            overlay: "abode/fruttii/fruttiijumpjoy1.png",
+            bgImage: "shrine/infocenter-bg.jpg",
+            actionType: "LINK",
+            actionURL: "greatbuddhashrine.html",
+            actionLabel: "Visit Shrine"
+        }, {
+            id: 3,
+            title: "🎨 Joyous Heart Gallery",
+            message: "Explore the Joyous Heart Gallery - a collection of artwork, stories, and teachings from the Dharmagarden community. Click here to view.",
+            overlay: "abode/fruttii/fruttiirunright.png",
+            bgImage: "shrine/infocenter-bg.jpg",
+            actionType: "VIDEO",
+            actionURL: "https://www.youtube.com/embed/UnQASwhsryM",
+            actionLabel: "Watch Video"
+        }, {
+            id: 4,
+            title: "🌿 New Paths Opening Soon",
+            message: "We are expanding the temple grounds with new walking paths, meditation gardens, and learning spaces. Stay tuned for updates!",
+            overlay: "abode/fruttii/fruttiihirun.png",
+            bgImage: "shrine/infocenter-bg.jpg",
+            actionType: "NONE",
+            actionURL: ""
+        }, {
+            id: 5,
+            title: "🍜 Happy Tummy Kitchen",
+            message: "Our community kitchen is now serving virtual meals. Learn about mindful eating and the joy of sharing food with others.",
+            overlay: "abode/fruttii/fruttiitummy.png",
+            bgImage: "shrine/infocenter-bg.jpg",
+            actionType: "LINK",
+            actionURL: "apology.html",
+            actionLabel: "Visit Kitchen"
+        }, {
+            id: 6,
+            title: "📚 New Lessons Available",
+            message: "The Sunshine Lotus School has new lessons on compassion, mindfulness, and the teachings of the Buddha. Enroll today!",
+            overlay: "abode/fruttii/fruttiijumpjoy1.png",
+            bgImage: "shrine/infocenter-bg.jpg",
+            actionType: "LINK",
+            actionURL: "apology.html",
+            actionLabel: "View Lessons"
+        }];
+
+        // ============================================================
+        // CAROUSEL ENGINE
+        // ============================================================
+
+        let currentIndex = 0;
+        let isDragging = false;
+        let startX = 0;
+        let currentTranslate = 0;
+        let prevTranslate = 0;
+        let animationID = 0;
+        const track = document.getElementById('carouselTrack');
+        const dotsContainer = document.getElementById('carouselDots');
+        const container = document.getElementById('carouselContainer');
+
+        // Build slides
+        function buildSlides() {
+            track.innerHTML = '';
+            slides.forEach((slide, index) => {
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'carousel-slide';
+                slideDiv.dataset.index = index;
+
+                // Background image
+                const bgImg = document.createElement('img');
+                bgImg.className = 'slide-bg';
+                bgImg.src = slide.bgImage || 'shrine/infocenter-bg.jpg';
+                bgImg.alt = 'Background';
+                slideDiv.appendChild(bgImg);
+
+                // Overlay image (PNG or animated GIF)
+                const overlayImg = document.createElement('img');
+                overlayImg.className = 'slide-overlay';
+                if (slide.overlay && slide.overlay.toLowerCase().endsWith('.gif')) {
+                    overlayImg.classList.add('gif-overlay');
+                }
+                overlayImg.src = slide.overlay || 'abode/fruttii/fruttiianjali1.png';
+                overlayImg.alt = slide.title;
+                overlayImg.draggable = false;
+                slideDiv.appendChild(overlayImg);
+
+                track.appendChild(slideDiv);
+            });
+        }
+
+        // Build dots
+        function buildDots() {
+            dotsContainer.innerHTML = '';
+            slides.forEach((_, index) => {
+                const dot = document.createElement('span');
+                dot.className = 'carousel-dot' + (index === 0 ? ' active' : '');
+                dot.dataset.index = index;
+                dot.addEventListener('click', () => goToSlide(index));
+                dot.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    goToSlide(index);
+                });
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        // Update dots
+        function updateDots() {
+            const dots = dotsContainer.querySelectorAll('.carousel-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentIndex);
+            });
+        }
+
+        // Go to specific slide
+        function goToSlide(index) {
+            if (index < 0) index = 0;
+            if (index >= slides.length) index = slides.length - 1;
+            currentIndex = index;
+            const slideWidth = container.offsetWidth;
+            currentTranslate = -index * slideWidth;
+            track.style.transform = `translateX(${currentTranslate}px)`;
+            updateDots();
+            updateFooter(index);
+        }
+
+        // Go to next/previous
+        function nextSlide() {
+            goToSlide(currentIndex + 1);
+        }
+
+        function prevSlide() {
+            goToSlide(currentIndex - 1);
+        }
+
+        // Update footer with slide info
+        function updateFooter(index) {
+            const slide = slides[index];
+            if (!slide) return;
+
+            document.getElementById('infoTitle').innerText = slide.title;
+
+            // Build footer text with optional action button
+            let footerHTML = slide.message;
+
+            if (slide.actionType !== 'NONE' && slide.actionURL) {
+                const label = slide.actionLabel || (slide.actionType === 'VIDEO' ? '🎬 Watch' : '🔗 Visit');
+                footerHTML += `<br><button class="footer-link" data-action="${slide.actionType}" data-url="${slide.actionURL}">${label}</button>`;
+            }
+
+            document.getElementById('infoText').innerHTML = footerHTML;
+
+            // Attach event listeners to footer buttons
+            document.querySelectorAll('.footer-link').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const action = this.dataset.action;
+                    const url = this.dataset.url;
+                    if (action === 'VIDEO') {
+                        openVideoModal(url);
+                    } else if (action === 'LINK') {
+                        window.location.href = url;
+                    }
+                });
+            });
+        }
+
+        // ============================================================
+        // TOUCH / SWIPE HANDLING
+        // ============================================================
+
+        function getPositionX(event) {
+            return event.touches ? event.touches[0].clientX : event.clientX;
+        }
+
+        function onDragStart(event) {
+            if (event.type === 'mousedown' && event.button !== 0) return;
+            isDragging = true;
+            startX = getPositionX(event);
+            track.style.transition = 'none';
+            event.preventDefault();
+        }
+
+        function onDragMove(event) {
+            if (!isDragging) return;
+            const currentX = getPositionX(event);
+            const diff = currentX - startX;
+            const slideWidth = container.offsetWidth;
+            const newTranslate = currentTranslate + diff;
+            track.style.transform = `translateX(${newTranslate}px)`;
+            event.preventDefault();
+        }
+
+        function onDragEnd(event) {
+            if (!isDragging) return;
+            isDragging = false;
+            track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
+            const slideWidth = container.offsetWidth;
+            const diff = getPositionX(event) - startX;
+            const threshold = slideWidth * 0.2;
+
+            if (diff < -threshold && currentIndex < slides.length - 1) {
+                goToSlide(currentIndex + 1);
+            } else if (diff > threshold && currentIndex > 0) {
+                goToSlide(currentIndex - 1);
+            } else {
+                goToSlide(currentIndex);
+            }
+        }
+
+        // ============================================================
+        // VIDEO MODAL FUNCTIONS
+        // ============================================================
+
+        const modal = document.getElementById('videoModal');
+        const player = document.getElementById('videoPlayer');
+        const closeBtn = document.getElementById('closeModal');
+        const overlay = document.getElementById('videoOverlay');
+        const playBtn = document.getElementById('playBtn');
+        let videoIdToPlay = null;
+
+        function openVideoModal(embedURL) {
+            let videoId = embedURL;
+            if (embedURL.includes('youtube.com/embed/')) {
+                videoId = embedURL.split('/embed/')[1].split('?')[0];
+            }
+            videoIdToPlay = videoId;
+            player.src = '';
+            overlay.style.display = 'flex';
+            modal.classList.add('active-modal');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function playVideo() {
+            if (!videoIdToPlay) return;
+            const url =
+            `https://www.youtube.com/embed/${videoIdToPlay}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
+            player.src = url;
+            overlay.style.display = 'none';
+        }
+
+        function closeVideoModal() {
+            modal.classList.remove('active-modal');
+            setTimeout(() => {
+                player.src = '';
+                overlay.style.display = 'flex';
+            }, 300);
+            document.body.style.overflow = '';
+            videoIdToPlay = null;
+        }
+
+        playBtn.addEventListener('click', playVideo);
+        overlay.addEventListener('click', playVideo);
+        closeBtn.addEventListener('click', closeVideoModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeVideoModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeVideoModal();
+        });
+
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+
+        document.getElementById('backBtn').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') prevSlide();
+            if (e.key === 'ArrowRight') nextSlide();
+        });
+
+        // ============================================================
+        // INITIALIZE
+        // ============================================================
+
+        function initCarousel() {
+            buildSlides();
+            buildDots();
+
+            // Set initial position
+            const slideWidth = container.offsetWidth;
+            currentTranslate = 0;
+            track.style.transform = `translateX(0px)`;
+            updateDots();
+            updateFooter(0);
+
+            // Touch events
+            container.addEventListener('touchstart', onDragStart, { passive: false });
+            container.addEventListener('touchmove', onDragMove, { passive: false });
+            container.addEventListener('touchend', onDragEnd, { passive: false });
+
+            // Mouse events
+            container.addEventListener('mousedown', onDragStart);
+            container.addEventListener('mousemove', onDragMove);
+            container.addEventListener('mouseup', onDragEnd);
+            container.addEventListener('mouseleave', onDragEnd);
+
+            // Handle resize
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    goToSlide(currentIndex);
+                }, 200);
+            });
+        }
+
+        // Wait for DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initCarousel);
+        } else {
+            initCarousel();
+        }
+
+        console.log('ℹ️ Info Center loaded!');
+        console.log('📋 Slides:', slides.length);
+        console.log('💡 Swipe left/right or use buttons to navigate');
+        console.log('🎨 Overlays support PNG and animated GIF');
+    </script>
+
+</body>
+</html>

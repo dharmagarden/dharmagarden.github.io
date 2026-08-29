@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+    <title>Dharmagarden - Info Center</title>
+    <style>
+        /* ========== RESET & BASE ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a1a, #2d1f0a);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            font-family: 'Segoe UI', 'Georgia', serif;
+        }
+
+        .page-wrapper {
+            max-width: 1100px;
+            width: 100%;
+            background: #3d2b1a;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 2px solid #d4af37;
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            min-height: 0;
+        }
+
+        /* ========== HEADER TITLE ========== */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0 15px 0;
+            border-bottom: 2px solid #d4af37;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            background: rgba(139, 105, 20, 0.3);
+            color: #ffd700;
+            border: 1px solid #d4af37;
+            padding: 6px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            background: rgba(139, 105, 20, 0.6);
+            transform: scale(1.05);
+        }
+
+        .main-title {
+            color: #ffd700;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-shadow: 2px 2px 0 #2c2e1e;
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        .main-subtitle {
+            color: #fdf0d8;
+            font-size: 0.85em;
+            margin: 0;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        /* ========== CAROUSEL CONTAINER ========== */
+        .carousel-wrapper {
+            position: relative;
+            width: 100%;
+            background: #2c1a0a;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 2px solid #b8860b;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+            touch-action: none;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            background: #2c1a0a;
+        }
+
+        /* ===== STATIC BACKGROUND ===== */
+        .static-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        /* ===== OVERLAY CONTAINER ===== */
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        /* ===== MASCOT OVERLAY ===== */
+        .mascot-overlay {
+            max-width: 70%;
+            max-height: 80%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 30px rgba(0,0,0,0.4));
+            user-select: none;
+            -webkit-user-drag: none;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            opacity: 0;
+            transform: scale(0.9);
+            position: absolute;
+        }
+
+        .mascot-overlay.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .mascot-overlay.exit {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        /* Support for animated GIFs */
+        .mascot-overlay.gif-overlay {
+            animation: none;
+        }
+
+        /* ===== PROGRESS BAR (Autoplay indicator) ===== */
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #d4af37, #ffd700);
+            z-index: 5;
+            width: 0%;
+            transition: width 0.1s linear;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .progress-bar.paused {
+            transition: none;
+        }
+
+        /* ========== NAVIGATION BUTTONS ========== */
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            background: rgba(139, 105, 20, 0.6);
+            color: white;
+            border: 2px solid #d4af37;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 22px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+            touch-action: manipulation;
+            pointer-events: auto;
+        }
+
+        .carousel-btn:hover {
+            background: rgba(139, 105, 20, 0.95);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-btn:active {
+            transform: translateY(-50%) scale(0.9);
+        }
+
+        .carousel-btn.prev {
+            left: 10px;
+        }
+
+        .carousel-btn.next {
+            right: 10px;
+        }
+
+        /* ========== DOTS INDICATOR ========== */
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 0;
+            background: rgba(44, 26, 10, 0.8);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 3;
+        }
+
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+        }
+
+        .carousel-dot.active {
+            background: #d4af37;
+            width: 24px;
+            border-radius: 5px;
+            border-color: #d4af37;
+        }
+
+        .carousel-dot:hover {
+            background: rgba(255, 215, 0, 0.6);
+        }
+
+        /* ========== FOOTER / MESSAGE BOX ========== */
+        .footer-content-box {
+            margin-top: 15px;
+            background: #fdf0d8;
+            border-radius: 16px;
+            border: 3px solid #b8860b;
+            padding: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .footer-inner {
+            background: #fef8e7;
+            border-radius: 12px;
+            padding: 10px 15px;
+            min-height: 60px;
+            max-height: 120px;
+            overflow-y: auto;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            color: #3b2a1f;
+        }
+
+        .footer-inner::-webkit-scrollbar {
+            width: 6px;
+        }
+        .footer-inner::-webkit-scrollbar-track {
+            background: #e8dcc8;
+            border-radius: 4px;
+        }
+        .footer-inner::-webkit-scrollbar-thumb {
+            background: #b8860b;
+            border-radius: 4px;
+        }
+
+        .footer-title {
+            color: #b45f06;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            line-height: 1.4;
+            color: #3b2a1f;
+        }
+
+        .footer-text .footer-link {
+            display: inline-block;
+            margin-top: 6px;
+            background: #8B6914;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background 0.2s;
+            border: none;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+        }
+
+        .footer-text .footer-link:hover {
+            background: #6B4F0E;
+        }
+
+        .footer-text .footer-link:active {
+            transform: scale(0.95);
+        }
+
+        /* ========== VIDEO MODAL ========== */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .video-modal.active-modal {
+            display: flex;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .close-modal-btn {
+            position: absolute;
+            top: -44px;
+            right: 0;
+            background: #8b0000;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 30px;
+            font-size: 14px;
+            transition: background 0.2s;
+            z-index: 10;
+        }
+
+        .close-modal-btn:hover {
+            background: #ff0000;
+        }
+
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .video-overlay:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .video-overlay .play-btn {
+            font-size: 4rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-overlay .play-btn:hover {
+            transform: scale(1.1);
+            background: white;
+        }
+
+        .video-overlay .play-text {
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 16px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            font-weight: 500;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 700px) {
+            .header-section {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .header-left {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .main-title {
+                font-size: 1.2em;
+            }
+            .main-subtitle {
+                font-size: 0.75em;
+            }
+            .carousel-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .carousel-btn.prev {
+                left: 5px;
+            }
+            .carousel-btn.next {
+                right: 5px;
+            }
+            .carousel-container {
+                aspect-ratio: 4 / 3;
+            }
+            .mascot-overlay {
+                max-width: 80%;
+                max-height: 75%;
+            }
+            .footer-inner {
+                padding: 8px 12px;
+                min-height: 50px;
+                max-height: 100px;
+            }
+            .footer-title {
+                font-size: 14px;
+            }
+            .footer-text {
+                font-size: 13px;
+            }
+            .video-overlay .play-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 3rem;
+            }
+            .video-overlay .play-text {
+                font-size: 1rem;
+            }
+            .progress-bar {
+                height: 2px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .carousel-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
+            .carousel-container {
+                aspect-ratio: 1 / 1;
+            }
+            .mascot-overlay {
+                max-width: 85%;
+                max-height: 80%;
+            }
+            .footer-inner {
+                padding: 6px 10px;
+                min-height: 40px;
+                max-height: 90px;
+            }
+            .footer-title {
+                font-size: 13px;
+            }
+            .footer-text {
+                font-size: 12px;
+            }
+            .carousel-dots {
+                padding: 8px 0;
+                gap: 6px;
+            }
+            .carousel-dot {
+                width: 8px;
+                height: 8px;
+            }
+            .carousel-dot.active {
+                width: 18px;
+            }
+        }
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            .carousel-container {
+                aspect-ratio: 16 / 9;
+                max-height: 60vh;
+            }
+            .mascot-overlay {
+                max-width: 50%;
+                max-height: 75%;
+            }
+            .header-section {
+                padding: 5px 0 10px 0;
+                margin-bottom: 10px;
+            }
+            .main-title {
+                font-size: 1.1em;
+            }
+            .footer-inner {
+                min-height: 40px;
+                max-height: 70px;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page-wrapper">
+
+        <!-- ========== HEADER TITLE ========== -->
+        <div class="header-section">
+            <div class="header-left">
+                <button class="back-btn" id="backBtn">◀ Back</button>
+                <div class="main-title">ℹ️ Info Center</div>
+            </div>
+            <div class="main-subtitle">✨ Meet Fruttii at the reception desk</div>
+        </div>
+
+        <!-- ========== CAROUSEL ========== -->
+        <div class="carousel-wrapper" id="carouselWrapper">
+            <div class="carousel-container" id="carouselContainer">
+
+                <!-- Static Background -->
+                <img class="static-bg" src="shrine/infocenter-bg.jpg" alt="Reception Desk" id="staticBg">
+
+                <!-- Overlay Container -->
+                <div class="overlay-container" id="overlayContainer">
+                    <!-- Mascot overlays will be inserted here by JavaScript -->
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-bar" id="progressBar"></div>
+
+                <!-- Navigation Buttons -->
+                <button class="carousel-btn prev" id="prevBtn" aria-label="Previous">❮</button>
+                <button class="carousel-btn next" id="nextBtn" aria-label="Next">❯</button>
+            </div>
+
+            <!-- Dots Indicator -->
+            <div class="carousel-dots" id="carouselDots"></div>
+        </div>
+
+        <!-- ========== FOOTER / MESSAGE BOX ========== -->
+        <div class="footer-content-box">
+            <div class="footer-inner">
+                <div class="footer-title" id="infoTitle">ℹ️ Info Center</div>
+                <div class="footer-text" id="infoText">Meet Fruttii at the reception desk...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ========== VIDEO MODAL ========== -->
+    <div id="videoModal" class="video-modal">
+        <div class="video-container">
+            <button class="close-modal-btn" id="closeModal">✕ CLOSE</button>
+            <div class="video-overlay" id="videoOverlay">
+                <button class="play-btn" id="playBtn">▶</button>
+                <span class="play-text">Click to play</span>
+            </div>
+            <iframe id="videoPlayer" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // CONFIGURATION - Add your slides here
+        // ============================================================
+
+        const slides = [{
+            id: 1,
+            title: "🙏 Welcome to Dharmagarden",
+            message: "We are delighted to have you here. This is a place of peace, learning, and compassion.",
+            overlay: "abode/fruttii/fruttiianjali1.png",
+            actionType: "NONE",
+            actionURL: "",
+            actionLabel: ""
+        }, {
+            id: 2,
+            title: "🌟 Great Buddha Shrine",
+            message: "The Great Buddha Shrine is now open! Visit the main shrine to learn about the offerings.",
+            overlay: "abode/fruttii/fruttiijumpjoy1.png",
+            actionType: "LINK",
+            actionURL: "greatbuddhashrine.html",
+            actionLabel: "Visit Shrine"
+        }, {
+            id: 3,
+            title: "🎨 Joyous Heart Gallery",
+            message: "Explore the Joyous Heart Gallery - artwork, stories, and teachings from the community.",
+            overlay: "abode/fruttii/fruttiirunright.png",
+            actionType: "VIDEO",
+            actionURL: "https://www.youtube.com/embed/UnQASwhsryM",
+            actionLabel: "Watch Video"
+        }, {
+            id: 4,
+            title: "🌿 New Paths Opening Soon",
+            message: "We are expanding the temple grounds with new walking paths and meditation gardens.",
+            overlay: "abode/fruttii/fruttiihirun.png",
+            actionType: "NONE",
+            actionURL: "",
+            actionLabel: ""
+        }, {
+            id: 5,
+            title: "🍜 Happy Tummy Kitchen",
+            message: "Our community kitchen serves virtual meals. Learn about mindful eating and sharing.",
+            overlay: "abode/fruttii/fruttiitummy.png",
+            actionType: "LINK",
+            actionURL: "apology.html",
+            actionLabel: "Visit Kitchen"
+        }, {
+            id: 6,
+            title: "📚 New Lessons Available",
+            message: "The Sunshine Lotus School has new lessons on compassion, mindfulness, and more.",
+            overlay: "abode/fruttii/fruttiijumpjoy1.png",
+            actionType: "LINK",
+            actionURL: "apology.html",
+            actionLabel: "View Lessons"
+        }];
+
+        // ============================================================
+        // CAROUSEL ENGINE
+        // ============================================================
+
+        let currentIndex = 0;
+        let autoplayTimer = null;
+        let progressTimer = null;
+        let isPaused = false;
+        let progressWidth = 0;
+        const AUTOPLAY_DELAY = 5000; // 5 seconds
+
+        const overlayContainer = document.getElementById('overlayContainer');
+        const dotsContainer = document.getElementById('carouselDots');
+        const progressBar = document.getElementById('progressBar');
+        const container = document.getElementById('carouselContainer');
+
+        // Build overlay images
+        function buildOverlays() {
+            overlayContainer.innerHTML = '';
+            slides.forEach((slide, index) => {
+                const img = document.createElement('img');
+                img.className = 'mascot-overlay';
+                if (slide.overlay && slide.overlay.toLowerCase().endsWith('.gif')) {
+                    img.classList.add('gif-overlay');
+                }
+                img.src = slide.overlay || 'abode/fruttii/fruttiianjali1.png';
+                img.alt = slide.title;
+                img.dataset.index = index;
+                img.draggable = false;
+                if (index === 0) img.classList.add('active');
+                overlayContainer.appendChild(img);
+            });
+        }
+
+        // Build dots
+        function buildDots() {
+            dotsContainer.innerHTML = '';
+            slides.forEach((_, index) => {
+                const dot = document.createElement('span');
+                dot.className = 'carousel-dot' + (index === 0 ? ' active' : '');
+                dot.dataset.index = index;
+                dot.addEventListener('click', () => goToSlide(index));
+                dot.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    goToSlide(index);
+                });
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        // Update dots
+        function updateDots() {
+            const dots = dotsContainer.querySelectorAll('.carousel-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentIndex);
+            });
+        }
+
+        // Update overlays (fade transition)
+        function updateOverlays(index) {
+            const overlays = overlayContainer.querySelectorAll('.mascot-overlay');
+            overlays.forEach((overlay, i) => {
+                overlay.classList.remove('active', 'exit');
+                if (i === index) {
+                    overlay.classList.add('active');
+                } else {
+                    overlay.classList.add('exit');
+                }
+            });
+        }
+
+        // Go to specific slide
+        function goToSlide(index) {
+            if (index < 0) index = 0;
+            if (index >= slides.length) index = slides.length - 1;
+            if (index === currentIndex) return;
+
+            currentIndex = index;
+            updateOverlays(index);
+            updateDots();
+            updateFooter(index);
+            resetAutoplay();
+        }
+
+        // Go to next/previous
+        function nextSlide() {
+            goToSlide(currentIndex + 1);
+        }
+
+        function prevSlide() {
+            goToSlide(currentIndex - 1);
+        }
+
+        // Update footer
+        function updateFooter(index) {
+            const slide = slides[index];
+            if (!slide) return;
+
+            document.getElementById('infoTitle').innerText = slide.title;
+
+            let footerHTML = slide.message;
+            if (slide.actionType !== 'NONE' && slide.actionURL) {
+                const label = slide.actionLabel || (slide.actionType === 'VIDEO' ? '🎬 Watch' : '🔗 Visit');
+                footerHTML += `<br><button class="footer-link" data-action="${slide.actionType}" data-url="${slide.actionURL}">${label}</button>`;
+            }
+
+            document.getElementById('infoText').innerHTML = footerHTML;
+
+            document.querySelectorAll('.footer-link').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const action = this.dataset.action;
+                    const url = this.dataset.url;
+                    if (action === 'VIDEO') {
+                        openVideoModal(url);
+                    } else if (action === 'LINK') {
+                        window.location.href = url;
+                    }
+                });
+            });
+        }
+
+        // ============================================================
+        // AUTOPLAY
+        // ============================================================
+
+        function startAutoplay() {
+            if (autoplayTimer) clearTimeout(autoplayTimer);
+            if (progressTimer) clearInterval(progressTimer);
+
+            progressWidth = 0;
+            progressBar.style.width = '0%';
+            progressBar.classList.remove('paused');
+
+            progressTimer = setInterval(() => {
+                if (!isPaused) {
+                    progressWidth += (100 / (AUTOPLAY_DELAY / 50));
+                    if (progressWidth >= 100) {
+                        progressWidth = 100;
+                        progressBar.style.width = '100%';
+                    } else {
+                        progressBar.style.width = progressWidth + '%';
+                    }
+                }
+            }, 50);
+
+            autoplayTimer = setTimeout(() => {
+                if (!isPaused) {
+                    nextSlide();
+                }
+            }, AUTOPLAY_DELAY);
+        }
+
+        function resetAutoplay() {
+            if (autoplayTimer) clearTimeout(autoplayTimer);
+            if (progressTimer) clearInterval(progressTimer);
+            startAutoplay();
+        }
+
+        function togglePause(pause) {
+            isPaused = pause;
+            if (isPaused) {
+                progressBar.classList.add('paused');
+                if (autoplayTimer) clearTimeout(autoplayTimer);
+                if (progressTimer) clearInterval(progressTimer);
+            } else {
+                progressBar.classList.remove('paused');
+                // Resume from current progress
+                const remaining = 100 - progressWidth;
+                const remainingTime = (remaining / 100) * AUTOPLAY_DELAY;
+
+                progressTimer = setInterval(() => {
+                    if (!isPaused) {
+                        progressWidth += (100 / (AUTOPLAY_DELAY / 50));
+                        if (progressWidth >= 100) {
+                            progressWidth = 100;
+                            progressBar.style.width = '100%';
+                        } else {
+                            progressBar.style.width = progressWidth + '%';
+                        }
+                    }
+                }, 50);
+
+                autoplayTimer = setTimeout(() => {
+                    if (!isPaused) {
+                        nextSlide();
+                    }
+                }, Math.max(remainingTime, 100));
+            }
+        }
+
+        // ============================================================
+        // TOUCH / SWIPE HANDLING
+        // ============================================================
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let isDragging = false;
+
+        container.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            isDragging = true;
+            togglePause(true);
+        }, { passive: true });
+
+        container.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+        }, { passive: true });
+
+        container.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+
+            // Only swipe if horizontal movement > vertical
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
+                if (diffX < 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+            }
+
+            togglePause(false);
+        }, { passive: true });
+
+        // Mouse drag for desktop
+        let mouseDown = false;
+        let mouseStartX = 0;
+
+        container.addEventListener('mousedown', (e) => {
+            if (e.button === 0) {
+                mouseDown = true;
+                mouseStartX = e.clientX;
+                togglePause(true);
+            }
+        });
+
+        container.addEventListener('mouseup', (e) => {
+            if (mouseDown) {
+                mouseDown = false;
+                const diffX = e.clientX - mouseStartX;
+                if (Math.abs(diffX) > 30) {
+                    if (diffX < 0) {
+                        nextSlide();
+                    } else {
+                        prevSlide();
+                    }
+                }
+                togglePause(false);
+            }
+        });
+
+        container.addEventListener('mouseleave', () => {
+            if (mouseDown) {
+                mouseDown = false;
+                togglePause(false);
+            }
+        });
+
+        // ============================================================
+        // VIDEO MODAL FUNCTIONS
+        // ============================================================
+
+        const modal = document.getElementById('videoModal');
+        const player = document.getElementById('videoPlayer');
+        const closeBtn = document.getElementById('closeModal');
+        const overlay = document.getElementById('videoOverlay');
+        const playBtn = document.getElementById('playBtn');
+        let videoIdToPlay = null;
+
+        function openVideoModal(embedURL) {
+            let videoId = embedURL;
+            if (embedURL.includes('youtube.com/embed/')) {
+                videoId = embedURL.split('/embed/')[1].split('?')[0];
+            }
+            videoIdToPlay = videoId;
+            player.src = '';
+            overlay.style.display = 'flex';
+            modal.classList.add('active-modal');
+            document.body.style.overflow = 'hidden';
+            togglePause(true);
+        }
+
+        function playVideo() {
+            if (!videoIdToPlay) return;
+            const url =
+            `https://www.youtube.com/embed/${videoIdToPlay}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
+            player.src = url;
+            overlay.style.display = 'none';
+        }
+
+        function closeVideoModal() {
+            modal.classList.remove('active-modal');
+            setTimeout(() => {
+                player.src = '';
+                overlay.style.display = 'flex';
+            }, 300);
+            document.body.style.overflow = '';
+            videoIdToPlay = null;
+            togglePause(false);
+        }
+
+        playBtn.addEventListener('click', playVideo);
+        overlay.addEventListener('click', playVideo);
+        closeBtn.addEventListener('click', closeVideoModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeVideoModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeVideoModal();
+        });
+
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+
+        document.getElementById('backBtn').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            togglePause(true);
+            prevSlide();
+            setTimeout(() => togglePause(false), 100);
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            togglePause(true);
+            nextSlide();
+            setTimeout(() => togglePause(false), 100);
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                togglePause(true);
+                prevSlide();
+                setTimeout(() => togglePause(false), 100);
+            }
+            if (e.key === 'ArrowRight') {
+                togglePause(true);
+                nextSlide();
+                setTimeout(() => togglePause(false), 100);
+            }
+        });
+
+        // ============================================================
+        // INITIALIZE
+        // ============================================================
+
+        function initCarousel() {
+            buildOverlays();
+            buildDots();
+            updateFooter(0);
+            startAutoplay();
+
+            console.log('ℹ️ Info Center loaded!');
+            console.log('📋 Slides:', slides.length);
+            console.log('🔄 Autoplay: 5 seconds');
+            console.log('💡 Swipe left/right or use buttons');
+            console.log('🎨 Pause on hover/touch');
+            console.log('📝 Overlays support PNG and animated GIF');
+            console.log('🖼️ Static background: shrine/infocenter-bg.jpg');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initCarousel);
+        } else {
+            initCarousel();
+        }
+    </script>
+
+</body>
+</html>
