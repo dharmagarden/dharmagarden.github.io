@@ -34,6 +34,7 @@
             flex-direction: column;
             height: auto;
             min-height: 0;
+            max-height: 100vh;
         }
 
         /* ========== HEADER TITLE ========== */
@@ -41,12 +42,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0 15px 0;
+            padding: 8px 0 12px 0;
             border-bottom: 2px solid #d4af37;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             flex-shrink: 0;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
         }
 
         .header-left {
@@ -59,10 +60,10 @@
             background: rgba(139, 105, 20, 0.3);
             color: #ffd700;
             border: 1px solid #d4af37;
-            padding: 6px 16px;
+            padding: 5px 14px;
             border-radius: 30px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 0.85em;
             transition: all 0.3s ease;
             font-family: 'Georgia', serif;
             white-space: nowrap;
@@ -75,7 +76,7 @@
 
         .main-title {
             color: #ffd700;
-            font-size: 1.5em;
+            font-size: 1.4em;
             font-weight: bold;
             text-shadow: 2px 2px 0 #2c2e1e;
             margin: 0;
@@ -84,7 +85,7 @@
 
         .main-subtitle {
             color: #fdf0d8;
-            font-size: 0.85em;
+            font-size: 0.8em;
             margin: 0;
             opacity: 0.9;
             font-style: italic;
@@ -95,7 +96,7 @@
             position: relative;
             width: 100%;
             background: #2c1a0a;
-            border-radius: 24px;
+            border-radius: 20px;
             overflow: hidden;
             border: 2px solid #b8860b;
             box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
@@ -109,6 +110,7 @@
             aspect-ratio: 16 / 10;
             overflow: hidden;
             background: #2c1a0a;
+            cursor: pointer;
         }
 
         /* ===== STATIC BACKGROUND ===== */
@@ -171,13 +173,13 @@
             animation: none;
         }
 
-        /* ===== PROGRESS BAR (Autoplay indicator) ===== */
+        /* ===== PROGRESS BAR (subtle) ===== */
         .progress-bar {
             position: absolute;
             bottom: 0;
             left: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #d4af37, #ffd700);
+            height: 2px;
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.6), rgba(255, 215, 0, 0.8));
             z-index: 5;
             width: 0%;
             transition: width 0.1s linear;
@@ -186,70 +188,7 @@
 
         .progress-bar.paused {
             transition: none;
-            background: linear-gradient(90deg, #888, #aaa);
-        }
-
-        /* ===== PAUSE OVERLAY ===== */
-        .pause-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 4;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            pointer-events: auto;
-            backdrop-filter: blur(2px);
-        }
-
-        .pause-overlay.active {
-            display: flex;
-        }
-
-        .pause-overlay .pause-icon {
-            font-size: 4rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            animation: pulsePause 1.5s ease-in-out infinite;
-            user-select: none;
-            pointer-events: none;
-        }
-
-        @keyframes pulsePause {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; }
-        }
-
-        /* ===== PAUSE BUTTON (small control) ===== */
-        .pause-btn {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            z-index: 6;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 8px 14px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(4px);
-            font-family: 'Georgia', serif;
-            pointer-events: auto;
-        }
-
-        .pause-btn:hover {
-            background: rgba(0, 0, 0, 0.7);
-            transform: scale(1.05);
-        }
-
-        .pause-btn:active {
-            transform: scale(0.95);
+            opacity: 0.3;
         }
 
         /* ========== NAVIGATION BUTTONS ========== */
@@ -258,27 +197,29 @@
             top: 50%;
             transform: translateY(-50%);
             z-index: 10;
-            background: rgba(139, 105, 20, 0.6);
+            background: rgba(139, 105, 20, 0.4);
             color: white;
-            border: 2px solid #d4af37;
-            width: 44px;
-            height: 44px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 22px;
+            font-size: 18px;
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(2px);
             touch-action: manipulation;
             pointer-events: auto;
+            opacity: 0.6;
         }
 
         .carousel-btn:hover {
-            background: rgba(139, 105, 20, 0.95);
-            transform: translateY(-50%) scale(1.1);
+            background: rgba(139, 105, 20, 0.7);
+            opacity: 1;
+            transform: translateY(-50%) scale(1.05);
         }
 
         .carousel-btn:active {
@@ -286,11 +227,11 @@
         }
 
         .carousel-btn.prev {
-            left: 10px;
+            left: 8px;
         }
 
         .carousel-btn.next {
-            right: 10px;
+            right: 8px;
         }
 
         /* ========== DOTS INDICATOR ========== */
@@ -298,19 +239,19 @@
             display: flex;
             justify-content: center;
             gap: 8px;
-            padding: 12px 0;
-            background: rgba(44, 26, 10, 0.8);
+            padding: 10px 0;
+            background: rgba(44, 26, 10, 0.6);
             flex-shrink: 0;
             position: relative;
             z-index: 3;
         }
 
         .carousel-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: rgba(255, 215, 0, 0.3);
-            border: 1px solid rgba(255, 215, 0, 0.2);
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.1);
             cursor: pointer;
             transition: all 0.3s ease;
             touch-action: manipulation;
@@ -318,22 +259,22 @@
 
         .carousel-dot.active {
             background: #d4af37;
-            width: 24px;
-            border-radius: 5px;
+            width: 20px;
+            border-radius: 4px;
             border-color: #d4af37;
         }
 
         .carousel-dot:hover {
-            background: rgba(255, 215, 0, 0.6);
+            background: rgba(255, 215, 0, 0.4);
         }
 
-        /* ========== FOOTER / MESSAGE BOX ========== */
+        /* ========== FOOTER / MESSAGE BOX - NO SCROLL ========== */
         .footer-content-box {
-            margin-top: 15px;
+            margin-top: 12px;
             background: #fdf0d8;
             border-radius: 16px;
             border: 3px solid #b8860b;
-            padding: 5px;
+            padding: 4px;
             width: 100%;
             box-sizing: border-box;
             flex-shrink: 0;
@@ -342,36 +283,27 @@
         .footer-inner {
             background: #fef8e7;
             border-radius: 12px;
-            padding: 10px 15px;
-            min-height: 60px;
-            max-height: 120px;
-            overflow-y: auto;
+            padding: 12px 16px;
+            /* REMOVED: min-height, max-height, overflow-y */
             font-family: 'Georgia', 'Times New Roman', serif;
             color: #3b2a1f;
+            width: 100%;
         }
 
         .footer-inner::-webkit-scrollbar {
-            width: 6px;
-        }
-        .footer-inner::-webkit-scrollbar-track {
-            background: #e8dcc8;
-            border-radius: 4px;
-        }
-        .footer-inner::-webkit-scrollbar-thumb {
-            background: #b8860b;
-            border-radius: 4px;
+            display: none;
         }
 
         .footer-title {
             color: #b45f06;
             font-size: 16px;
             font-weight: bold;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
         }
 
         .footer-text {
             font-size: 14px;
-            line-height: 1.4;
+            line-height: 1.5;
             color: #3b2a1f;
         }
 
@@ -380,7 +312,7 @@
             margin-top: 6px;
             background: #8B6914;
             color: white;
-            padding: 4px 16px;
+            padding: 5px 18px;
             border-radius: 20px;
             text-decoration: none;
             font-size: 0.9em;
@@ -501,33 +433,38 @@
             font-weight: 500;
         }
 
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 700px) {
-            .header-section {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 8px;
+        /* ========== RESPONSIVE - MOBILE FIRST ========== */
+        
+        /* Portrait phones */
+        @media (max-width: 600px) {
+            body {
+                padding: 8px;
             }
-            .header-left {
-                width: 100%;
-                justify-content: space-between;
+            .page-wrapper {
+                padding: 10px;
+                border-radius: 28px;
+                max-height: 98vh;
+            }
+            .header-section {
+                padding: 6px 0 10px 0;
+                margin-bottom: 10px;
             }
             .main-title {
-                font-size: 1.2em;
+                font-size: 1.1em;
             }
             .main-subtitle {
-                font-size: 0.75em;
+                font-size: 0.7em;
             }
             .carousel-btn {
-                width: 36px;
-                height: 36px;
-                font-size: 18px;
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
             }
             .carousel-btn.prev {
-                left: 5px;
+                left: 4px;
             }
             .carousel-btn.next {
-                right: 5px;
+                right: 4px;
             }
             .carousel-container {
                 aspect-ratio: 4 / 3;
@@ -537,43 +474,41 @@
                 max-height: 75%;
             }
             .footer-inner {
-                padding: 8px 12px;
-                min-height: 50px;
-                max-height: 100px;
+                padding: 10px 14px;
             }
             .footer-title {
                 font-size: 14px;
             }
             .footer-text {
                 font-size: 13px;
+                line-height: 1.4;
             }
-            .pause-overlay .pause-icon {
-                font-size: 3rem;
+            .footer-text .footer-link {
+                font-size: 0.85em;
+                padding: 4px 14px;
             }
-            .pause-btn {
-                bottom: 12px;
-                right: 12px;
-                padding: 6px 12px;
-                font-size: 0.8em;
+            .carousel-dots {
+                padding: 8px 0;
+            }
+            .carousel-dot {
+                width: 7px;
+                height: 7px;
+            }
+            .carousel-dot.active {
+                width: 16px;
             }
             .video-overlay .play-btn {
-                width: 60px;
-                height: 60px;
-                font-size: 3rem;
-            }
-            .video-overlay .play-text {
-                font-size: 1rem;
-            }
-            .progress-bar {
-                height: 2px;
+                width: 55px;
+                height: 55px;
+                font-size: 2.5rem;
             }
         }
 
+        /* Very small phones */
         @media (max-width: 400px) {
-            .carousel-btn {
-                width: 30px;
-                height: 30px;
-                font-size: 14px;
+            .page-wrapper {
+                padding: 8px;
+                border-radius: 20px;
             }
             .carousel-container {
                 aspect-ratio: 1 / 1;
@@ -583,9 +518,7 @@
                 max-height: 80%;
             }
             .footer-inner {
-                padding: 6px 10px;
-                min-height: 40px;
-                max-height: 90px;
+                padding: 8px 12px;
             }
             .footer-title {
                 font-size: 13px;
@@ -593,51 +526,99 @@
             .footer-text {
                 font-size: 12px;
             }
-            .carousel-dots {
-                padding: 8px 0;
-                gap: 6px;
-            }
-            .carousel-dot {
-                width: 8px;
-                height: 8px;
-            }
-            .carousel-dot.active {
-                width: 18px;
-            }
-            .pause-overlay .pause-icon {
-                font-size: 2.5rem;
-            }
-            .pause-btn {
-                bottom: 8px;
-                right: 8px;
-                padding: 4px 10px;
-                font-size: 0.7em;
+            .carousel-btn {
+                width: 26px;
+                height: 26px;
+                font-size: 12px;
             }
         }
 
+        /* Landscape phones - background image looks great, no footer scroll */
         @media (max-height: 500px) and (orientation: landscape) {
-            .carousel-container {
-                aspect-ratio: 16 / 9;
-                max-height: 60vh;
+            body {
+                padding: 6px;
             }
-            .mascot-overlay {
-                max-width: 50%;
-                max-height: 75%;
+            .page-wrapper {
+                padding: 8px 12px;
+                border-radius: 24px;
+                max-height: 98vh;
             }
             .header-section {
-                padding: 5px 0 10px 0;
-                margin-bottom: 10px;
+                padding: 4px 0 8px 0;
+                margin-bottom: 8px;
             }
             .main-title {
-                font-size: 1.1em;
+                font-size: 1.0em;
+            }
+            .main-subtitle {
+                font-size: 0.65em;
+            }
+            .back-btn {
+                font-size: 0.75em;
+                padding: 3px 10px;
+            }
+            .carousel-container {
+                aspect-ratio: 16 / 9;
+                max-height: 55vh;
+            }
+            .mascot-overlay {
+                max-width: 45%;
+                max-height: 70%;
+            }
+            .carousel-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
             }
             .footer-inner {
-                min-height: 40px;
-                max-height: 70px;
-                padding: 6px 10px;
+                padding: 6px 12px;
             }
-            .pause-overlay .pause-icon {
-                font-size: 2.5rem;
+            .footer-title {
+                font-size: 12px;
+                margin-bottom: 2px;
+            }
+            .footer-text {
+                font-size: 11px;
+                line-height: 1.3;
+            }
+            .footer-text .footer-link {
+                font-size: 0.8em;
+                padding: 3px 12px;
+                margin-top: 3px;
+            }
+            .carousel-dots {
+                padding: 6px 0;
+                gap: 6px;
+            }
+            .carousel-dot {
+                width: 6px;
+                height: 6px;
+            }
+            .carousel-dot.active {
+                width: 14px;
+            }
+            .progress-bar {
+                height: 2px;
+            }
+        }
+
+        /* Desktop and tablets */
+        @media (min-width: 601px) {
+            .carousel-container {
+                aspect-ratio: 16 / 10;
+            }
+            .mascot-overlay {
+                max-width: 65%;
+                max-height: 80%;
+            }
+            .footer-inner {
+                padding: 14px 20px;
+            }
+            .footer-title {
+                font-size: 18px;
+            }
+            .footer-text {
+                font-size: 15px;
             }
         }
     </style>
@@ -653,7 +634,7 @@
                 <button class="back-btn" id="backBtn">◀ Back</button>
                 <div class="main-title">ℹ️ Info Center</div>
             </div>
-            <div class="main-subtitle">✨ Meet Fruttii at the reception desk</div>
+            <div class="main-subtitle">Hi, I'm Bodhi Fruttii. Swipe me for more messages. Tap me to pause the message.</div>
         </div>
 
         <!-- ========== CAROUSEL ========== -->
@@ -668,16 +649,8 @@
                     <!-- Mascot overlays will be inserted here by JavaScript -->
                 </div>
 
-                <!-- Progress Bar -->
+                <!-- Progress Bar (subtle) -->
                 <div class="progress-bar" id="progressBar"></div>
-
-                <!-- Pause Overlay (shows when paused) -->
-                <div class="pause-overlay" id="pauseOverlay">
-                    <span class="pause-icon">⏸️</span>
-                </div>
-
-                <!-- Pause/Play Button -->
-                <button class="pause-btn" id="pauseBtn">⏸️ Pause</button>
 
                 <!-- Navigation Buttons -->
                 <button class="carousel-btn prev" id="prevBtn" aria-label="Previous">❮</button>
@@ -688,7 +661,7 @@
             <div class="carousel-dots" id="carouselDots"></div>
         </div>
 
-        <!-- ========== FOOTER / MESSAGE BOX ========== -->
+        <!-- ========== FOOTER / MESSAGE BOX - EXPANDS VERTICALLY ========== -->
         <div class="footer-content-box">
             <div class="footer-inner">
                 <div class="footer-title" id="infoTitle">ℹ️ Info Center</div>
@@ -720,9 +693,6 @@
             title: "🙏 Welcome to Dharmagarden",
             message: "We are delighted to have you here. This is a place of peace, learning, and compassion.",
             overlay: "abode/fruttii/fruttiianjali1.png",
-            // GIF options: 
-            // overlay: "abode/fruttii/fruttiianimated.gif",
-            // gifLoop: false,  // Set to false for play-once, true for loop (default)
             actionType: "NONE",
             actionURL: "",
             actionLabel: ""
@@ -778,19 +748,13 @@
         let isPaused = false;
         let progressWidth = 0;
         let isTransitioning = false;
-        const AUTOPLAY_DELAY = 5000; // 5 seconds
+        const AUTOPLAY_DELAY = 5000;
 
         const overlayContainer = document.getElementById('overlayContainer');
         const dotsContainer = document.getElementById('carouselDots');
         const progressBar = document.getElementById('progressBar');
-        const pauseOverlay = document.getElementById('pauseOverlay');
-        const pauseBtn = document.getElementById('pauseBtn');
         const container = document.getElementById('carouselContainer');
 
-        // Store GIF elements for control
-        let currentGifElement = null;
-
-        // Build overlay images
         function buildOverlays() {
             overlayContainer.innerHTML = '';
             slides.forEach((slide, index) => {
@@ -813,7 +777,6 @@
             });
         }
 
-        // Build dots
         function buildDots() {
             dotsContainer.innerHTML = '';
             slides.forEach((_, index) => {
@@ -829,7 +792,6 @@
             });
         }
 
-        // Update dots
         function updateDots() {
             const dots = dotsContainer.querySelectorAll('.carousel-dot');
             dots.forEach((dot, index) => {
@@ -837,7 +799,6 @@
             });
         }
 
-        // Update overlays (fade transition)
         function updateOverlays(index) {
             const overlays = overlayContainer.querySelectorAll('.mascot-overlay');
             overlays.forEach((overlay, i) => {
@@ -855,7 +816,6 @@
             });
         }
 
-        // Go to specific slide
         function goToSlide(index) {
             if (isTransitioning) return;
             if (index < 0) index = 0;
@@ -867,23 +827,20 @@
             updateOverlays(index);
             updateDots();
             updateFooter(index);
-            
-            // If autoplay is not paused, reset the timer
+
             if (!isPaused) {
                 clearAutoplay();
                 startAutoplay();
             } else {
-                // If paused, update progress bar to show current position
                 progressBar.style.width = '0%';
                 progressBar.classList.add('paused');
             }
-            
+
             setTimeout(() => {
                 isTransitioning = false;
             }, 600);
         }
 
-        // Go to next/previous
         function nextSlide() {
             if (isTransitioning) return;
             const next = currentIndex + 1;
@@ -904,7 +861,6 @@
             }
         }
 
-        // Update footer
         function updateFooter(index) {
             const slide = slides[index];
             if (!slide) return;
@@ -944,8 +900,6 @@
             progressWidth = 0;
             progressBar.style.width = '0%';
             progressBar.classList.remove('paused');
-            pauseOverlay.classList.remove('active');
-            pauseBtn.textContent = '⏸️ Pause';
 
             if (!isPaused) {
                 progressTimer = setInterval(() => {
@@ -981,100 +935,93 @@
 
         function togglePause(pause) {
             isPaused = pause;
-            
             if (isPaused) {
-                // Pause
                 progressBar.classList.add('paused');
-                pauseOverlay.classList.add('active');
-                pauseBtn.textContent = '▶️ Play';
                 clearAutoplay();
-                console.log('⏸️ Autoplay paused');
             } else {
-                // Play
                 progressBar.classList.remove('paused');
-                pauseOverlay.classList.remove('active');
-                pauseBtn.textContent = '⏸️ Pause';
                 startAutoplay();
-                console.log('▶️ Autoplay resumed');
             }
         }
 
         // ============================================================
-        // PAUSE/PLAY CONTROLS
+        // USER INTERACTIONS
         // ============================================================
 
-        // Pause button
-        pauseBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            togglePause(!isPaused);
-        });
-
-        // Click on the image area toggles pause
         container.addEventListener('click', (e) => {
-            // Don't toggle if clicking on buttons or overlay
-            if (e.target.closest('.carousel-btn') || 
-                e.target.closest('.pause-btn') ||
-                e.target.closest('.pause-overlay')) {
-                return;
-            }
+            if (e.target.closest('.carousel-btn')) return;
             togglePause(!isPaused);
         });
 
         // ============================================================
-        // TOUCH / SWIPE HANDLING
+        // TOUCH / SWIPE
         // ============================================================
 
         let touchStartX = 0;
         let touchStartY = 0;
         let isDragging = false;
+        let hasSwiped = false;
 
         container.addEventListener('touchstart', (e) => {
             if (isTransitioning) return;
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
             isDragging = true;
-            // Pause on touch start so user can read
-            togglePause(true);
+            hasSwiped = false;
         }, { passive: true });
 
         container.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const diffX = currentX - touchStartX;
+            const diffY = currentY - touchStartY;
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 20) {
+                hasSwiped = true;
+            }
         }, { passive: true });
 
         container.addEventListener('touchend', (e) => {
             if (!isDragging) return;
             isDragging = false;
-
-            if (isTransitioning) {
-                return;
-            }
+            if (isTransitioning) return;
 
             const touchEndX = e.changedTouches[0].clientX;
             const touchEndY = e.changedTouches[0].clientY;
             const diffX = touchEndX - touchStartX;
             const diffY = touchEndY - touchStartY;
 
-            // Only swipe if horizontal movement > vertical
             if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
+                if (!isPaused) togglePause(true);
                 if (diffX < 0) {
                     nextSlide();
                 } else {
                     prevSlide();
                 }
+            } else if (hasSwiped && !isPaused) {
+                togglePause(true);
             }
-            // Note: We keep paused after swipe so user can read
         }, { passive: true });
 
-        // Mouse drag for desktop
+        // Mouse drag
         let mouseDown = false;
         let mouseStartX = 0;
+        let mouseHasDragged = false;
 
         container.addEventListener('mousedown', (e) => {
             if (e.button === 0 && !isTransitioning) {
                 mouseDown = true;
                 mouseStartX = e.clientX;
-                // Pause on drag start
-                togglePause(true);
+                mouseHasDragged = false;
+            }
+        });
+
+        container.addEventListener('mousemove', (e) => {
+            if (mouseDown) {
+                const diff = e.clientX - mouseStartX;
+                if (Math.abs(diff) > 15) {
+                    mouseHasDragged = true;
+                }
             }
         });
 
@@ -1084,14 +1031,16 @@
                 if (!isTransitioning) {
                     const diffX = e.clientX - mouseStartX;
                     if (Math.abs(diffX) > 30) {
+                        if (!isPaused) togglePause(true);
                         if (diffX < 0) {
                             nextSlide();
                         } else {
                             prevSlide();
                         }
+                    } else if (mouseHasDragged && !isPaused) {
+                        togglePause(true);
                     }
                 }
-                // Note: We keep paused after mouse drag so user can read
             }
         });
 
@@ -1102,7 +1051,44 @@
         });
 
         // ============================================================
-        // VIDEO MODAL FUNCTIONS
+        // NAVIGATION BUTTONS
+        // ============================================================
+
+        document.getElementById('backBtn').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (!isTransitioning) {
+                if (!isPaused) togglePause(true);
+                prevSlide();
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (!isTransitioning) {
+                if (!isPaused) togglePause(true);
+                nextSlide();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' && !isTransitioning) {
+                if (!isPaused) togglePause(true);
+                prevSlide();
+            }
+            if (e.key === 'ArrowRight' && !isTransitioning) {
+                if (!isPaused) togglePause(true);
+                nextSlide();
+            }
+            if (e.key === ' ' || e.key === 'Space') {
+                e.preventDefault();
+                togglePause(!isPaused);
+            }
+        });
+
+        // ============================================================
+        // VIDEO MODAL
         // ============================================================
 
         const modal = document.getElementById('videoModal');
@@ -1122,7 +1108,7 @@
             overlay.style.display = 'flex';
             modal.classList.add('active-modal');
             document.body.style.overflow = 'hidden';
-            togglePause(true);
+            if (!isPaused) togglePause(true);
         }
 
         function playVideo() {
@@ -1140,10 +1126,7 @@
             }, 300);
             document.body.style.overflow = '';
             videoIdToPlay = null;
-            // Resume autoplay after closing video
-            if (isPaused) {
-                togglePause(false);
-            }
+            if (isPaused) togglePause(false);
         }
 
         playBtn.addEventListener('click', playVideo);
@@ -1154,47 +1137,6 @@
         });
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeVideoModal();
-        });
-
-        // ============================================================
-        // NAVIGATION
-        // ============================================================
-
-        document.getElementById('backBtn').addEventListener('click', () => {
-            window.location.href = 'index.html';
-        });
-
-        document.getElementById('prevBtn').addEventListener('click', () => {
-            if (!isTransitioning) {
-                togglePause(true);
-                prevSlide();
-                // Keep paused after navigation
-            }
-        });
-
-        document.getElementById('nextBtn').addEventListener('click', () => {
-            if (!isTransitioning) {
-                togglePause(true);
-                nextSlide();
-                // Keep paused after navigation
-            }
-        });
-
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft' && !isTransitioning) {
-                togglePause(true);
-                prevSlide();
-            }
-            if (e.key === 'ArrowRight' && !isTransitioning) {
-                togglePause(true);
-                nextSlide();
-            }
-            // Space bar toggles pause
-            if (e.key === ' ' || e.key === 'Space') {
-                e.preventDefault();
-                togglePause(!isPaused);
-            }
         });
 
         // ============================================================
@@ -1210,10 +1152,10 @@
             console.log('ℹ️ Info Center loaded!');
             console.log('📋 Slides:', slides.length);
             console.log('🔄 Autoplay: 5 seconds');
-            console.log('💡 Swipe left/right or use buttons');
-            console.log('⏸️ Click image or press Space to pause/play');
-            console.log('📝 GIF loop control: gifLoop: false = play once');
-            console.log('🎯 Pause state preserved after navigation');
+            console.log('💡 Swipe or use buttons to navigate');
+            console.log('👆 Tap/click image to pause/play');
+            console.log('📱 Footer expands vertically - no scroll inside');
+            console.log('📱 Landscape mode: background cropped vertically');
         }
 
         if (document.readyState === 'loading') {
