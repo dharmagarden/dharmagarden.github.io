@@ -109,6 +109,7 @@
             aspect-ratio: 16 / 10;
             overflow: hidden;
             background: #2c1a0a;
+            cursor: pointer;
         }
 
         /* ===== STATIC BACKGROUND ===== */
@@ -153,6 +154,7 @@
             opacity: 0;
             transform: scale(0.9);
             position: absolute;
+            pointer-events: none;
         }
 
         .mascot-overlay.active {
@@ -170,13 +172,13 @@
             animation: none;
         }
 
-        /* ===== PROGRESS BAR (Autoplay indicator) ===== */
+        /* ===== PROGRESS BAR (subtle) ===== */
         .progress-bar {
             position: absolute;
             bottom: 0;
             left: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #d4af37, #ffd700);
+            height: 2px;
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.6), rgba(255, 215, 0, 0.8));
             z-index: 5;
             width: 0%;
             transition: width 0.1s linear;
@@ -185,6 +187,7 @@
 
         .progress-bar.paused {
             transition: none;
+            opacity: 0.3;
         }
 
         /* ========== NAVIGATION BUTTONS ========== */
@@ -193,27 +196,29 @@
             top: 50%;
             transform: translateY(-50%);
             z-index: 10;
-            background: rgba(139, 105, 20, 0.6);
+            background: rgba(139, 105, 20, 0.4);
             color: white;
-            border: 2px solid #d4af37;
-            width: 44px;
-            height: 44px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 22px;
+            font-size: 18px;
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(2px);
             touch-action: manipulation;
             pointer-events: auto;
+            opacity: 0.6;
         }
 
         .carousel-btn:hover {
-            background: rgba(139, 105, 20, 0.95);
-            transform: translateY(-50%) scale(1.1);
+            background: rgba(139, 105, 20, 0.7);
+            opacity: 1;
+            transform: translateY(-50%) scale(1.05);
         }
 
         .carousel-btn:active {
@@ -221,11 +226,11 @@
         }
 
         .carousel-btn.prev {
-            left: 10px;
+            left: 8px;
         }
 
         .carousel-btn.next {
-            right: 10px;
+            right: 8px;
         }
 
         /* ========== DOTS INDICATOR ========== */
@@ -233,19 +238,19 @@
             display: flex;
             justify-content: center;
             gap: 8px;
-            padding: 12px 0;
-            background: rgba(44, 26, 10, 0.8);
+            padding: 10px 0;
+            background: rgba(44, 26, 10, 0.6);
             flex-shrink: 0;
             position: relative;
             z-index: 3;
         }
 
         .carousel-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: rgba(255, 215, 0, 0.3);
-            border: 1px solid rgba(255, 215, 0, 0.2);
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.1);
             cursor: pointer;
             transition: all 0.3s ease;
             touch-action: manipulation;
@@ -253,13 +258,13 @@
 
         .carousel-dot.active {
             background: #d4af37;
-            width: 24px;
-            border-radius: 5px;
+            width: 20px;
+            border-radius: 4px;
             border-color: #d4af37;
         }
 
         .carousel-dot:hover {
-            background: rgba(255, 215, 0, 0.6);
+            background: rgba(255, 215, 0, 0.4);
         }
 
         /* ========== FOOTER / MESSAGE BOX ========== */
@@ -454,15 +459,15 @@
                 font-size: 0.75em;
             }
             .carousel-btn {
-                width: 36px;
-                height: 36px;
-                font-size: 18px;
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
             }
             .carousel-btn.prev {
-                left: 5px;
+                left: 4px;
             }
             .carousel-btn.next {
-                right: 5px;
+                right: 4px;
             }
             .carousel-container {
                 aspect-ratio: 4 / 3;
@@ -497,9 +502,9 @@
 
         @media (max-width: 400px) {
             .carousel-btn {
-                width: 30px;
-                height: 30px;
-                font-size: 14px;
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
             }
             .carousel-container {
                 aspect-ratio: 1 / 1;
@@ -524,11 +529,11 @@
                 gap: 6px;
             }
             .carousel-dot {
-                width: 8px;
-                height: 8px;
+                width: 6px;
+                height: 6px;
             }
             .carousel-dot.active {
-                width: 18px;
+                width: 16px;
             }
         }
 
@@ -582,7 +587,7 @@
                     <!-- Mascot overlays will be inserted here by JavaScript -->
                 </div>
 
-                <!-- Progress Bar -->
+                <!-- Progress Bar (subtle) -->
                 <div class="progress-bar" id="progressBar"></div>
 
                 <!-- Navigation Buttons -->
@@ -672,7 +677,7 @@
         }];
 
         // ============================================================
-        // CAROUSEL ENGINE
+        // CAROUSEL ENGINE - MINIMAL & CLEAN
         // ============================================================
 
         let currentIndex = 0;
@@ -680,6 +685,7 @@
         let progressTimer = null;
         let isPaused = false;
         let progressWidth = 0;
+        let isTransitioning = false;
         const AUTOPLAY_DELAY = 5000; // 5 seconds
 
         const overlayContainer = document.getElementById('overlayContainer');
@@ -695,6 +701,11 @@
                 img.className = 'mascot-overlay';
                 if (slide.overlay && slide.overlay.toLowerCase().endsWith('.gif')) {
                     img.classList.add('gif-overlay');
+                    if (slide.gifLoop === false) {
+                        img.setAttribute('loop', '1');
+                    } else {
+                        img.setAttribute('loop', 'infinite');
+                    }
                 }
                 img.src = slide.overlay || 'abode/fruttii/fruttiianjali1.png';
                 img.alt = slide.title;
@@ -736,6 +747,11 @@
                 overlay.classList.remove('active', 'exit');
                 if (i === index) {
                     overlay.classList.add('active');
+                    if (overlay.classList.contains('gif-overlay')) {
+                        const src = overlay.src;
+                        overlay.src = '';
+                        overlay.src = src;
+                    }
                 } else {
                     overlay.classList.add('exit');
                 }
@@ -744,24 +760,50 @@
 
         // Go to specific slide
         function goToSlide(index) {
+            if (isTransitioning) return;
             if (index < 0) index = 0;
             if (index >= slides.length) index = slides.length - 1;
             if (index === currentIndex) return;
 
+            isTransitioning = true;
             currentIndex = index;
             updateOverlays(index);
             updateDots();
             updateFooter(index);
-            resetAutoplay();
+            
+            // Reset timer if not paused
+            if (!isPaused) {
+                clearAutoplay();
+                startAutoplay();
+            } else {
+                progressBar.style.width = '0%';
+                progressBar.classList.add('paused');
+            }
+            
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 600);
         }
 
         // Go to next/previous
         function nextSlide() {
-            goToSlide(currentIndex + 1);
+            if (isTransitioning) return;
+            const next = currentIndex + 1;
+            if (next >= slides.length) {
+                goToSlide(0);
+            } else {
+                goToSlide(next);
+            }
         }
 
         function prevSlide() {
-            goToSlide(currentIndex - 1);
+            if (isTransitioning) return;
+            const prev = currentIndex - 1;
+            if (prev < 0) {
+                goToSlide(slides.length - 1);
+            } else {
+                goToSlide(prev);
+            }
         }
 
         // Update footer
@@ -805,45 +847,9 @@
             progressBar.style.width = '0%';
             progressBar.classList.remove('paused');
 
-            progressTimer = setInterval(() => {
-                if (!isPaused) {
-                    progressWidth += (100 / (AUTOPLAY_DELAY / 50));
-                    if (progressWidth >= 100) {
-                        progressWidth = 100;
-                        progressBar.style.width = '100%';
-                    } else {
-                        progressBar.style.width = progressWidth + '%';
-                    }
-                }
-            }, 50);
-
-            autoplayTimer = setTimeout(() => {
-                if (!isPaused) {
-                    nextSlide();
-                }
-            }, AUTOPLAY_DELAY);
-        }
-
-        function resetAutoplay() {
-            if (autoplayTimer) clearTimeout(autoplayTimer);
-            if (progressTimer) clearInterval(progressTimer);
-            startAutoplay();
-        }
-
-        function togglePause(pause) {
-            isPaused = pause;
-            if (isPaused) {
-                progressBar.classList.add('paused');
-                if (autoplayTimer) clearTimeout(autoplayTimer);
-                if (progressTimer) clearInterval(progressTimer);
-            } else {
-                progressBar.classList.remove('paused');
-                // Resume from current progress
-                const remaining = 100 - progressWidth;
-                const remainingTime = (remaining / 100) * AUTOPLAY_DELAY;
-
+            if (!isPaused) {
                 progressTimer = setInterval(() => {
-                    if (!isPaused) {
+                    if (!isPaused && !isTransitioning) {
                         progressWidth += (100 / (AUTOPLAY_DELAY / 50));
                         if (progressWidth >= 100) {
                             progressWidth = 100;
@@ -853,14 +859,50 @@
                         }
                     }
                 }, 50);
+            }
 
-                autoplayTimer = setTimeout(() => {
-                    if (!isPaused) {
-                        nextSlide();
-                    }
-                }, Math.max(remainingTime, 100));
+            autoplayTimer = setTimeout(() => {
+                if (!isPaused && !isTransitioning) {
+                    nextSlide();
+                }
+            }, AUTOPLAY_DELAY);
+        }
+
+        function clearAutoplay() {
+            if (autoplayTimer) {
+                clearTimeout(autoplayTimer);
+                autoplayTimer = null;
+            }
+            if (progressTimer) {
+                clearInterval(progressTimer);
+                progressTimer = null;
             }
         }
+
+        function togglePause(pause) {
+            isPaused = pause;
+            
+            if (isPaused) {
+                progressBar.classList.add('paused');
+                clearAutoplay();
+                console.log('⏸️ Paused');
+            } else {
+                progressBar.classList.remove('paused');
+                startAutoplay();
+                console.log('▶️ Playing');
+            }
+        }
+
+        // ============================================================
+        // USER INTERACTIONS - Clean & Intuitive
+        // ============================================================
+
+        // Click on the image toggles pause/play
+        container.addEventListener('click', (e) => {
+            // Don't toggle if clicking on buttons
+            if (e.target.closest('.carousel-btn')) return;
+            togglePause(!isPaused);
+        });
 
         // ============================================================
         // TOUCH / SWIPE HANDLING
@@ -869,70 +911,139 @@
         let touchStartX = 0;
         let touchStartY = 0;
         let isDragging = false;
+        let hasSwiped = false;
 
         container.addEventListener('touchstart', (e) => {
+            if (isTransitioning) return;
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
             isDragging = true;
-            togglePause(true);
+            hasSwiped = false;
         }, { passive: true });
 
         container.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const diffX = currentX - touchStartX;
+            const diffY = currentY - touchStartY;
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 20) {
+                hasSwiped = true;
+            }
         }, { passive: true });
 
         container.addEventListener('touchend', (e) => {
             if (!isDragging) return;
             isDragging = false;
 
+            if (isTransitioning) return;
+
             const touchEndX = e.changedTouches[0].clientX;
             const touchEndY = e.changedTouches[0].clientY;
             const diffX = touchEndX - touchStartX;
             const diffY = touchEndY - touchStartY;
 
-            // Only swipe if horizontal movement > vertical
             if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
+                // Pause on swipe
+                if (!isPaused) togglePause(true);
                 if (diffX < 0) {
                     nextSlide();
                 } else {
                     prevSlide();
                 }
+            } else if (hasSwiped && !isPaused) {
+                // If user swiped but not enough to change slide, still pause
+                togglePause(true);
             }
-
-            togglePause(false);
         }, { passive: true });
 
         // Mouse drag for desktop
         let mouseDown = false;
         let mouseStartX = 0;
+        let mouseHasDragged = false;
 
         container.addEventListener('mousedown', (e) => {
-            if (e.button === 0) {
+            if (e.button === 0 && !isTransitioning) {
                 mouseDown = true;
                 mouseStartX = e.clientX;
-                togglePause(true);
+                mouseHasDragged = false;
+            }
+        });
+
+        container.addEventListener('mousemove', (e) => {
+            if (mouseDown) {
+                const diff = e.clientX - mouseStartX;
+                if (Math.abs(diff) > 15) {
+                    mouseHasDragged = true;
+                }
             }
         });
 
         container.addEventListener('mouseup', (e) => {
             if (mouseDown) {
                 mouseDown = false;
-                const diffX = e.clientX - mouseStartX;
-                if (Math.abs(diffX) > 30) {
-                    if (diffX < 0) {
-                        nextSlide();
-                    } else {
-                        prevSlide();
+                if (!isTransitioning) {
+                    const diffX = e.clientX - mouseStartX;
+                    if (Math.abs(diffX) > 30) {
+                        // Pause on drag
+                        if (!isPaused) togglePause(true);
+                        if (diffX < 0) {
+                            nextSlide();
+                        } else {
+                            prevSlide();
+                        }
+                    } else if (mouseHasDragged && !isPaused) {
+                        // If user dragged but not enough to change slide, still pause
+                        togglePause(true);
                     }
                 }
-                togglePause(false);
             }
         });
 
         container.addEventListener('mouseleave', () => {
             if (mouseDown) {
                 mouseDown = false;
-                togglePause(false);
+            }
+        });
+
+        // ============================================================
+        // NAVIGATION BUTTONS
+        // ============================================================
+
+        document.getElementById('backBtn').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (!isTransitioning) {
+                // Pause on button click
+                if (!isPaused) togglePause(true);
+                prevSlide();
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (!isTransitioning) {
+                // Pause on button click
+                if (!isPaused) togglePause(true);
+                nextSlide();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' && !isTransitioning) {
+                if (!isPaused) togglePause(true);
+                prevSlide();
+            }
+            if (e.key === 'ArrowRight' && !isTransitioning) {
+                if (!isPaused) togglePause(true);
+                nextSlide();
+            }
+            // Space bar toggles pause
+            if (e.key === ' ' || e.key === 'Space') {
+                e.preventDefault();
+                togglePause(!isPaused);
             }
         });
 
@@ -957,13 +1068,13 @@
             overlay.style.display = 'flex';
             modal.classList.add('active-modal');
             document.body.style.overflow = 'hidden';
-            togglePause(true);
+            // Pause carousel
+            if (!isPaused) togglePause(true);
         }
 
         function playVideo() {
             if (!videoIdToPlay) return;
-            const url =
-            `https://www.youtube.com/embed/${videoIdToPlay}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
+            const url = `https://www.youtube.com/embed/${videoIdToPlay}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
             player.src = url;
             overlay.style.display = 'none';
         }
@@ -976,7 +1087,8 @@
             }, 300);
             document.body.style.overflow = '';
             videoIdToPlay = null;
-            togglePause(false);
+            // Resume autoplay
+            if (isPaused) togglePause(false);
         }
 
         playBtn.addEventListener('click', playVideo);
@@ -987,40 +1099,6 @@
         });
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeVideoModal();
-        });
-
-        // ============================================================
-        // NAVIGATION
-        // ============================================================
-
-        document.getElementById('backBtn').addEventListener('click', () => {
-            window.location.href = 'index.html';
-        });
-
-        document.getElementById('prevBtn').addEventListener('click', () => {
-            togglePause(true);
-            prevSlide();
-            setTimeout(() => togglePause(false), 100);
-        });
-
-        document.getElementById('nextBtn').addEventListener('click', () => {
-            togglePause(true);
-            nextSlide();
-            setTimeout(() => togglePause(false), 100);
-        });
-
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') {
-                togglePause(true);
-                prevSlide();
-                setTimeout(() => togglePause(false), 100);
-            }
-            if (e.key === 'ArrowRight') {
-                togglePause(true);
-                nextSlide();
-                setTimeout(() => togglePause(false), 100);
-            }
         });
 
         // ============================================================
@@ -1036,10 +1114,9 @@
             console.log('ℹ️ Info Center loaded!');
             console.log('📋 Slides:', slides.length);
             console.log('🔄 Autoplay: 5 seconds');
-            console.log('💡 Swipe left/right or use buttons');
-            console.log('🎨 Pause on hover/touch');
-            console.log('📝 Overlays support PNG and animated GIF');
-            console.log('🖼️ Static background: shrine/infocenter-bg.jpg');
+            console.log('💡 Swipe or use buttons to navigate');
+            console.log('👆 Tap/click image to pause/play');
+            console.log('📝 GIF loop control: gifLoop: false = play once');
         }
 
         if (document.readyState === 'loading') {

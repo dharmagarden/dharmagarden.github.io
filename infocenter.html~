@@ -99,8 +99,8 @@
             overflow: hidden;
             border: 2px solid #b8860b;
             box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
-            touch-action: none; /* Prevents browser scroll interference */
             flex-shrink: 0;
+            touch-action: none;
         }
 
         .carousel-container {
@@ -111,26 +111,8 @@
             background: #2c1a0a;
         }
 
-        .carousel-track {
-            display: flex;
-            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            height: 100%;
-            will-change: transform;
-        }
-
-        .carousel-slide {
-            min-width: 100%;
-            height: 100%;
-            position: relative;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        /* Background image for each slide */
-        .carousel-slide .slide-bg {
+        /* ===== STATIC BACKGROUND ===== */
+        .static-bg {
             position: absolute;
             top: 0;
             left: 0;
@@ -138,27 +120,136 @@
             height: 100%;
             object-fit: cover;
             z-index: 1;
-            opacity: 0.3;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
         }
 
-        /* Overlay image (Fruttii mascot with transparent background) */
-        .carousel-slide .slide-overlay {
-            position: relative;
+        /* ===== OVERLAY CONTAINER ===== */
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: 2;
-            max-width: 80%;
-            max-height: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        /* ===== MASCOT OVERLAY ===== */
+        .mascot-overlay {
+            max-width: 70%;
+            max-height: 80%;
             width: auto;
             height: auto;
             object-fit: contain;
             filter: drop-shadow(0 8px 30px rgba(0,0,0,0.4));
             user-select: none;
             -webkit-user-drag: none;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            opacity: 0;
+            transform: scale(0.9);
+            position: absolute;
             pointer-events: none;
         }
 
+        .mascot-overlay.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .mascot-overlay.exit {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
         /* Support for animated GIFs */
-        .carousel-slide .slide-overlay.gif-overlay {
-            animation: none; /* GIF plays natively */
+        .mascot-overlay.gif-overlay {
+            animation: none;
+        }
+
+        /* ===== PROGRESS BAR (Autoplay indicator) ===== */
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #d4af37, #ffd700);
+            z-index: 5;
+            width: 0%;
+            transition: width 0.1s linear;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .progress-bar.paused {
+            transition: none;
+            background: linear-gradient(90deg, #888, #aaa);
+        }
+
+        /* ===== PAUSE OVERLAY ===== */
+        .pause-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 4;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            pointer-events: auto;
+            backdrop-filter: blur(2px);
+        }
+
+        .pause-overlay.active {
+            display: flex;
+        }
+
+        .pause-overlay .pause-icon {
+            font-size: 4rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            animation: pulsePause 1.5s ease-in-out infinite;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        @keyframes pulsePause {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* ===== PAUSE BUTTON (small control) ===== */
+        .pause-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 6;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+            font-family: 'Georgia', serif;
+            pointer-events: auto;
+        }
+
+        .pause-btn:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: scale(1.05);
+        }
+
+        .pause-btn:active {
+            transform: scale(0.95);
         }
 
         /* ========== NAVIGATION BUTTONS ========== */
@@ -167,7 +258,7 @@
             top: 50%;
             transform: translateY(-50%);
             z-index: 10;
-            background: rgba(139, 105, 20, 0.7);
+            background: rgba(139, 105, 20, 0.6);
             color: white;
             border: 2px solid #d4af37;
             width: 44px;
@@ -182,6 +273,7 @@
             transition: all 0.3s ease;
             backdrop-filter: blur(4px);
             touch-action: manipulation;
+            pointer-events: auto;
         }
 
         .carousel-btn:hover {
@@ -209,6 +301,8 @@
             padding: 12px 0;
             background: rgba(44, 26, 10, 0.8);
             flex-shrink: 0;
+            position: relative;
+            z-index: 3;
         }
 
         .carousel-dot {
@@ -361,7 +455,6 @@
             background: #ff0000;
         }
 
-        /* Video overlay for click-to-play */
         .video-overlay {
             position: absolute;
             inset: 0;
@@ -374,9 +467,11 @@
             cursor: pointer;
             transition: background 0.3s ease;
         }
+
         .video-overlay:hover {
             background: rgba(0, 0, 0, 0.1);
         }
+
         .video-overlay .play-btn {
             font-size: 4rem;
             background: rgba(255, 255, 255, 0.9);
@@ -392,10 +487,12 @@
             align-items: center;
             justify-content: center;
         }
+
         .video-overlay .play-btn:hover {
             transform: scale(1.1);
             background: white;
         }
+
         .video-overlay .play-text {
             color: white;
             font-size: 1.2rem;
@@ -435,6 +532,10 @@
             .carousel-container {
                 aspect-ratio: 4 / 3;
             }
+            .mascot-overlay {
+                max-width: 80%;
+                max-height: 75%;
+            }
             .footer-inner {
                 padding: 8px 12px;
                 min-height: 50px;
@@ -446,9 +547,14 @@
             .footer-text {
                 font-size: 13px;
             }
-            .carousel-slide .slide-overlay {
-                max-width: 90%;
-                max-height: 80%;
+            .pause-overlay .pause-icon {
+                font-size: 3rem;
+            }
+            .pause-btn {
+                bottom: 12px;
+                right: 12px;
+                padding: 6px 12px;
+                font-size: 0.8em;
             }
             .video-overlay .play-btn {
                 width: 60px;
@@ -457,6 +563,9 @@
             }
             .video-overlay .play-text {
                 font-size: 1rem;
+            }
+            .progress-bar {
+                height: 2px;
             }
         }
 
@@ -469,9 +578,9 @@
             .carousel-container {
                 aspect-ratio: 1 / 1;
             }
-            .carousel-slide .slide-overlay {
-                max-width: 95%;
-                max-height: 85%;
+            .mascot-overlay {
+                max-width: 85%;
+                max-height: 80%;
             }
             .footer-inner {
                 padding: 6px 10px;
@@ -495,6 +604,15 @@
             .carousel-dot.active {
                 width: 18px;
             }
+            .pause-overlay .pause-icon {
+                font-size: 2.5rem;
+            }
+            .pause-btn {
+                bottom: 8px;
+                right: 8px;
+                padding: 4px 10px;
+                font-size: 0.7em;
+            }
         }
 
         @media (max-height: 500px) and (orientation: landscape) {
@@ -502,9 +620,9 @@
                 aspect-ratio: 16 / 9;
                 max-height: 60vh;
             }
-            .carousel-slide .slide-overlay {
-                max-width: 60%;
-                max-height: 80%;
+            .mascot-overlay {
+                max-width: 50%;
+                max-height: 75%;
             }
             .header-section {
                 padding: 5px 0 10px 0;
@@ -517,6 +635,9 @@
                 min-height: 40px;
                 max-height: 70px;
                 padding: 6px 10px;
+            }
+            .pause-overlay .pause-icon {
+                font-size: 2.5rem;
             }
         }
     </style>
@@ -532,19 +653,35 @@
                 <button class="back-btn" id="backBtn">◀ Back</button>
                 <div class="main-title">ℹ️ Info Center</div>
             </div>
-            <div class="main-subtitle">Swipe or click to explore</div>
+            <div class="main-subtitle">✨ Meet Fruttii at the reception desk</div>
         </div>
 
         <!-- ========== CAROUSEL ========== -->
         <div class="carousel-wrapper" id="carouselWrapper">
             <div class="carousel-container" id="carouselContainer">
-                <div class="carousel-track" id="carouselTrack">
-                    <!-- Slides will be inserted by JavaScript -->
+
+                <!-- Static Background -->
+                <img class="static-bg" src="shrine/infocenter-bg.jpg" alt="Reception Desk" id="staticBg">
+
+                <!-- Overlay Container -->
+                <div class="overlay-container" id="overlayContainer">
+                    <!-- Mascot overlays will be inserted here by JavaScript -->
                 </div>
 
+                <!-- Progress Bar -->
+                <div class="progress-bar" id="progressBar"></div>
+
+                <!-- Pause Overlay (shows when paused) -->
+                <div class="pause-overlay" id="pauseOverlay">
+                    <span class="pause-icon">⏸️</span>
+                </div>
+
+                <!-- Pause/Play Button -->
+                <button class="pause-btn" id="pauseBtn">⏸️ Pause</button>
+
                 <!-- Navigation Buttons -->
-                <button class="carousel-btn prev" id="prevBtn" aria-label="Previous slide">❮</button>
-                <button class="carousel-btn next" id="nextBtn" aria-label="Next slide">❯</button>
+                <button class="carousel-btn prev" id="prevBtn" aria-label="Previous">❮</button>
+                <button class="carousel-btn next" id="nextBtn" aria-label="Next">❯</button>
             </div>
 
             <!-- Dots Indicator -->
@@ -555,7 +692,7 @@
         <div class="footer-content-box">
             <div class="footer-inner">
                 <div class="footer-title" id="infoTitle">ℹ️ Info Center</div>
-                <div class="footer-text" id="infoText">Swipe or use the buttons to browse messages from Fruttii.</div>
+                <div class="footer-text" id="infoText">Meet Fruttii at the reception desk...</div>
             </div>
         </div>
 
@@ -581,54 +718,51 @@
         const slides = [{
             id: 1,
             title: "🙏 Welcome to Dharmagarden",
-            message: "We are delighted to have you here. This is a place of peace, learning, and compassion. Explore the temple, visit the shrines, and discover the path of Truth.",
+            message: "We are delighted to have you here. This is a place of peace, learning, and compassion.",
             overlay: "abode/fruttii/fruttiianjali1.png",
-            // overlay can also be an animated GIF:
+            // GIF options: 
             // overlay: "abode/fruttii/fruttiianimated.gif",
-            bgImage: "shrine/infocenter-bg.jpg",
+            // gifLoop: false,  // Set to false for play-once, true for loop (default)
             actionType: "NONE",
-            actionURL: ""
+            actionURL: "",
+            actionLabel: ""
         }, {
             id: 2,
-            title: "🌟 New: Great Buddha Shrine",
-            message: "The Great Buddha Shrine is now open! Visit the main shrine to learn about the offerings and participate in interactive rituals. Click here to visit.",
+            title: "🌟 Great Buddha Shrine",
+            message: "The Great Buddha Shrine is now open! Visit the main shrine to learn about the offerings.",
             overlay: "abode/fruttii/fruttiijumpjoy1.png",
-            bgImage: "shrine/infocenter-bg.jpg",
             actionType: "LINK",
             actionURL: "greatbuddhashrine.html",
             actionLabel: "Visit Shrine"
         }, {
             id: 3,
             title: "🎨 Joyous Heart Gallery",
-            message: "Explore the Joyous Heart Gallery - a collection of artwork, stories, and teachings from the Dharmagarden community. Click here to view.",
+            message: "Explore the Joyous Heart Gallery - artwork, stories, and teachings from the community.",
             overlay: "abode/fruttii/fruttiirunright.png",
-            bgImage: "shrine/infocenter-bg.jpg",
             actionType: "VIDEO",
             actionURL: "https://www.youtube.com/embed/UnQASwhsryM",
             actionLabel: "Watch Video"
         }, {
             id: 4,
             title: "🌿 New Paths Opening Soon",
-            message: "We are expanding the temple grounds with new walking paths, meditation gardens, and learning spaces. Stay tuned for updates!",
+            message: "We are expanding the temple grounds with new walking paths and meditation gardens.",
             overlay: "abode/fruttii/fruttiihirun.png",
-            bgImage: "shrine/infocenter-bg.jpg",
             actionType: "NONE",
-            actionURL: ""
+            actionURL: "",
+            actionLabel: ""
         }, {
             id: 5,
             title: "🍜 Happy Tummy Kitchen",
-            message: "Our community kitchen is now serving virtual meals. Learn about mindful eating and the joy of sharing food with others.",
+            message: "Our community kitchen serves virtual meals. Learn about mindful eating and sharing.",
             overlay: "abode/fruttii/fruttiitummy.png",
-            bgImage: "shrine/infocenter-bg.jpg",
             actionType: "LINK",
             actionURL: "apology.html",
             actionLabel: "Visit Kitchen"
         }, {
             id: 6,
             title: "📚 New Lessons Available",
-            message: "The Sunshine Lotus School has new lessons on compassion, mindfulness, and the teachings of the Buddha. Enroll today!",
+            message: "The Sunshine Lotus School has new lessons on compassion, mindfulness, and more.",
             overlay: "abode/fruttii/fruttiijumpjoy1.png",
-            bgImage: "shrine/infocenter-bg.jpg",
             actionType: "LINK",
             actionURL: "apology.html",
             actionLabel: "View Lessons"
@@ -639,42 +773,43 @@
         // ============================================================
 
         let currentIndex = 0;
-        let isDragging = false;
-        let startX = 0;
-        let currentTranslate = 0;
-        let prevTranslate = 0;
-        let animationID = 0;
-        const track = document.getElementById('carouselTrack');
+        let autoplayTimer = null;
+        let progressTimer = null;
+        let isPaused = false;
+        let progressWidth = 0;
+        let isTransitioning = false;
+        const AUTOPLAY_DELAY = 5000; // 5 seconds
+
+        const overlayContainer = document.getElementById('overlayContainer');
         const dotsContainer = document.getElementById('carouselDots');
+        const progressBar = document.getElementById('progressBar');
+        const pauseOverlay = document.getElementById('pauseOverlay');
+        const pauseBtn = document.getElementById('pauseBtn');
         const container = document.getElementById('carouselContainer');
 
-        // Build slides
-        function buildSlides() {
-            track.innerHTML = '';
+        // Store GIF elements for control
+        let currentGifElement = null;
+
+        // Build overlay images
+        function buildOverlays() {
+            overlayContainer.innerHTML = '';
             slides.forEach((slide, index) => {
-                const slideDiv = document.createElement('div');
-                slideDiv.className = 'carousel-slide';
-                slideDiv.dataset.index = index;
-
-                // Background image
-                const bgImg = document.createElement('img');
-                bgImg.className = 'slide-bg';
-                bgImg.src = slide.bgImage || 'shrine/infocenter-bg.jpg';
-                bgImg.alt = 'Background';
-                slideDiv.appendChild(bgImg);
-
-                // Overlay image (PNG or animated GIF)
-                const overlayImg = document.createElement('img');
-                overlayImg.className = 'slide-overlay';
+                const img = document.createElement('img');
+                img.className = 'mascot-overlay';
                 if (slide.overlay && slide.overlay.toLowerCase().endsWith('.gif')) {
-                    overlayImg.classList.add('gif-overlay');
+                    img.classList.add('gif-overlay');
+                    if (slide.gifLoop === false) {
+                        img.setAttribute('loop', '1');
+                    } else {
+                        img.setAttribute('loop', 'infinite');
+                    }
                 }
-                overlayImg.src = slide.overlay || 'abode/fruttii/fruttiianjali1.png';
-                overlayImg.alt = slide.title;
-                overlayImg.draggable = false;
-                slideDiv.appendChild(overlayImg);
-
-                track.appendChild(slideDiv);
+                img.src = slide.overlay || 'abode/fruttii/fruttiianjali1.png';
+                img.alt = slide.title;
+                img.dataset.index = index;
+                img.draggable = false;
+                if (index === 0) img.classList.add('active');
+                overlayContainer.appendChild(img);
             });
         }
 
@@ -702,37 +837,81 @@
             });
         }
 
+        // Update overlays (fade transition)
+        function updateOverlays(index) {
+            const overlays = overlayContainer.querySelectorAll('.mascot-overlay');
+            overlays.forEach((overlay, i) => {
+                overlay.classList.remove('active', 'exit');
+                if (i === index) {
+                    overlay.classList.add('active');
+                    if (overlay.classList.contains('gif-overlay')) {
+                        const src = overlay.src;
+                        overlay.src = '';
+                        overlay.src = src;
+                    }
+                } else {
+                    overlay.classList.add('exit');
+                }
+            });
+        }
+
         // Go to specific slide
         function goToSlide(index) {
+            if (isTransitioning) return;
             if (index < 0) index = 0;
             if (index >= slides.length) index = slides.length - 1;
+            if (index === currentIndex) return;
+
+            isTransitioning = true;
             currentIndex = index;
-            const slideWidth = container.offsetWidth;
-            currentTranslate = -index * slideWidth;
-            track.style.transform = `translateX(${currentTranslate}px)`;
+            updateOverlays(index);
             updateDots();
             updateFooter(index);
+            
+            // If autoplay is not paused, reset the timer
+            if (!isPaused) {
+                clearAutoplay();
+                startAutoplay();
+            } else {
+                // If paused, update progress bar to show current position
+                progressBar.style.width = '0%';
+                progressBar.classList.add('paused');
+            }
+            
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 600);
         }
 
         // Go to next/previous
         function nextSlide() {
-            goToSlide(currentIndex + 1);
+            if (isTransitioning) return;
+            const next = currentIndex + 1;
+            if (next >= slides.length) {
+                goToSlide(0);
+            } else {
+                goToSlide(next);
+            }
         }
 
         function prevSlide() {
-            goToSlide(currentIndex - 1);
+            if (isTransitioning) return;
+            const prev = currentIndex - 1;
+            if (prev < 0) {
+                goToSlide(slides.length - 1);
+            } else {
+                goToSlide(prev);
+            }
         }
 
-        // Update footer with slide info
+        // Update footer
         function updateFooter(index) {
             const slide = slides[index];
             if (!slide) return;
 
             document.getElementById('infoTitle').innerText = slide.title;
 
-            // Build footer text with optional action button
             let footerHTML = slide.message;
-
             if (slide.actionType !== 'NONE' && slide.actionURL) {
                 const label = slide.actionLabel || (slide.actionType === 'VIDEO' ? '🎬 Watch' : '🔗 Visit');
                 footerHTML += `<br><button class="footer-link" data-action="${slide.actionType}" data-url="${slide.actionURL}">${label}</button>`;
@@ -740,7 +919,6 @@
 
             document.getElementById('infoText').innerHTML = footerHTML;
 
-            // Attach event listeners to footer buttons
             document.querySelectorAll('.footer-link').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -756,48 +934,172 @@
         }
 
         // ============================================================
+        // AUTOPLAY
+        // ============================================================
+
+        function startAutoplay() {
+            if (autoplayTimer) clearTimeout(autoplayTimer);
+            if (progressTimer) clearInterval(progressTimer);
+
+            progressWidth = 0;
+            progressBar.style.width = '0%';
+            progressBar.classList.remove('paused');
+            pauseOverlay.classList.remove('active');
+            pauseBtn.textContent = '⏸️ Pause';
+
+            if (!isPaused) {
+                progressTimer = setInterval(() => {
+                    if (!isPaused && !isTransitioning) {
+                        progressWidth += (100 / (AUTOPLAY_DELAY / 50));
+                        if (progressWidth >= 100) {
+                            progressWidth = 100;
+                            progressBar.style.width = '100%';
+                        } else {
+                            progressBar.style.width = progressWidth + '%';
+                        }
+                    }
+                }, 50);
+            }
+
+            autoplayTimer = setTimeout(() => {
+                if (!isPaused && !isTransitioning) {
+                    nextSlide();
+                }
+            }, AUTOPLAY_DELAY);
+        }
+
+        function clearAutoplay() {
+            if (autoplayTimer) {
+                clearTimeout(autoplayTimer);
+                autoplayTimer = null;
+            }
+            if (progressTimer) {
+                clearInterval(progressTimer);
+                progressTimer = null;
+            }
+        }
+
+        function togglePause(pause) {
+            isPaused = pause;
+            
+            if (isPaused) {
+                // Pause
+                progressBar.classList.add('paused');
+                pauseOverlay.classList.add('active');
+                pauseBtn.textContent = '▶️ Play';
+                clearAutoplay();
+                console.log('⏸️ Autoplay paused');
+            } else {
+                // Play
+                progressBar.classList.remove('paused');
+                pauseOverlay.classList.remove('active');
+                pauseBtn.textContent = '⏸️ Pause';
+                startAutoplay();
+                console.log('▶️ Autoplay resumed');
+            }
+        }
+
+        // ============================================================
+        // PAUSE/PLAY CONTROLS
+        // ============================================================
+
+        // Pause button
+        pauseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            togglePause(!isPaused);
+        });
+
+        // Click on the image area toggles pause
+        container.addEventListener('click', (e) => {
+            // Don't toggle if clicking on buttons or overlay
+            if (e.target.closest('.carousel-btn') || 
+                e.target.closest('.pause-btn') ||
+                e.target.closest('.pause-overlay')) {
+                return;
+            }
+            togglePause(!isPaused);
+        });
+
+        // ============================================================
         // TOUCH / SWIPE HANDLING
         // ============================================================
 
-        function getPositionX(event) {
-            return event.touches ? event.touches[0].clientX : event.clientX;
-        }
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let isDragging = false;
 
-        function onDragStart(event) {
-            if (event.type === 'mousedown' && event.button !== 0) return;
+        container.addEventListener('touchstart', (e) => {
+            if (isTransitioning) return;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
             isDragging = true;
-            startX = getPositionX(event);
-            track.style.transition = 'none';
-            event.preventDefault();
-        }
+            // Pause on touch start so user can read
+            togglePause(true);
+        }, { passive: true });
 
-        function onDragMove(event) {
+        container.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
-            const currentX = getPositionX(event);
-            const diff = currentX - startX;
-            const slideWidth = container.offsetWidth;
-            const newTranslate = currentTranslate + diff;
-            track.style.transform = `translateX(${newTranslate}px)`;
-            event.preventDefault();
-        }
+        }, { passive: true });
 
-        function onDragEnd(event) {
+        container.addEventListener('touchend', (e) => {
             if (!isDragging) return;
             isDragging = false;
-            track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
 
-            const slideWidth = container.offsetWidth;
-            const diff = getPositionX(event) - startX;
-            const threshold = slideWidth * 0.2;
-
-            if (diff < -threshold && currentIndex < slides.length - 1) {
-                goToSlide(currentIndex + 1);
-            } else if (diff > threshold && currentIndex > 0) {
-                goToSlide(currentIndex - 1);
-            } else {
-                goToSlide(currentIndex);
+            if (isTransitioning) {
+                return;
             }
-        }
+
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+
+            // Only swipe if horizontal movement > vertical
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
+                if (diffX < 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+            }
+            // Note: We keep paused after swipe so user can read
+        }, { passive: true });
+
+        // Mouse drag for desktop
+        let mouseDown = false;
+        let mouseStartX = 0;
+
+        container.addEventListener('mousedown', (e) => {
+            if (e.button === 0 && !isTransitioning) {
+                mouseDown = true;
+                mouseStartX = e.clientX;
+                // Pause on drag start
+                togglePause(true);
+            }
+        });
+
+        container.addEventListener('mouseup', (e) => {
+            if (mouseDown) {
+                mouseDown = false;
+                if (!isTransitioning) {
+                    const diffX = e.clientX - mouseStartX;
+                    if (Math.abs(diffX) > 30) {
+                        if (diffX < 0) {
+                            nextSlide();
+                        } else {
+                            prevSlide();
+                        }
+                    }
+                }
+                // Note: We keep paused after mouse drag so user can read
+            }
+        });
+
+        container.addEventListener('mouseleave', () => {
+            if (mouseDown) {
+                mouseDown = false;
+            }
+        });
 
         // ============================================================
         // VIDEO MODAL FUNCTIONS
@@ -820,12 +1122,12 @@
             overlay.style.display = 'flex';
             modal.classList.add('active-modal');
             document.body.style.overflow = 'hidden';
+            togglePause(true);
         }
 
         function playVideo() {
             if (!videoIdToPlay) return;
-            const url =
-            `https://www.youtube.com/embed/${videoIdToPlay}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
+            const url = `https://www.youtube.com/embed/${videoIdToPlay}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
             player.src = url;
             overlay.style.display = 'none';
         }
@@ -838,6 +1140,10 @@
             }, 300);
             document.body.style.overflow = '';
             videoIdToPlay = null;
+            // Resume autoplay after closing video
+            if (isPaused) {
+                togglePause(false);
+            }
         }
 
         playBtn.addEventListener('click', playVideo);
@@ -858,13 +1164,37 @@
             window.location.href = 'index.html';
         });
 
-        document.getElementById('prevBtn').addEventListener('click', prevSlide);
-        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (!isTransitioning) {
+                togglePause(true);
+                prevSlide();
+                // Keep paused after navigation
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (!isTransitioning) {
+                togglePause(true);
+                nextSlide();
+                // Keep paused after navigation
+            }
+        });
 
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') prevSlide();
-            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft' && !isTransitioning) {
+                togglePause(true);
+                prevSlide();
+            }
+            if (e.key === 'ArrowRight' && !isTransitioning) {
+                togglePause(true);
+                nextSlide();
+            }
+            // Space bar toggles pause
+            if (e.key === ' ' || e.key === 'Space') {
+                e.preventDefault();
+                togglePause(!isPaused);
+            }
         });
 
         // ============================================================
@@ -872,48 +1202,25 @@
         // ============================================================
 
         function initCarousel() {
-            buildSlides();
+            buildOverlays();
             buildDots();
-
-            // Set initial position
-            const slideWidth = container.offsetWidth;
-            currentTranslate = 0;
-            track.style.transform = `translateX(0px)`;
-            updateDots();
             updateFooter(0);
+            startAutoplay();
 
-            // Touch events
-            container.addEventListener('touchstart', onDragStart, { passive: false });
-            container.addEventListener('touchmove', onDragMove, { passive: false });
-            container.addEventListener('touchend', onDragEnd, { passive: false });
-
-            // Mouse events
-            container.addEventListener('mousedown', onDragStart);
-            container.addEventListener('mousemove', onDragMove);
-            container.addEventListener('mouseup', onDragEnd);
-            container.addEventListener('mouseleave', onDragEnd);
-
-            // Handle resize
-            let resizeTimeout;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    goToSlide(currentIndex);
-                }, 200);
-            });
+            console.log('ℹ️ Info Center loaded!');
+            console.log('📋 Slides:', slides.length);
+            console.log('🔄 Autoplay: 5 seconds');
+            console.log('💡 Swipe left/right or use buttons');
+            console.log('⏸️ Click image or press Space to pause/play');
+            console.log('📝 GIF loop control: gifLoop: false = play once');
+            console.log('🎯 Pause state preserved after navigation');
         }
 
-        // Wait for DOM ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initCarousel);
         } else {
             initCarousel();
         }
-
-        console.log('ℹ️ Info Center loaded!');
-        console.log('📋 Slides:', slides.length);
-        console.log('💡 Swipe left/right or use buttons to navigate');
-        console.log('🎨 Overlays support PNG and animated GIF');
     </script>
 
 </body>
