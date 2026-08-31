@@ -143,8 +143,8 @@
 
         /* ===== MASCOT OVERLAY ===== */
         .mascot-overlay {
-            max-width: 70%;
-            max-height: 80%;
+            max-width: 50%;
+            max-height: 70%;
             width: auto;
             height: auto;
             object-fit: contain;
@@ -453,7 +453,7 @@
                 font-size: 1.1em;
             }
             .main-subtitle {
-                font-size: 0.7em;
+                font-size: 1em;
             }
             .carousel-btn {
                 width: 30px;
@@ -631,10 +631,10 @@
         <!-- ========== HEADER TITLE ========== -->
         <div class="header-section">
             <div class="header-left">
-                <button class="back-btn" id="backBtn">◀ Back</button>
+                <button class="back-btn" id="backBtn">◀ Back to temple</button>
                 <div class="main-title">ℹ️ Info Center</div>
             </div>
-            <div class="main-subtitle">Hi, I'm Bodhi Fruttii. Swipe me for more messages. Tap me to pause the message.</div>
+            <div class="main-subtitle">Hi, I'm Bodhi Fruttii. <br>Swipe me sideways for more messages. <br>Tap me to pause/autoplay the message.</div>
         </div>
 
         <!-- ========== CAROUSEL ========== -->
@@ -645,9 +645,7 @@
                 <img class="static-bg" src="shrine/infocenter-bg.jpg" alt="Reception Desk" id="staticBg">
 
                 <!-- Overlay Container -->
-                <div class="overlay-container" id="overlayContainer">
-                    <!-- Mascot overlays will be inserted here by JavaScript -->
-                </div>
+                <div class="overlay-container" id="overlayContainer"><img class="mascot-overlay exit" src="abode/fruttii/fruttiianjali1.png" alt="🙏 Welcome to Dharmagarden" data-index="0"><img class="mascot-overlay exit" src="abode/fruttii/fruttiijumpjoy1.png" alt="🌟 Great Buddha Shrine" data-index="1"><img class="mascot-overlay exit" src="abode/fruttii/fruttiirunright.png" alt="🎨 Joyous Heart Gallery" data-index="2"><img class="mascot-overlay active" src="abode/fruttii/fruttiihirun.png" alt="🌿 New Paths Opening Soon" data-index="3"><img class="mascot-overlay exit" src="abode/fruttii/fruttiitummy.png" alt="🍜 Happy Tummy Kitchen" data-index="4"><img class="mascot-overlay exit" src="abode/fruttii/fruttiijumpjoy1.png" alt="📚 New Lessons Available" data-index="5"></div>
 
                 <!-- Progress Bar (subtle) -->
                 <div class="progress-bar" id="progressBar"></div>
