@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>The Story of Prince Siddhartha - Educational Deck</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* --- PAGE BACKGROUND COLOR --- */
+        /* Change the background-color below to change the page background */
+        body {
+            background: #a7a020;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        .deck-wrapper {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            background: brown;
+            border-radius: 24px;
+            padding: 20px 10px;
+            position: relative;
+        }
+
+        /* --- main title (visible on embed) --- */
+        .deck-main-title {
+            text-align: center;
+            font-size: 23px;
+            font-weight: 600;
+            color: #5a3e0e;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            padding: 0 5px;
+        }
+        .deck-main-title span {
+            background: linear-gradient(145deg, #c9a03d, #8B6914);
+            padding: 0 9px;
+            border-radius: 40px;
+            color: white;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(139, 105, 20, 0.2);
+        }
+        @media (max-width: 500px) {
+            .deck-main-title {
+                font-size: 20px;
+            }
+        }
+
+        .deck-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            background: white;
+            min-height: 550px;
+        }
+
+        .deck-slide {
+            display: none;
+            padding: 15px;
+            animation: fadeIn 0.4s ease;
+            background: white;
+        }
+
+        .deck-slide.active-slide {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .slide-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        /* --- image block --- */
+        .slide-image {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .slide-image img {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: block;
+        }
+
+        .slide-image img:hover {
+            transform: scale(1.02);
+        }
+
+        /* --- text block (right side) - NOW with the caption styling --- */
+        .slide-text {
+            flex: 1.5;
+            min-width: 200px;
+            padding: 14px 16px;
+            background: #f8f4ea;
+            border-radius: 16px;
+            border-left: 6px solid #c9a03d;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.02);
+        }
+
+        .slide-text h3 {
+            color: #8B6914;
+            font-size: 22px;
+            margin-bottom: 12px;
+            border-left: 4px solid #D4AF37;
+            padding-left: 15px;
+        }
+
+        .slide-text h4 {
+            color: #C9A03D;
+            font-size: 16px;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+
+        .slide-text p {
+            color: #2c2416;
+            line-height: 1.5;
+            margin-bottom: 13px;
+            font-size: 15px;
+        }
+
+        .slide-text .learn-more {
+            display: inline-block;
+            background: #8B6914;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: background 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slide-text .learn-more:hover {
+            background: #6B4F0E;
+        }
+
+        /* --- CUSTOM TEXT BOX (below watch button) - DIFFERENT BG --- */
+        .slide-caption-box {
+            margin-top: 16px;
+            padding: 14px 16px;
+            background: #eef3f7;
+            border-radius: 16px;
+            border-left: 6px solid #7a9bb5;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.02);
+            font-size: 13px;
+            line-height: 1.3;
+            color: #1e2a36;
+        }
+        .slide-caption-box strong {
+            color: #3d5a73;
+        }
+        .slide-caption-box .caption-sponsor {
+            display: block;
+            margin-top: 8px;
+            font-style: italic;
+            color: #4a5f6b;
+            border-top: 1px dashed #b8ccd9;
+            padding-top: 8px;
+        }
+
+        /* --- nav buttons --- */
+        .nav-btn {
+            position: absolute;
+            top: 20%;
+            transform: translateY(-50%);
+            background: rgba(139, 105, 20, 0.8);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 20;
+        }
+
+        .nav-btn:hover {
+            background: rgba(107, 79, 14, 0.95);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .prev-deck {
+            left: 5px;
+        }
+
+        .next-deck {
+            right: 5px;
+        }
+
+        .deck-dots {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+        }
+
+        .deck-dot {
+            height: 10px;
+            width: 10px;
+            margin: 0 6px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .deck-dot.active-dot {
+            background-color: #8B6914;
+            width: 24px;
+            border-radius: 5px;
+        }
+
+        .page-counter {
+            text-align: center;
+            font-size: 13px;
+            color: #e0e0e0;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        hr {
+            display: block;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            margin-left: auto;
+            margin-right: auto;
+            border-style: inset;
+            border-width: 1px;
+            border-color: #e0d5c0;
+        }
+
+        /* --- inline video modal (Youtube embed) --- */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(3px);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+        .video-modal.active-modal {
+            display: flex;
+        }
+        .video-modal-content {
+            background: #111;
+            border-radius: 24px;
+            max-width: 800px;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            overflow: hidden;
+        }
+        .video-modal-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        .video-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 28px;
+            font-weight: 300;
+            cursor: pointer;
+            border-radius: 40px;
+            width: 44px;
+            height: 44px;
+            backdrop-filter: blur(4px);
+            transition: 0.2s;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .video-modal-close:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+		 /* Centers the entire block on your page */
+		  .link-container {
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    text-align: center;
+		    margin: 20px 0;
+		  }
+
+		  /* Removes default link underline from text */
+		  .link-container a {
+		    text-decoration: none;
+		    display: inline-block;
+		  }
+
+		  /* Controls the size of the image */
+		  .link-container img {
+		    width: 100px;         /* Change this to your preferred width */
+		    height: auto;         /* Maintains original aspect ratio */
+		    display: block;       /* Places text neatly below the image */
+		    margin: 0 auto;       /* Ensures the image itself centers */
+		  }
+
+		  /* Styles the text below the image */
+		  .link-container p {
+		    color: #333333;       /* Changes text color */
+		    font-size: 13px;      /* Changes text size */
+		    font-family: sans-serif;
+		    margin-top: 10px;     /* Space between image and text */
+		  }
+
+        @media (max-width: 700px) {
+            .slide-content {
+                flex-direction: column;
+            }
+            .deck-slide {
+                padding: 20px;
+            }
+            .slide-text h3 {
+                font-size: 18px;
+            }
+            .nav-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .video-modal-content {
+                aspect-ratio: 16 / 9;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="deck-wrapper">
+    <!-- main title visible on embed -->
+    <div class="deck-main-title"><span>The Story of Prince Siddhartha</span></div>
+
+    <button class="nav-btn prev-deck" id="prevDeckBtn">❮</button>
+    <button class="nav-btn next-deck" id="nextDeckBtn">❯</button>
+
+    <div class="deck-container" id="deckContainer">
+        <!-- SLIDE 1 -->
+        <div class="deck-slide">
+            <div class="slide-content">
+                <div class="slide-image">
+                    <img src="https://i.imgur.com/DqKfyYH.jpeg" alt="Here comes the prince" data-video="rGk5iBEKEUc">
+                </div>
+                <div class="slide-text">
+                    <h3>🎀 1. Here comes the prince</h3>
+                    <p>Once upon a long long time, a Bodhisatta descended from Tusita Heaven to the foothills of the Himalaya. He wanted to be born in the Sakya kingdom and chose King Suddhodana and Queen Maya as his parents. The queen dreamt of a white elephant entering her body, and ten months later gave birth in Lumbini Garden. The baby prince immediately took seven steps, with lotus flowers appearing under his feet, and declared: "Chief am I in the world. This is my last birth. I will help all beings."</p>
+                    <div class="learn-more" data-video="rGk5iBEKEUc">🎬 Watch the story →</div>
+                    <!-- CUSTOM TEXT BOX (below watch button) -->
+                    <div class="slide-caption-box">
+                        <strong>🙏 Grateful Thanks</strong><br>
+                        to the following for sponsoring the above video.<br>
+                        🪷Saw Kok Wei🪷
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2 -->
+        <div class="deck-slide">
+            <div class="slide-content">
+                <div class="slide-image">
+                    <img src="https://i.imgur.com/zEAod70.jpeg" alt="Asita the sage" data-video="59CfOX_N4us">
+                </div>
+                <div class="slide-text">
+                    <h3>🧘 2. Asita the sage</h3>
+                    <p>An old sage named Asita heard of the prince's birth and hurried to the palace. He held the baby and saw thirty-two marks of greatness on his body. He smiled and then wept. The king and queen were worried and asked why? He replied that he smiled because the child would become a Buddha one day. But he wept because he would not live to see that day.</p>
+                    <div class="learn-more" data-video="59CfOX_N4us">🎬 Watch the story →</div>
+                    <div class="slide-caption-box">
+                        <strong>🙏 Grateful Thanks</strong><br>
+                        to the following for sponsoring the above video.<br>
+                        🪷Foong Ah Chee IMO Foong Yit & Mdm Lee Yoot Chun🪷Carol Lim🪷Dhammavira Lim🪷Khoo Bun Yu & family🪷Bro Chai Shi Hao🪷Tan Soo Eng🪷
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- SLIDE 3 -->
+        <div class="deck-slide">
+            <div class="slide-content">
+                <div class="slide-image">
+                    <img src="https://i.imgur.com/vn5atYD.jpeg" alt="The prince's name" data-video="ixfXF7QDfpQ">
+                </div>
+                <div class="slide-text">
+                    <h3>📛 3. Naming the Prince</h3>
+                    <p>On the fifth day, a naming ceremony was held. The king invited eight sages to choose a name for the prince. Seven held up two fingers and said, "The prince may become a great king or a Buddha." Only the youngest, Kondanna, held up one finger and said, "He will certainly become a Buddha!" The prince was named Siddhartha, meaning "wish fulfilled." On the seventh day, Queen Maya passed away. Because of the great merit of giving birth to a Buddha, she was reborn in heaven. Her sister, Prajapati, vowed to care for the prince as her own son.</p>
+                    <div class="learn-more" data-video="ixfXF7QDfpQ">🎬 Watch the story →</div>
+                    <!-- CUSTOM TEXT BOX (below watch button) -->
+                    <div class="slide-caption-box">
+                        <strong>🙏 Grateful Thanks</strong><br>
+                        to the following for sponsoring the above video.<br>
+                        🪷Khew Sin Fong imo Jeremy Wong Hoong Hee🪷Fai Chen🪷Saw Kok Wei🪷
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- SLIDE 4 -->
+        <div class="deck-slide">
+            <div class="slide-content">
+                <div class="slide-image">
+                    <img src="https://i.imgur.com/BZexkSo.jpeg" alt="The prince saves a swan" data-video="8kTXmzQhrxQ">
+                </div>
+                <div class="slide-text">
+                    <h3>🦢 4. The prince saves a swan</h3>
+                    <p>Prince Siddhartha was a very kind boy. One day, an injured swan fell before him. The swan was bleeding from an arrow wound. Then his cousin Devadatta ran over and said, "That's my swan! I shot it!" The prince wanted to save the swan and quarreled with Devadatta. They went to the council of elders for judgement. The elders said: "Life should belong to one who saves life and not one who seek to destroy it." The swan was given to Siddhartha. He cared for it until it healed, then set it free into the sky.</p>
+                    <div class="learn-more" data-video="8kTXmzQhrxQ">🎬 Watch the story →</div>
+                    <!-- CUSTOM TEXT BOX (below watch button) -->
+                    <div class="slide-caption-box">
+                        <strong>🙏 Grateful Thanks</strong><br>
+                        to the following for sponsoring the above video.<br>
+                        🪷🙏🙏🙏🪷
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="deck-dots" id="deckDots"></div>
+    <div class="page-counter" id="pageCounter">📖 Page 1 / 13</div>
+<div class="link-container">
+  <a href="https://sites.google.com/view/lidsine-dharmagarden/support-dharmagarden">
+    <img src="https://i.imgur.com/QQH2MzX.png" alt="Support Dharmagarden">
+    <p>Click here to support Dharmagarden</p>
+  </a>
+</div>
+
+<!-- VIDEO MODAL (inline + popup) -->
+<div class="video-modal" id="videoModal">
+    <div class="video-modal-content">
+        <button class="video-modal-close" id="closeModalBtn">✕</button>
+        <iframe id="videoIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----- Carousel logic -----
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.deck-slide');
+        const dotsContainer = document.getElementById('deckDots');
+        const counter = document.getElementById('pageCounter');
+        const prevBtn = document.getElementById('prevDeckBtn');
+        const nextBtn = document.getElementById('nextDeckBtn');
+
+        function initDots() {
+            if (!dotsContainer) return;
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < slides.length; i++) {
+                const dot = document.createElement('span');
+                dot.classList.add('deck-dot');
+                dot.setAttribute('data-index', i);
+                dot.addEventListener('click', () => goToSlide(i));
+                dotsContainer.appendChild(dot);
+            }
+            updateDotsAndCounter();
+        }
+
+        function updateDotsAndCounter() {
+            const dots = document.querySelectorAll('.deck-dot');
+            dots.forEach((dot, idx) => {
+                if (idx === currentSlide) {
+                    dot.classList.add('active-dot');
+                } else {
+                    dot.classList.remove('active-dot');
+                }
+            });
+            if (counter) {
+                counter.innerText = `📖 Page ${currentSlide + 1} / ${slides.length}`;
+            }
+            slides.forEach((slide, idx) => {
+                if (idx === currentSlide) {
+                    slide.classList.add('active-slide');
+                } else {
+                    slide.classList.remove('active-slide');
+                }
+            });
+        }
+
+        function goToSlide(index) {
+            if (index < 0) index = 0;
+            if (index >= slides.length) index = slides.length - 1;
+            currentSlide = index;
+            updateDotsAndCounter();
+        }
+
+        function nextSlide() {
+            let next = currentSlide + 1;
+            if (next >= slides.length) next = 0;
+            goToSlide(next);
+        }
+
+        function prevSlide() {
+            let prev = currentSlide - 1;
+            if (prev < 0) prev = slides.length - 1;
+            goToSlide(prev);
+        }
+
+        if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+        if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') prevSlide();
+            if (e.key === 'ArrowRight') nextSlide();
+        });
+
+        initDots();
+        goToSlide(0);
+
+        // ----- Video modal (inline playback) -----
+        const modal = document.getElementById('videoModal');
+        const iframe = document.getElementById('videoIframe');
+        const closeBtn = document.getElementById('closeModalBtn');
+
+        function openVideo(videoId) {
+            if (!videoId) return;
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+            modal.classList.add('active-modal');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active-modal');
+            iframe.src = '';
+        }
+
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        document.querySelectorAll('img[data-video]').forEach(img => {
+            img.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const vid = this.getAttribute('data-video');
+                if (vid) openVideo(vid);
+            });
+        });
+
+        document.querySelectorAll('.learn-more[data-video]').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const vid = this.getAttribute('data-video');
+                if (vid) openVideo(vid);
+            });
+        });
+
+        window.openVideo = openVideo;
+    })();
+</script>
+</body>
+</html>
