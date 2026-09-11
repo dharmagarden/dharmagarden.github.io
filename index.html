@@ -39,7 +39,7 @@
         /* ========== HEADER TITLE ========== */
         .header-section {
             text-align: center;
-            padding: 10px 0 15px 0;
+            padding: 5px 0 15px 0;
             border-bottom: 2px solid #d4af37;
             margin-bottom: 15px;
             flex-shrink: 0;
@@ -47,7 +47,7 @@
 
         .main-title {
             color: #ffd700;
-            font-size: 1.5em;
+            font-size: 1.2em;
             font-weight: bold;
             text-shadow: 2px 2px 0 #2c2e1e;
             margin: 0;
@@ -56,7 +56,7 @@
 
         .main-subtitle {
             color: #fdf0d8;
-            font-size: 1.0em;
+            font-size: 0.8em;
             margin: 5px 0 0 0;
             opacity: 0.9;
             font-style: italic;
@@ -212,7 +212,7 @@
         }
 
         .footer-text {
-            font-size: 14px;
+            font-size: 12px;
             line-height: 1.4;
             color: #3b2a1f;
         }
@@ -683,7 +683,7 @@
         <!-- ========== HEADER ========== -->
         <div class="header-section">
             <div class="main-title">🏯 Dharmagarden</div>
-            <div class="main-subtitle">Welcome to our humble abode</div>
+            <div class="main-subtitle">Welcome to our humble abode.</div>
         </div>
 
         <!-- ========== MAP CONTAINER ========== -->
@@ -698,7 +698,7 @@
         <div class="footer-content-box">
             <div class="footer-inner">
                 <div class="footer-title" id="infoTitle">🏯 Welcome to Dharmagarden</div>
-                <div class="footer-text" id="infoText">Please tap the glowing gate to enter!</div>
+                <div class="footer-text" id="infoText">Please tap the glowing gate to enter! You can use two fingers to pinch/drag to zoom/scroll around.</div>
             </div>
         </div>
 
@@ -1183,10 +1183,10 @@
         function resetFooter() {
             if (!templeEntered) {
                 document.getElementById("infoTitle").innerText = "🏯 Dharmagarden";
-                document.getElementById("infoText").innerText = "✨ Click the glowing gate to enter!";
+                document.getElementById("infoText").innerText = "✨ Click the glowing gate to enter! You can use two fingers to pinch/drag to zoom/scroll around.";
             } else {
                 document.getElementById("infoTitle").innerText = "🪷 Welcome to Dharmagarden";
-                document.getElementById("infoText").innerText = "👆 Click a location to learn more!";
+                document.getElementById("infoText").innerText = "👆 Click a location to learn more! You can use two fingers to pinch/drag to zoom/scroll around.";
             }
         }
 
@@ -1309,7 +1309,7 @@
                 });
                 
                 document.getElementById('infoTitle').innerText = '🪷 Welcome to Dharmagarden';
-                document.getElementById('infoText').innerText = '👆 Click a location to learn more!';
+                document.getElementById('infoText').innerText = '👆 Click a location to learn more!<br>You can use two fingers to pinch/drag to zoom/scroll around.';
                 console.log('🔄 Temple state restored');
             }
             
