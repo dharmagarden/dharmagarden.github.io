@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- UPDATED: Enable pinch-zoom -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
     <title>Great Buddha Shrine - Dharmagarden</title>
     <style>
         /* ========== RESET & BASE ========== */
@@ -30,6 +31,9 @@
             padding: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             border: 2px solid #d4af37;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
         }
 
         /* ========== HEADER TITLE ========== */
@@ -43,6 +47,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
+            flex-shrink: 0;
         }
 
         .header-left {
@@ -95,6 +100,7 @@
             overflow: hidden;
             border: 2px solid #b8860b;
             box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+            flex-shrink: 0;
         }
 
         .image-container {
@@ -153,6 +159,23 @@
             filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.9)) !important;
         }
 
+        /* Selected sprite state */
+        .menu-sprite.selected {
+            transform: translate(-50%, -50%) scale(1.2) !important;
+            filter: drop-shadow(0 0 35px rgba(255, 215, 0, 1)) drop-shadow(0 0 60px rgba(255, 200, 0, 0.7)) !important;
+            z-index: 50;
+            animation: spriteGlow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes spriteGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.9)) drop-shadow(0 0 50px rgba(255, 200, 0, 0.5));
+            }
+            50% {
+                filter: drop-shadow(0 0 45px rgba(255, 215, 0, 1)) drop-shadow(0 0 80px rgba(255, 200, 0, 0.8));
+            }
+        }
+
         /* Special glow for service hotspots */
         .menu-sprite.service-sprite {
             animation: servicePulse 2s ease-in-out infinite;
@@ -167,7 +190,7 @@
             }
         }
 
-        /* ========== FOOTER / SCROLL BOX ========== */
+        /* ========== FOOTER / DESCRIPTION BOX ========== */
         .footer-content-box {
             margin-top: 15px;
             background: #fdf0d8;
@@ -176,42 +199,104 @@
             padding: 5px;
             width: 100%;
             box-sizing: border-box;
+            flex-shrink: 0;
         }
 
         .footer-inner {
             background: #fef8e7;
             border-radius: 12px;
-            padding: 7px 10px;
-            min-height: 70px;
-            max-height: 120px;
-            overflow-y: auto;
+            padding: 12px 16px;
             font-family: 'Georgia', 'Times New Roman', serif;
             color: #3b2a1f;
-        }
-
-        .footer-inner::-webkit-scrollbar {
-            width: 6px;
-        }
-        .footer-inner::-webkit-scrollbar-track {
-            background: #e8dcc8;
-            border-radius: 4px;
-        }
-        .footer-inner::-webkit-scrollbar-thumb {
-            background: #b8860b;
-            border-radius: 4px;
+            width: 100%;
+            /* No min/max height - expands vertically */
         }
 
         .footer-title {
             color: #b45f06;
             font-size: 18px;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-title .sprite-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            vertical-align: middle;
         }
 
         .footer-text {
             font-size: 15px;
-            line-height: 1.5;
+            line-height: 1.6;
             color: #3b2a1f;
+        }
+
+        .footer-text .feedback-message {
+            color: #b45f06;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        /* Small sprite preview in footer */
+        .footer-sprite-preview {
+            display: none;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .footer-sprite-preview.active {
+            display: block;
+        }
+
+        .footer-sprite-preview img {
+            max-width: 80px;
+            max-height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(212, 175, 55, 0.6));
+            animation: spritePreviewPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes spritePreviewPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Service action button in footer */
+        .footer-action-btn {
+            display: inline-block;
+            margin-top: 10px;
+            background: linear-gradient(145deg, #8B6914, #6B4F0E);
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+            box-shadow: 0 3px 10px rgba(139, 105, 20, 0.3);
+        }
+
+        .footer-action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(139, 105, 20, 0.5);
+        }
+
+        .footer-action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .footer-action-btn.service-action {
+            background: linear-gradient(145deg, #d45a1a, #a8440a);
+        }
+
+        .footer-action-btn.service-action:hover {
+            background: #8a3808;
         }
 
         /* ========== VIDEO MODAL ========== */
@@ -271,7 +356,6 @@
             background: #ff0000;
         }
 
-        /* Video overlay for click-to-play */
         .video-overlay {
             position: absolute;
             inset: 0;
@@ -284,9 +368,11 @@
             cursor: pointer;
             transition: background 0.3s ease;
         }
+
         .video-overlay:hover {
             background: rgba(0,0,0,0.1);
         }
+
         .video-overlay .play-btn {
             font-size: 4rem;
             background: rgba(255,255,255,0.9);
@@ -302,10 +388,12 @@
             align-items: center;
             justify-content: center;
         }
+
         .video-overlay .play-btn:hover {
             transform: scale(1.1);
             background: white;
         }
+
         .video-overlay .play-text {
             color: white;
             font-size: 1.2rem;
@@ -314,215 +402,116 @@
             font-weight: 500;
         }
 
-        /* ========== INFO POPUP ========== */
-        .info-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 9998;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-            box-sizing: border-box;
-            background: rgba(0, 0, 0, 0.3);
-            animation: overlayFadeIn 0.3s ease;
-        }
-
-        .info-overlay.active {
-            display: flex;
-        }
-
-        @keyframes overlayFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .info-popup {
-            background: #fdf0d8;
-            padding: 25px 30px;
-            border-radius: 20px;
-            box-shadow: 0 0 0 3px #d4af37, 0 0 0 6px #8B6914, 0 20px 60px rgba(0,0,0,0.5);
-            max-width: 450px;
-            width: 100%;
-            position: relative;
-            animation: pngPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes pngPopIn {
-            0% { transform: scale(0.7); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .info-popup .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 14px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #8B6914;
-            transition: transform 0.2s;
-            line-height: 1;
-        }
-
-        .info-popup .close-btn:hover {
-            transform: scale(1.2);
-        }
-
-        .info-popup .popup-icon {
-            font-size: 2.5em;
-            text-align: center;
-            margin-bottom: 5px;
-        }
-
-        .info-popup h2 {
-            color: #5a3e0e;
-            font-size: 1.5em;
-            text-align: center;
-            border-bottom: 2px solid #d4af37;
-            padding-bottom: 10px;
-            margin-bottom: 12px;
-            font-family: 'Georgia', serif;
-        }
-
-        .info-popup .popup-description {
-            font-size: 1em;
-            color: #3b2a1f;
-            line-height: 1.5;
-            margin: 10px 0 15px 0;
-            padding: 10px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 12px;
-        }
-
-        .info-popup .popup-action-btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background: #8B6914;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Georgia', serif;
-        }
-
-        .info-popup .popup-action-btn:hover {
-            background: #6B4F0E;
-            transform: scale(1.02);
-        }
-
-        .info-popup .popup-action-btn:active {
-            transform: scale(0.98);
-        }
-
-        .info-popup .hint {
-            text-align: center;
-            font-size: 0.8em;
-            color: #8a7a6a;
-            margin-top: 10px;
-        }
-
-        /* Service popup - special styling */
-        .info-popup.service-popup {
-            border-left: 6px solid #ff6b35;
-        }
-
-        .info-popup.service-popup h2 {
-            border-bottom-color: #ff6b35;
-        }
-
-        .info-popup.service-popup .popup-action-btn {
-            background: linear-gradient(145deg, #d45a1a, #a8440a);
-        }
-
-        .info-popup.service-popup .popup-action-btn:hover {
-            background: #8a3808;
-        }
-
-        /* Mobile: smaller popup */
+        /* ========== RESPONSIVE ========== */
         @media (max-width: 600px) {
+            body {
+                padding: 8px;
+            }
+            .page-wrapper {
+                padding: 10px;
+                border-radius: 16px;
+            }
             .header-section {
                 flex-direction: column;
                 gap: 8px;
+                padding: 6px 0 10px 0;
+                margin-bottom: 10px;
             }
             .header-left {
                 width: 100%;
                 justify-content: space-between;
             }
             .main-title {
-                font-size: 1.2em;
+                font-size: 1.1em;
             }
             .main-subtitle {
+                font-size: 0.7em;
+            }
+            .back-btn {
                 font-size: 0.75em;
+                padding: 4px 10px;
             }
-            .info-popup {
-                padding: 20px;
-                max-width: 95%;
+            .footer-inner {
+                padding: 10px 14px;
             }
-            .info-popup h2 {
-                font-size: 1.2em;
+            .footer-title {
+                font-size: 15px;
             }
-            .info-popup .popup-description {
+            .footer-text {
+                font-size: 13px;
+                line-height: 1.5;
+            }
+            .footer-sprite-preview img {
+                max-width: 60px;
+                max-height: 60px;
+            }
+            .footer-action-btn {
                 font-size: 0.9em;
+                padding: 6px 18px;
             }
             .video-overlay .play-btn {
                 width: 60px;
                 height: 60px;
                 font-size: 3rem;
             }
-            .video-overlay .play-text {
-                font-size: 1rem;
-            }
         }
 
         @media (max-width: 400px) {
-            .info-popup {
-                padding: 15px;
+            .footer-inner {
+                padding: 8px 12px;
             }
-            .info-popup h2 {
-                font-size: 1.0em;
+            .footer-title {
+                font-size: 13px;
             }
-            .info-popup .popup-description {
+            .footer-text {
+                font-size: 12px;
+            }
+            .footer-sprite-preview img {
+                max-width: 50px;
+                max-height: 50px;
+            }
+            .footer-action-btn {
                 font-size: 0.8em;
-            }
-            .info-popup .popup-action-btn {
-                font-size: 0.9em;
-                padding: 10px;
+                padding: 5px 14px;
             }
         }
 
         @media (max-height: 500px) and (orientation: landscape) {
-            .info-popup {
-                max-width: 400px;
-                padding: 15px;
-                max-height: 80vh;
-                overflow-y: auto;
+            body {
+                padding: 6px;
             }
-            .info-popup h2 {
-                font-size: 1.1em;
-                padding-bottom: 6px;
+            .page-wrapper {
+                padding: 8px 12px;
+            }
+            .header-section {
+                padding: 4px 0 8px 0;
                 margin-bottom: 8px;
             }
-            .info-popup .popup-description {
-                font-size: 0.8em;
-                margin: 5px 0 8px 0;
+            .main-title {
+                font-size: 1.0em;
             }
-            .info-popup .popup-action-btn {
-                padding: 8px;
-                font-size: 0.9em;
+            .main-subtitle {
+                font-size: 0.65em;
             }
-            .video-overlay .play-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 2.5rem;
+            .footer-inner {
+                padding: 8px 12px;
+            }
+            .footer-title {
+                font-size: 13px;
+                margin-bottom: 3px;
+            }
+            .footer-text {
+                font-size: 11px;
+                line-height: 1.3;
+            }
+            .footer-sprite-preview img {
+                max-width: 40px;
+                max-height: 40px;
+            }
+            .footer-action-btn {
+                font-size: 0.75em;
+                padding: 4px 14px;
+                margin-top: 5px;
             }
         }
     </style>
@@ -538,37 +527,29 @@
                 <button class="back-btn" id="backBtn">◀ Back to Main Abode</button>
                 <div class="main-title">🪷 Buddha Shrine</div>
             </div>
-            <div class="main-subtitle">Click on an object to learn their significance</div>
+            <div class="main-subtitle">Tap any object to learn its significance</div>
         </div>
 
         <!-- ========== MAP CONTAINER ========== -->
         <div class="menu-map-wrapper">
             <div class="image-container">
-                <img class="menu-bg-image" src="greatbuddhashrine\altarbg.jpg" alt="Great Buddha Shrine Interior" id="bgImage">
+                <img class="menu-bg-image" src="greatbuddhashrine/altarbg.jpg" alt="Great Buddha Shrine Interior" id="bgImage">
                 <div id="spriteLayer"></div>
             </div>
         </div>
 
-        <!-- ========== FOOTER / SCROLL BOX ========== -->
+        <!-- ========== FOOTER / DESCRIPTION BOX ========== -->
         <div class="footer-content-box">
             <div class="footer-inner">
+                <!-- Small sprite preview that appears when an item is selected -->
+                <div class="footer-sprite-preview" id="footerSpritePreview">
+                    <img src="" alt="Selected item" id="footerPreviewImg">
+                </div>
                 <div class="footer-title" id="infoTitle">🪷 Great Buddha Shrine</div>
-                <div class="footer-text" id="infoText">Click on any object to learn its significance, or click on a service to participate.</div>
+                <div class="footer-text" id="infoText">Tap any object on the altar to learn its significance, or tap a service to participate.</div>
             </div>
         </div>
 
-    </div>
-
-    <!-- ========== INFO POPUP ========== -->
-    <div class="info-overlay" id="infoOverlay">
-        <div class="info-popup" id="infoPopup">
-            <button class="close-btn" id="popupCloseBtn">✕</button>
-            <div class="popup-icon" id="popupIcon">🪷</div>
-            <h2 id="popupTitle">Item Name</h2>
-            <div class="popup-description" id="popupDescription">Description goes here...</div>
-            <button class="popup-action-btn" id="popupActionBtn">💡 Learn More</button>
-            <div class="hint">Click button or ✕ to close</div>
-        </div>
     </div>
 
     <!-- ========== VIDEO MODAL ========== -->
@@ -579,16 +560,15 @@
                 <button class="play-btn" id="playBtn">▶</button>
                 <span class="play-text">Click to play</span>
             </div>
-            <iframe id="videoPlayer" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <iframe id="videoPlayer" src="" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
     </div>
 
     <script>
         // ============================================================
-        // CONFIGURATION - REPLACE THESE WITH YOUR URLs
+        // CONFIGURATION
         // ============================================================
 
-        // 🔴 IMPORTANT: Replace these with your actual Google Sites URLs
         const MAIN_PAGE_URL = 'index.html';
         const SHRINE_PAGE_URL = 'greatbuddhashrine.html';
 
@@ -636,8 +616,8 @@
             },
             {
                 id: 4,
-                name: "Medicinal drink",
-                description: "Medicinal Drink.",
+                name: "Medicinal Drink",
+                description: "Medicinal drink offered to the Buddha. In Buddhist tradition, offering medicine represents the wish for all beings to be free from illness and suffering, both physical and mental.",
                 topPercent: 63.7,
                 leftPercent: 66.55,
                 widthPercent: 6.84,
@@ -648,7 +628,7 @@
             },
             {
                 id: 5,
-                name: "💧 Water Offering",
+                name: "Water Offering",
                 description: "Water represents purity, clarity, and the refreshing nature of the Dharma. Offering water symbolizes our wish to purify our minds and cultivate a clear, calm, and compassionate heart. It also represents hospitality and respect.",
                 topPercent: 63.6,
                 leftPercent: 60.2,
@@ -685,7 +665,7 @@
             {
                 id: 8,
                 name: "Prayer Bell",
-                description: "Prayer bell use during puja chanting.",
+                description: "The prayer bell is used during puja chanting. Its sound represents the voice of the Buddha, calling us to mindfulness. Ringing the bell purifies the atmosphere and awakens us from the sleep of ignorance.",
                 topPercent: 73,
                 leftPercent: 14.02,
                 widthPercent: 27.54,
@@ -703,7 +683,7 @@
                 topPercent: 77,
                 leftPercent: 41,
                 widthPercent: 10,
-                spriteIcon: "https://i.imgur.com/PLACEHOLDER_SERVICE_INCENSE.png",
+                spriteIcon: "greatbuddhashrine/incense.png",
                 type: "SERVICE",
                 actionType: "SERVICE",
                 targetURL: "",
@@ -716,7 +696,7 @@
                 topPercent: 77,
                 leftPercent: 48,
                 widthPercent: 10,
-                spriteIcon: "https://i.imgur.com/PLACEHOLDER_SERVICE_WISH.png",
+                spriteIcon: "greatbuddhashrine/flowers.png",
                 type: "SERVICE",
                 actionType: "SERVICE",
                 targetURL: "",
@@ -729,10 +709,10 @@
                 topPercent: 77,
                 leftPercent: 56,
                 widthPercent: 10,
-                spriteIcon: "https://i.imgur.com/PLACEHOLDER_SERVICE_BELL.png",
+                spriteIcon: "greatbuddhashrine/prayerbell.png",
                 type: "SERVICE",
                 actionType: "VIDEO",
-                targetURL: ""
+                targetURL: "https://www.youtube.com/embed/UnQASwhsryM"
             },
             {
                 id: 12,
@@ -741,10 +721,10 @@
                 topPercent: 77,
                 leftPercent: 67,
                 widthPercent: 12,
-                spriteIcon: "https://i.imgur.com/PLACEHOLDER_SERVICE_MEDITATION.png",
+                spriteIcon: "greatbuddhashrine/buddhaimage.png",
                 type: "SERVICE",
                 actionType: "VIDEO",
-                targetURL: ""
+                targetURL: "https://www.youtube.com/embed/UnQASwhsryM"
             }
         ];
 
@@ -753,82 +733,96 @@
         // ============================================================
 
         const templeEntered = sessionStorage.getItem('templeEntered') === 'true';
+        let selectedSprite = null;
+        let currentSprite = null;
+
         console.log('🪷 Temple entered state:', templeEntered);
 
         // ============================================================
-        // NAVIGATION - Back to Main Page (Google Sites Safe)
+        // NAVIGATION - Back to Main Page
         // ============================================================
 
         document.getElementById('backBtn').addEventListener('click', function(e) {
             e.preventDefault();
             console.log('◀ Returning to main temple...');
-            
-            // Method 1: Try to navigate the top window (Google Sites)
+
             try {
-                // Try to go back in history
                 if (window.history.length > 1) {
                     window.history.back();
                 } else {
-                    // If no history, navigate directly
-                    window.top.location.href = MAIN_PAGE_URL;
+                    window.location.href = MAIN_PAGE_URL;
                 }
             } catch (error) {
-                // Method 2: If blocked, try opening in same tab using location
-                console.log('⚠️ Navigation blocked, using fallback...');
                 window.location.href = MAIN_PAGE_URL;
             }
         });
 
         // ============================================================
-        // POPUP FUNCTIONS
+        // SPRITE SELECTION & FOOTER UPDATE
         // ============================================================
 
-        let currentSprite = null;
+        function selectSprite(sprite, imgElement) {
+            // Clear previous selection
+            if (selectedSprite) {
+                selectedSprite.classList.remove('selected');
+            }
 
-        function showInfoPopup(sprite) {
+            // Set new selection
+            selectedSprite = imgElement;
+            imgElement.classList.add('selected');
             currentSprite = sprite;
             
-            const popup = document.getElementById('infoPopup');
+            // Update footer with sprite preview and description
+            updateFooterWithSprite(sprite);
+        }
+
+        function updateFooterWithSprite(sprite) {
+            // Show sprite preview in footer
+            const preview = document.getElementById('footerSpritePreview');
+            const previewImg = document.getElementById('footerPreviewImg');
+            previewImg.src = sprite.spriteIcon;
+            preview.classList.add('active');
+
+            // Update title
+            document.getElementById('infoTitle').innerHTML =
+                `<span>${sprite.name}</span>`;
             
-            document.getElementById('popupIcon').textContent = sprite.name.split(' ')[0] || '🪷';
-            document.getElementById('popupTitle').textContent = sprite.name;
-            document.getElementById('popupDescription').textContent = sprite.description;
+            // Update description based on type
+            const infoText = document.getElementById('infoText');
             
             if (sprite.type === 'SERVICE') {
-                popup.classList.add('service-popup');
-                document.getElementById('popupActionBtn').textContent = '🙏 Participate';
+                // Service - show description + participate button
+                infoText.innerHTML = `
+                    ${sprite.description}
+                    <br>
+                    <button class="footer-action-btn service-action" id="footerActionBtn">
+                        🙏 Participate
+                    </button>
+                `;
             } else {
-                popup.classList.remove('service-popup');
-                document.getElementById('popupActionBtn').textContent = '💡 Learn More';
+                // Regular item - just show description
+                infoText.innerHTML = sprite.description;
             }
             
-            const overlay = document.getElementById('infoOverlay');
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            
-            console.log('📖 Showing info for:', sprite.name);
+            // Attach event listener to the action button
+            const actionBtn = document.getElementById('footerActionBtn');
+            if (actionBtn) {
+                actionBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    handleFooterAction(sprite);
+                });
+            }
         }
 
-        function closeInfoPopup() {
-            const overlay = document.getElementById('infoOverlay');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-            console.log('❌ Info popup closed');
-        }
-
-        function handlePopupAction() {
-            if (!currentSprite) return;
+        function handleFooterAction(sprite) {
+            console.log('🎯 Action on:', sprite.name);
             
-            console.log('🎯 Action on:', currentSprite.name);
-            
-            if (currentSprite.actionType === 'INFO') {
-                closeInfoPopup();
-                showFeedback('📖 ' + currentSprite.name + ' - Thank you for learning! 🙏');
-            } else if (currentSprite.actionType === 'SERVICE') {
-                handleService(currentSprite);
-            } else if (currentSprite.actionType === 'VIDEO') {
-                closeInfoPopup();
-                openVideoModal(currentSprite.targetURL);
+            if (sprite.actionType === 'SERVICE') {
+                handleService(sprite);
+            } else if (sprite.actionType === 'VIDEO') {
+                openVideoModal(sprite.targetURL);
+            } else if (sprite.actionType === 'INFO') {
+                showFeedback('📖 ' + sprite.name + ' - Thank you for learning! 🙏');
             }
         }
 
@@ -837,8 +831,6 @@
         // ============================================================
 
         function handleService(sprite) {
-            closeInfoPopup();
-            
             switch(sprite.serviceAction) {
                 case 'incense':
                     showFeedback('🪔 Lighting incense... May your wishes rise like smoke to the heavens. 🙏');
@@ -852,13 +844,36 @@
         }
 
         function showFeedback(message) {
+            const preview = document.getElementById('footerSpritePreview');
+            preview.classList.remove('active');
+
             document.getElementById('infoTitle').innerText = '🙏 Blessings';
-            document.getElementById('infoText').innerText = message;
+            document.getElementById('infoText').innerHTML = `<span class="feedback-message">${message}</span>`;
+
+            // Clear selection
+            if (selectedSprite) {
+                selectedSprite.classList.remove('selected');
+                selectedSprite = null;
+            }
+            currentSprite = null;
             
             setTimeout(() => {
-                document.getElementById('infoTitle').innerText = '🪷 Great Buddha Shrine';
-                document.getElementById('infoText').innerText = 'Click on any item on the altar to learn its significance, or click on a service to participate.';
+                resetFooter();
             }, 5000);
+        }
+
+        function resetFooter() {
+            const preview = document.getElementById('footerSpritePreview');
+            preview.classList.remove('active');
+
+            document.getElementById('infoTitle').innerText = '🪷 Great Buddha Shrine';
+            document.getElementById('infoText').innerText = 'Tap any object on the altar to learn its significance, or tap a service to participate.';
+
+            if (selectedSprite) {
+                selectedSprite.classList.remove('selected');
+                selectedSprite = null;
+            }
+            currentSprite = null;
         }
 
         // ============================================================
@@ -874,6 +889,11 @@
         let videoIdToPlay = null;
 
         function openVideoModal(embedURL) {
+            if (!embedURL) {
+                console.warn('⚠️ No video URL provided');
+                return;
+            }
+
             let videoId = embedURL;
             if (embedURL.includes('youtube.com/embed/')) {
                 videoId = embedURL.split('/embed/')[1].split('?')[0];
@@ -944,7 +964,11 @@
                 }
 
                 img.addEventListener("mouseenter", () => {
-                    updateFooter(sprite.name, sprite.description);
+                    // Hover shows name only
+                    if (!selectedSprite) {
+                        document.getElementById('infoTitle').innerText = sprite.name;
+                        document.getElementById('infoText').innerText = 'Click to learn more...';
+                    }
                 });
 
                 img.addEventListener("click", (e) => {
@@ -953,14 +977,14 @@
                     
                     console.log('🖱️ Click on:', sprite.name);
                     
-                    if (document.getElementById('infoOverlay').classList.contains('active')) {
-                        closeInfoPopup();
+                    // If same sprite clicked again, deselect
+                    if (selectedSprite === img) {
+                        resetFooter();
+                        return;
                     }
                     
-                    setTimeout(() => {
-                        showInfoPopup(sprite);
-                        updateFooter(sprite.name, 'Click the button to continue');
-                    }, 50);
+                    // Select this sprite
+                    selectSprite(sprite, img);
                     
                     img.classList.add('touched');
                     setTimeout(() => {
@@ -985,22 +1009,12 @@
             document.getElementById("infoText").innerText = text;
         }
 
-        // Popup event listeners
-        document.getElementById('popupCloseBtn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            closeInfoPopup();
-            currentSprite = null;
-        });
-
-        document.getElementById('popupActionBtn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            handlePopupAction();
-        });
-
-        document.getElementById('infoOverlay').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('infoOverlay')) {
-                closeInfoPopup();
-                currentSprite = null;
+        // Click outside to deselect
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.menu-sprite') &&
+                !e.target.closest('.footer-content-box') &&
+                !e.target.closest('.video-modal')) {
+                resetFooter();
             }
         });
 
@@ -1014,16 +1028,15 @@
             console.log('🪷 Great Buddha Shrine loaded!');
             console.log('💡 Click on altar items to learn their significance');
             console.log('💡 Click on services to participate in rituals');
-            console.log('📝 Replace placeholder image URLs with your actual images');
+            console.log('🔍 Pinch-zoom enabled for mobile');
             console.log('🏯 Temple entered state:', templeEntered);
             console.log('🔗 MAIN_PAGE_URL:', MAIN_PAGE_URL);
             
             if (templeEntered) {
-                document.getElementById('infoText').innerText = '🪷 Welcome to the Great Buddha Shrine. Click on any item to learn more.';
+                document.getElementById('infoText').innerText = '🪷 Welcome to the Great Buddha Shrine. Tap any item to learn more.';
             }
         }, 100);
     </script>
 
 </body>
 </html>
-
